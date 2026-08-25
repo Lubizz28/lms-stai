@@ -14,20 +14,15 @@ import {
   FileQuestion, 
   Image as ImageIcon, 
   ChevronRight, 
-  Sparkles, 
-  GraduationCap
+  Sparkles
 } from 'lucide-react';
-import { Card } from '../../components/ui/Card';
-import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
-import { Table, Column } from '../../components/ui/Table';
 import { Pagination } from '../../components/ui/Pagination';
 import { BankQuestion, QuestionType, QuestionDifficulty, ImportQuestionInput, QuizOption } from '../../types/quiz';
 import { quizService } from '../../services/quizService';
 import { useToast } from '../../components/feedback/ToastContext';
-import { KAMUS_UI } from '../../constants/dictionary';
 import { ExportDropdown, DataImportModal, ExportConfig, BulkImportResult } from '../../components/export-import';
 import { QUESTION_BANK_IMPORT_SCHEMA } from '../../constants/exportImportSchemas';
 import { exportQuestionBankExcelTemplate } from '../../utils/excelUtils';
@@ -36,27 +31,39 @@ export interface BankSoalPageProps {
   onBack?: () => void;
 }
 
-export const COURSES_INFO: Record<string, { name: string; prodi: string; credits: number; semester: number }> = {
-  'PAI-301': { name: 'Ushul Fiqih & Qawaid Fiqhiyyah', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3 },
-  'PAI-204': { name: 'Ulumul Qur\'an & Tafsir Tematik', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 2 },
-  'PAI-205': { name: 'Ulumul Hadits & Kritik Sanad', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2 },
-  'PAI-302': { name: 'Pengembangan Kurikulum PAI', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3 },
-  'PAI-102': { name: 'Ilmu Pendidikan Islam', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 1 },
-  'TAR-204': { name: 'Sejarah Peradaban Islam', prodi: 'Fakultas Tarbiyah', credits: 2, semester: 2 },
-  'TBI-201': { name: 'Bahasa Arab Komunikatif & Qira\'ah', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2 },
-  'MPI-101': { name: 'Manajemen Pendidikan Islam', prodi: 'Manajemen Pendidikan Islam', credits: 3, semester: 1 },
-  'EKS-201': { name: 'Fiqih Muamalah & Ekonomi Syariah', prodi: 'Ekonomi Syariah', credits: 3, semester: 2 },
+export const COURSES_INFO: Record<string, { name: string; prodi: string; credits: number; semester: number; icon: string }> = {
+  'PAI-301': { name: 'Ushul Fiqih & Qawaid Fiqhiyyah', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3, icon: '⚖️' },
+  'PAI-204': { name: 'Ulumul Qur\'an & Tafsir Tematik', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 2, icon: '📖' },
+  'PAI-205': { name: 'Ulumul Hadits & Kritik Sanad', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2, icon: '📜' },
+  'PAI-302': { name: 'Pengembangan Kurikulum PAI', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3, icon: '🎓' },
+  'PAI-102': { name: 'Ilmu Pendidikan Islam', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 1, icon: '🕌' },
+  'TAR-204': { name: 'Sejarah Peradaban Islam', prodi: 'Fakultas Tarbiyah', credits: 2, semester: 2, icon: '🏛️' },
+  'TBI-201': { name: 'Bahasa Arab Komunikatif & Qira\'ah', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2, icon: '🗣️' },
+  'MPI-101': { name: 'Manajemen Pendidikan Islam', prodi: 'Manajemen Pendidikan Islam', credits: 3, semester: 1, icon: '📋' },
+  'EKS-201': { name: 'Fiqih Muamalah & Ekonomi Syariah', prodi: 'Ekonomi Syariah', credits: 3, semester: 2, icon: '💰' },
 };
 
-export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
+// Helper: Tipe label yang mudah dibaca user
+const TIPE_LABEL: Record<string, string> = {
+  'PILIHAN_GANDA': 'Pilihan Ganda',
+  'BENAR_SALAH': 'Benar / Salah',
+  'JAWABAN_SINGKAT': 'Isian Singkat',
+  'ESAI': 'Esai'
+};
+
+const DIFFICULTY_CONFIG: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  'MUDAH': { label: 'Mudah', color: '#166534', bg: '#dcfce7', border: '#bbf7d0' },
+  'SEDANG': { label: 'Sedang', color: '#92400e', bg: '#fef3c7', border: '#fde68a' },
+  'SULIT': { label: 'Sulit', color: '#991b1b', bg: '#fee2e2', border: '#fecaca' }
+};
+
+export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) => {
   const toast = useToast();
   const [questions, setQuestions] = useState<BankQuestion[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   
-  // Search & Filter for Course Catalog (Level 1)
+  // Search & Filter
   const [courseSearchQuery, setCourseSearchQuery] = useState('');
-
-  // Search & Filter for Questions List (Level 2)
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('SEMUA');
   const [filterDifficulty, setFilterDifficulty] = useState('SEMUA');
@@ -71,11 +78,11 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
   const [previewShowAnswer, setPreviewShowAnswer] = useState(false);
   const [importModal, setImportModal] = useState(false);
 
-  // Pagination State
+  // Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
-  // Form states untuk Tambah/Edit Manual
+  // Form states
   const [courseCode, setCourseCode] = useState('PAI-301');
   const [topic, setTopic] = useState('');
   const [qType, setQType] = useState<QuestionType>('PILIHAN_GANDA');
@@ -86,8 +93,6 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
   const [points, setPoints] = useState(20);
   const [explanation, setExplanation] = useState('');
   const [tags, setTags] = useState('');
-
-  // Pilihan Ganda Form states (5 Opsi A, B, C, D, E dengan Teks & Gambar)
   const [optA, setOptA] = useState('');
   const [optAImage, setOptAImage] = useState('');
   const [optB, setOptB] = useState('');
@@ -99,23 +104,16 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
   const [optE, setOptE] = useState('');
   const [optEImage, setOptEImage] = useState('');
   const [correctOptIndex, setCorrectOptIndex] = useState(0);
-
   const [shortAnswer, setShortAnswer] = useState('');
   const [essayRubric, setEssayRubric] = useState('');
 
   const loadQuestions = () => {
-    const list = quizService.getBankQuestions();
-    setQuestions(list);
+    setQuestions(quizService.getBankQuestions());
   };
 
-  useEffect(() => {
-    loadQuestions();
-  }, []);
+  useEffect(() => { loadQuestions(); }, []);
 
-  // Auto reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, filterType, filterDifficulty, selectedCourse]);
+  useEffect(() => { setCurrentPage(1); }, [searchQuery, filterType, filterDifficulty, selectedCourse]);
 
   const hasActiveFilters = searchQuery !== '' || filterType !== 'SEMUA' || filterDifficulty !== 'SEMUA';
 
@@ -126,805 +124,398 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     setCurrentPage(1);
   };
 
-  // Helper Upload Gambar Soal (Base64)
+  // Upload handlers
   const handleQuestionImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.warning('Ukuran Terlalu Besar', 'Maksimal ukuran file gambar adalah 5MB.');
-      return;
-    }
+    if (file.size > 5 * 1024 * 1024) { toast.warning('Ukuran Terlalu Besar', 'Maksimal 5MB.'); return; }
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      if (typeof ev.target?.result === 'string') {
-        setImageUrl(ev.target.result);
-        toast.success('Gambar Soal Dimuat', 'Gambar ilustrasi butir soal berhasil diunggah.');
-      }
-    };
+    reader.onload = (ev) => { if (typeof ev.target?.result === 'string') { setImageUrl(ev.target.result); toast.success('Berhasil', 'Gambar soal berhasil diunggah.'); } };
     reader.readAsDataURL(file);
   };
 
-  // Helper Upload Gambar Opsi Pilihan Ganda (Base64)
-  const handleOptionImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImg: (val: string) => void, optLabel: string) => {
+  const handleOptionImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImg: (v: string) => void, label: string) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      toast.warning('Ukuran Terlalu Besar', 'Maksimal ukuran file gambar opsi adalah 5MB.');
-      return;
-    }
+    if (file.size > 5 * 1024 * 1024) { toast.warning('Ukuran Terlalu Besar', 'Maksimal 5MB.'); return; }
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      if (typeof ev.target?.result === 'string') {
-        setImg(ev.target.result);
-        toast.success(`Gambar Opsi ${optLabel} Dimuat`, `Gambar untuk Opsi ${optLabel} berhasil diunggah.`);
-      }
-    };
+    reader.onload = (ev) => { if (typeof ev.target?.result === 'string') { setImg(ev.target.result); toast.success('Berhasil', `Gambar opsi ${label} berhasil diunggah.`); } };
     reader.readAsDataURL(file);
   };
 
-  // Group questions by course code for summary stats
+  // Stats per course
   const courseStats = useMemo(() => {
-    const stats: Record<string, { 
-      code: string; 
-      name: string; 
-      prodi: string;
-      credits: number;
-      semester: number;
-      total: number; 
-      pg: number; 
-      bs: number; 
-      js: number; 
-      esai: number;
-      mudah: number;
-      sedang: number;
-      sulit: number;
-    }> = {};
-    
-    // Add known courses first
+    const stats: Record<string, { code: string; name: string; prodi: string; credits: number; semester: number; icon: string; total: number; pg: number; bs: number; js: number; esai: number }> = {};
     Object.entries(COURSES_INFO).forEach(([code, info]) => {
-      stats[code] = { 
-        code, 
-        name: info.name, 
-        prodi: info.prodi,
-        credits: info.credits,
-        semester: info.semester,
-        total: 0, 
-        pg: 0, 
-        bs: 0, 
-        js: 0, 
-        esai: 0,
-        mudah: 0,
-        sedang: 0,
-        sulit: 0
-      };
+      stats[code] = { code, name: info.name, prodi: info.prodi, credits: info.credits, semester: info.semester, icon: info.icon, total: 0, pg: 0, bs: 0, js: 0, esai: 0 };
     });
-
     questions.forEach((q) => {
       const code = q.courseCode || 'LAINNYA';
-      if (!stats[code]) {
-        stats[code] = { 
-          code, 
-          name: COURSES_INFO[code]?.name || 'Mata Kuliah Pilihan', 
-          prodi: COURSES_INFO[code]?.prodi || 'Program Studi Terkait',
-          credits: COURSES_INFO[code]?.credits || 2,
-          semester: COURSES_INFO[code]?.semester || 1,
-          total: 0, 
-          pg: 0, 
-          bs: 0, 
-          js: 0, 
-          esai: 0,
-          mudah: 0,
-          sedang: 0,
-          sulit: 0
-        };
-      }
+      if (!stats[code]) stats[code] = { code, name: 'Lainnya', prodi: '-', credits: 2, semester: 1, icon: '📝', total: 0, pg: 0, bs: 0, js: 0, esai: 0 };
       stats[code].total += 1;
       if (q.type === 'PILIHAN_GANDA') stats[code].pg += 1;
       if (q.type === 'BENAR_SALAH') stats[code].bs += 1;
       if (q.type === 'JAWABAN_SINGKAT') stats[code].js += 1;
       if (q.type === 'ESAI') stats[code].esai += 1;
-
-      if (q.difficulty === 'MUDAH') stats[code].mudah += 1;
-      if (q.difficulty === 'SEDANG') stats[code].sedang += 1;
-      if (q.difficulty === 'SULIT') stats[code].sulit += 1;
     });
-
     return stats;
   }, [questions]);
 
-  // Overall Question Bank Metrics
-  const globalMetrics = useMemo(() => {
-    const totalCourses = Object.keys(courseStats).length;
-    const totalQuestions = questions.length;
-    const totalPG = questions.filter(q => q.type === 'PILIHAN_GANDA').length;
-    const totalBS = questions.filter(q => q.type === 'BENAR_SALAH').length;
-    const totalJS = questions.filter(q => q.type === 'JAWABAN_SINGKAT').length;
-    const totalEsai = questions.filter(q => q.type === 'ESAI').length;
+  const globalMetrics = useMemo(() => ({
+    totalCourses: Object.keys(courseStats).length,
+    totalQuestions: questions.length,
+  }), [questions, courseStats]);
 
-    return {
-      totalCourses,
-      totalQuestions,
-      totalPG,
-      totalBS,
-      totalJS,
-      totalEsai
-    };
-  }, [questions, courseStats]);
-
-  // Filtered Course Catalog (Level 1)
   const filteredCourses = useMemo(() => {
     return Object.values(courseStats).filter(st => {
       const q = courseSearchQuery.toLowerCase().trim();
       if (!q) return true;
-      return (
-        st.code.toLowerCase().includes(q) ||
-        st.name.toLowerCase().includes(q) ||
-        st.prodi.toLowerCase().includes(q)
-      );
+      return st.code.toLowerCase().includes(q) || st.name.toLowerCase().includes(q) || st.prodi.toLowerCase().includes(q);
     });
   }, [courseStats, courseSearchQuery]);
 
-  // Open Create Modal
+  // Form handlers
   const handleOpenCreate = () => {
     setEditingQuestionId(null);
     setCourseCode(selectedCourse || 'PAI-301');
-    setTopic('');
-    setQType('PILIHAN_GANDA');
-    setDifficulty('SEDANG');
-    setQuestionText('');
-    setArabicText('');
-    setImageUrl('');
-    setPoints(20);
-    setOptA('');
-    setOptAImage('');
-    setOptB('');
-    setOptBImage('');
-    setOptC('');
-    setOptCImage('');
-    setOptD('');
-    setOptDImage('');
-    setOptE('');
-    setOptEImage('');
-    setCorrectOptIndex(0);
-    setShortAnswer('');
-    setEssayRubric('');
-    setExplanation('');
-    setTags('');
+    setTopic(''); setQType('PILIHAN_GANDA'); setDifficulty('SEDANG');
+    setQuestionText(''); setArabicText(''); setImageUrl(''); setPoints(20);
+    setOptA(''); setOptAImage(''); setOptB(''); setOptBImage('');
+    setOptC(''); setOptCImage(''); setOptD(''); setOptDImage('');
+    setOptE(''); setOptEImage(''); setCorrectOptIndex(0);
+    setShortAnswer(''); setEssayRubric(''); setExplanation(''); setTags('');
     setEditModal(true);
   };
 
-  // Open Edit Modal
   const handleOpenEdit = (q: BankQuestion) => {
     setEditingQuestionId(q.id);
     setCourseCode(q.courseCode || selectedCourse || 'PAI-301');
-    setTopic(q.topic || '');
-    setQType(q.type || 'PILIHAN_GANDA');
-    setDifficulty(q.difficulty || 'SEDANG');
-    setQuestionText(q.questionText || '');
-    setArabicText(q.arabicText || '');
-    setImageUrl(q.imageUrl || '');
-    setPoints(q.defaultPoints || 20);
-    setExplanation(q.explanation || '');
+    setTopic(q.topic || ''); setQType(q.type || 'PILIHAN_GANDA');
+    setDifficulty(q.difficulty || 'SEDANG'); setQuestionText(q.questionText || '');
+    setArabicText(q.arabicText || ''); setImageUrl(q.imageUrl || '');
+    setPoints(q.defaultPoints || 20); setExplanation(q.explanation || '');
     setTags((q.tags || []).join(', '));
-
     if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
       const opts = q.options || [];
-      setOptA(opts[0]?.text || '');
-      setOptAImage(opts[0]?.imageUrl || '');
-      setOptB(opts[1]?.text || '');
-      setOptBImage(opts[1]?.imageUrl || '');
-      setOptC(opts[2]?.text || '');
-      setOptCImage(opts[2]?.imageUrl || '');
-      setOptD(opts[3]?.text || '');
-      setOptDImage(opts[3]?.imageUrl || '');
-      setOptE(opts[4]?.text || '');
-      setOptEImage(opts[4]?.imageUrl || '');
-      const correctIdx = opts.findIndex((o) => o.isCorrect);
-      setCorrectOptIndex(correctIdx >= 0 ? correctIdx : 0);
+      setOptA(opts[0]?.text || ''); setOptAImage(opts[0]?.imageUrl || '');
+      setOptB(opts[1]?.text || ''); setOptBImage(opts[1]?.imageUrl || '');
+      setOptC(opts[2]?.text || ''); setOptCImage(opts[2]?.imageUrl || '');
+      setOptD(opts[3]?.text || ''); setOptDImage(opts[3]?.imageUrl || '');
+      setOptE(opts[4]?.text || ''); setOptEImage(opts[4]?.imageUrl || '');
+      const ci = opts.findIndex(o => o.isCorrect);
+      setCorrectOptIndex(ci >= 0 ? ci : 0);
     } else {
-      setOptA('');
-      setOptAImage('');
-      setOptB('');
-      setOptBImage('');
-      setOptC('');
-      setOptCImage('');
-      setOptD('');
-      setOptDImage('');
-      setOptE('');
-      setOptEImage('');
-      setCorrectOptIndex(0);
+      setOptA(''); setOptAImage(''); setOptB(''); setOptBImage('');
+      setOptC(''); setOptCImage(''); setOptD(''); setOptDImage('');
+      setOptE(''); setOptEImage(''); setCorrectOptIndex(0);
     }
-
-    setShortAnswer(q.correctShortAnswer || '');
-    setEssayRubric(q.essayRubric || '');
+    setShortAnswer(q.correctShortAnswer || ''); setEssayRubric(q.essayRubric || '');
     setEditModal(true);
   };
 
-  // Confirm Delete
-  const handleOpenDelete = (q: BankQuestion) => {
-    setDeletingQuestion(q);
-    setDeleteConfirmModal(true);
-  };
+  const handleOpenDelete = (q: BankQuestion) => { setDeletingQuestion(q); setDeleteConfirmModal(true); };
 
   const handleExecuteDelete = () => {
     if (!deletingQuestion) return;
     try {
       quizService.deleteBankQuestion(deletingQuestion.id);
-      loadQuestions();
-      setDeleteConfirmModal(false);
-      setDeletingQuestion(null);
-      toast.success('Soal Berhasil Dihapus', 'Butir soal telah dihapus dari repositori Bank Soal.');
-    } catch (err: any) {
-      toast.danger('Gagal Menghapus Soal', err.message);
-    }
+      loadQuestions(); setDeleteConfirmModal(false); setDeletingQuestion(null);
+      toast.success('Berhasil Dihapus', 'Soal telah dihapus dari Bank Soal.');
+    } catch (err: any) { toast.danger('Gagal', err.message); }
   };
 
-  // Save (Create or Update) Question
   const handleSaveQuestion = (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      if (points > 100) {
-        toast.warning(
-          'Peringatan Bobot Soal',
-          `Bobot poin butir soal (${points} poin) melebihi batas standar maksimal 100 poin.`
-        );
-      }
-      if (points < 1) {
-        toast.danger('Bobot Tidak Valid', 'Bobot poin butir soal minimal adalah 1 poin.');
-        return;
-      }
+      if (points > 100) toast.warning('Peringatan', `Bobot (${points} poin) melebihi batas 100.`);
+      if (points < 1) { toast.danger('Tidak Valid', 'Bobot minimal 1 poin.'); return; }
 
       let options: QuizOption[] | undefined;
-
       if (qType === 'BENAR_SALAH') {
         options = [
           { id: `opt-${Date.now()}-1`, text: 'Benar', isCorrect: correctOptIndex === 0 },
           { id: `opt-${Date.now()}-2`, text: 'Salah', isCorrect: correctOptIndex === 1 },
         ];
       } else if (qType === 'PILIHAN_GANDA') {
-        const rawOptions = [
+        const raw = [
           { id: `opt-${Date.now()}-1`, text: optA.trim(), imageUrl: optAImage.trim() || undefined, isCorrect: correctOptIndex === 0 },
           { id: `opt-${Date.now()}-2`, text: optB.trim(), imageUrl: optBImage.trim() || undefined, isCorrect: correctOptIndex === 1 },
           { id: `opt-${Date.now()}-3`, text: optC.trim(), imageUrl: optCImage.trim() || undefined, isCorrect: correctOptIndex === 2 },
           { id: `opt-${Date.now()}-4`, text: optD.trim(), imageUrl: optDImage.trim() || undefined, isCorrect: correctOptIndex === 3 },
           { id: `opt-${Date.now()}-5`, text: optE.trim(), imageUrl: optEImage.trim() || undefined, isCorrect: correctOptIndex === 4 },
-        ].filter((o) => o.text !== '' || !!o.imageUrl);
-
-        const mappedOptions = rawOptions.map((o, idx) => ({
-          ...o,
-          text: o.text || `Pilihan ${String.fromCharCode(65 + idx)}`
-        }));
-
-        if (mappedOptions.length < 2) {
-          toast.warning('Opsi Kurang', 'Soal pilihan ganda minimal harus memiliki 2 opsi jawaban (teks atau gambar).');
-          return;
-        }
-
-        options = mappedOptions;
+        ].filter(o => o.text !== '' || !!o.imageUrl);
+        const mapped = raw.map((o, i) => ({ ...o, text: o.text || `Pilihan ${String.fromCharCode(65+i)}` }));
+        if (mapped.length < 2) { toast.warning('Opsi Kurang', 'Minimal 2 opsi jawaban.'); return; }
+        options = mapped;
       }
 
-      const questionPayload = {
-        courseCode,
-        topic: topic.trim() || 'Umum',
-        type: qType,
-        difficulty,
-        questionText: questionText.trim(),
-        arabicText: arabicText.trim() || undefined,
-        imageUrl: imageUrl.trim() || undefined,
-        options,
+      const payload = {
+        courseCode, topic: topic.trim() || 'Umum', type: qType, difficulty,
+        questionText: questionText.trim(), arabicText: arabicText.trim() || undefined,
+        imageUrl: imageUrl.trim() || undefined, options,
         correctShortAnswer: qType === 'JAWABAN_SINGKAT' ? shortAnswer.trim() : undefined,
         essayRubric: qType === 'ESAI' ? essayRubric.trim() : undefined,
-        defaultPoints: points,
-        explanation: explanation.trim() || undefined,
-        tags: tags.split(',').map((t) => t.trim()).filter(Boolean)
+        defaultPoints: points, explanation: explanation.trim() || undefined,
+        tags: tags.split(',').map(t => t.trim()).filter(Boolean)
       };
 
       if (editingQuestionId) {
-        quizService.updateBankQuestion(editingQuestionId, questionPayload);
-        toast.success('Soal Diperbarui', 'Perubahan butir soal berhasil disimpan.');
+        quizService.updateBankQuestion(editingQuestionId, payload);
+        toast.success('Diperbarui', 'Perubahan soal berhasil disimpan.');
       } else {
-        quizService.addBankQuestion(questionPayload);
-        toast.success('Soal Ditambahkan', 'Butir soal baru berhasil disimpan ke Bank Soal.');
+        quizService.addBankQuestion(payload);
+        toast.success('Ditambahkan', 'Soal baru berhasil disimpan ke Bank Soal.');
       }
-
-      loadQuestions();
-      setEditModal(false);
-      setEditingQuestionId(null);
-    } catch (err: any) {
-      toast.danger('Gagal Menyimpan Soal', err.message);
-    }
+      loadQuestions(); setEditModal(false); setEditingQuestionId(null);
+    } catch (err: any) { toast.danger('Gagal', err.message); }
   };
 
-  // Handler Impor Massal Excel
+  // Bulk Import
   const handleBulkImportQuestions = async (validRows: ImportQuestionInput[]): Promise<BulkImportResult> => {
-    let successCount = 0;
-    let failedCount = 0;
+    let successCount = 0, failedCount = 0;
     const errors: string[] = [];
-
     validRows.forEach((row, idx) => {
       try {
         let options: QuizOption[] | undefined;
-        let shortAnswer: string | undefined;
-        let essayRubric: string | undefined;
-        const cleanKey = (row.correctKey || '').trim().toUpperCase();
-
+        let sa: string | undefined, er: string | undefined;
+        const ck = (row.correctKey || '').trim().toUpperCase();
         if (row.type === 'BENAR_SALAH') {
           options = [
-            { id: `opt-imp-${Date.now()}-${idx}-1`, text: 'Benar', isCorrect: cleanKey === 'A' || cleanKey === 'BENAR' || cleanKey === 'TRUE' },
-            { id: `opt-imp-${Date.now()}-${idx}-2`, text: 'Salah', isCorrect: cleanKey === 'B' || cleanKey === 'SALAH' || cleanKey === 'FALSE' },
+            { id: `oi-${Date.now()}-${idx}-1`, text: 'Benar', isCorrect: ck === 'A' || ck === 'BENAR' || ck === 'TRUE' },
+            { id: `oi-${Date.now()}-${idx}-2`, text: 'Salah', isCorrect: ck === 'B' || ck === 'SALAH' || ck === 'FALSE' },
           ];
-        } else if (row.type === 'JAWABAN_SINGKAT') {
-          shortAnswer = row.correctKey || row.optA || '';
-        } else if (row.type === 'ESAI') {
-          essayRubric = row.correctKey || row.explanation || 'Rubrik penilaian esai terstandar.';
-        } else {
-          // PILIHAN GANDA (5 Opsi A-E)
-          const rawOpts = [
-            { text: (row.optA || '').trim(), imageUrl: row.optAImage?.trim() || undefined, key: 'A' },
-            { text: (row.optB || '').trim(), imageUrl: row.optBImage?.trim() || undefined, key: 'B' },
-            { text: (row.optC || '').trim(), imageUrl: row.optCImage?.trim() || undefined, key: 'C' },
-            { text: (row.optD || '').trim(), imageUrl: row.optDImage?.trim() || undefined, key: 'D' },
-            { text: (row.optE || '').trim(), imageUrl: row.optEImage?.trim() || undefined, key: 'E' },
-          ].filter((o) => o.text !== '' || !!o.imageUrl);
-
-          if (rawOpts.length < 2) {
-            failedCount += 1;
-            errors.push(`Baris #${idx + 1}: Soal pilihan ganda butuh minimal 2 opsi jawaban.`);
-            return;
-          }
-
-          options = rawOpts.map((opt, oIdx) => ({
-            id: `opt-imp-${Date.now()}-${idx}-${oIdx}`,
-            text: opt.text || `Pilihan ${String.fromCharCode(65 + oIdx)}`,
-            imageUrl: opt.imageUrl,
-            isCorrect: opt.key === cleanKey || opt.text.toUpperCase() === cleanKey || String.fromCharCode(65 + oIdx) === cleanKey
+        } else if (row.type === 'JAWABAN_SINGKAT') { sa = row.correctKey || row.optA || ''; }
+        else if (row.type === 'ESAI') { er = row.correctKey || row.explanation || 'Rubrik penilaian esai.'; }
+        else {
+          const ro = [
+            { text: (row.optA||'').trim(), imageUrl: row.optAImage?.trim()||undefined, key: 'A' },
+            { text: (row.optB||'').trim(), imageUrl: row.optBImage?.trim()||undefined, key: 'B' },
+            { text: (row.optC||'').trim(), imageUrl: row.optCImage?.trim()||undefined, key: 'C' },
+            { text: (row.optD||'').trim(), imageUrl: row.optDImage?.trim()||undefined, key: 'D' },
+            { text: (row.optE||'').trim(), imageUrl: row.optEImage?.trim()||undefined, key: 'E' },
+          ].filter(o => o.text !== '' || !!o.imageUrl);
+          if (ro.length < 2) { failedCount++; errors.push(`Baris #${idx+1}: Minimal 2 opsi.`); return; }
+          options = ro.map((o, i) => ({
+            id: `oi-${Date.now()}-${idx}-${i}`, text: o.text || `Pilihan ${String.fromCharCode(65+i)}`,
+            imageUrl: o.imageUrl, isCorrect: o.key === ck || String.fromCharCode(65+i) === ck
           }));
         }
-
         quizService.addBankQuestion({
           courseCode: row.courseCode || selectedCourse || 'PAI-301',
-          topic: row.topic || 'Materi Pokok',
-          type: row.type || 'PILIHAN_GANDA',
-          difficulty: row.difficulty || 'SEDANG',
-          questionText: row.questionText,
-          arabicText: row.arabicText?.trim() || undefined,
-          imageUrl: row.imageUrl?.trim() || undefined,
-          options,
-          correctShortAnswer: shortAnswer,
-          essayRubric,
-          defaultPoints: Number(row.defaultPoints) || 20,
-          explanation: row.explanation,
-          tags: row.tags ? row.tags.split(',').map((t) => t.trim()).filter(Boolean) : ['Impor Excel']
+          topic: row.topic || 'Materi Pokok', type: row.type || 'PILIHAN_GANDA',
+          difficulty: row.difficulty || 'SEDANG', questionText: row.questionText,
+          arabicText: row.arabicText?.trim() || undefined, imageUrl: row.imageUrl?.trim() || undefined,
+          options, correctShortAnswer: sa, essayRubric: er,
+          defaultPoints: Number(row.defaultPoints) || 20, explanation: row.explanation,
+          tags: row.tags ? row.tags.split(',').map(t => t.trim()).filter(Boolean) : ['Impor']
         });
-
-        successCount += 1;
-      } catch (err: any) {
-        failedCount += 1;
-        errors.push(`Baris #${idx + 1}: ${err.message || 'Galat saat memproses butir soal.'}`);
-      }
+        successCount++;
+      } catch (err: any) { failedCount++; errors.push(`Baris #${idx+1}: ${err.message}`); }
     });
-
-    const highPointRows = validRows.filter((r) => Number(r.defaultPoints) > 100);
-    if (highPointRows.length > 0) {
-      toast.warning(
-        'Peringatan Bobot Soal',
-        `Terdeteksi ${highPointRows.length} butir soal hasil impor dengan bobot melebihi batas 100 poin.`
-      );
-    }
-
     loadQuestions();
-    return {
-      total: validRows.length,
-      inserted: successCount,
-      updated: 0,
-      skipped: failedCount,
-      errors
-    };
+    return { total: validRows.length, inserted: successCount, updated: 0, skipped: failedCount, errors };
   };
 
-  // Filter questions for Selected Course (Level 2)
+  // Filtered questions (Level 2)
   const filteredQuestions = useMemo(() => {
     if (!selectedCourse) return [];
-
-    return questions.filter((q) => {
-      const matchesCourse = (q.courseCode || 'PAI-301') === selectedCourse;
-      const sQuery = searchQuery.toLowerCase().trim();
-      
-      const qText = (q.questionText || '').toLowerCase();
-      const qTopic = (q.topic || '').toLowerCase();
-      const qTags = (q.tags || []).map((t) => (t || '').toLowerCase());
-
-      const matchesSearch = !sQuery ||
-        qText.includes(sQuery) ||
-        qTopic.includes(sQuery) ||
-        qTags.some((t) => t.includes(sQuery));
-
-      const matchesType = filterType === 'SEMUA' || q.type === filterType;
-      const matchesDifficulty = filterDifficulty === 'SEMUA' || q.difficulty === filterDifficulty;
-      
-      return matchesCourse && matchesSearch && matchesType && matchesDifficulty;
+    return questions.filter(q => {
+      const mc = (q.courseCode || 'PAI-301') === selectedCourse;
+      const s = searchQuery.toLowerCase().trim();
+      const ms = !s || (q.questionText||'').toLowerCase().includes(s) || (q.topic||'').toLowerCase().includes(s) || (q.tags||[]).some(t => (t||'').toLowerCase().includes(s));
+      const mt = filterType === 'SEMUA' || q.type === filterType;
+      const md = filterDifficulty === 'SEMUA' || q.difficulty === filterDifficulty;
+      return mc && ms && mt && md;
     });
   }, [questions, searchQuery, filterType, filterDifficulty, selectedCourse]);
 
-  // Paginated Questions
   const totalPages = Math.ceil(filteredQuestions.length / pageSize) || 1;
   const paginatedQuestions = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
     return filteredQuestions.slice(start, start + pageSize);
   }, [filteredQuestions, currentPage, pageSize]);
 
-  // Active Selected Course Info
-  const activeCourseInfo = selectedCourse ? (COURSES_INFO[selectedCourse] || { name: 'Mata Kuliah Pilihan', prodi: 'Program Studi Terkait', credits: 3, semester: 1 }) : null;
+  const activeCourseInfo = selectedCourse ? (COURSES_INFO[selectedCourse] || { name: 'Mata Kuliah Pilihan', prodi: '-', credits: 3, semester: 1, icon: '📝' }) : null;
   const activeCourseStats = selectedCourse ? courseStats[selectedCourse] : null;
 
-  // Konfigurasi Ekspor Profesional Bank Soal
+  // Export config
   const bankQuestionExportConfig: ExportConfig<BankQuestion> = useMemo(() => ({
-    filename: `SALAM_Bank_Soal_${selectedCourse || 'Katalog_Semua'}`,
-    title: `REPOSITORI BANK SOAL KURIKULUM — ${selectedCourse ? `${activeCourseInfo?.name} (${selectedCourse})` : 'SEMUA MATA KULIAH'}`,
-    subtitle: 'Sekolah Tinggi Agama Islam (STAI) Al-Ittihad Cianjur',
+    filename: `SALAM_Bank_Soal_${selectedCourse || 'Semua'}`,
+    title: `BANK SOAL — ${selectedCourse ? `${activeCourseInfo?.name} (${selectedCourse})` : 'SEMUA MATA KULIAH'}`,
+    subtitle: 'STAI Al-Ittihad Cianjur',
     data: filteredQuestions,
     columns: [
       { key: 'courseCode', header: 'Kode MK', width: '90px' },
-      { key: 'topic', header: 'Topik / Materi', width: '160px' },
-      { key: 'type', header: 'Tipe Soal', width: '120px' },
-      { key: 'difficulty', header: 'Tingkat', width: '80px', align: 'center' },
-      { key: 'questionText', header: 'Teks Pertanyaan', width: '280px' },
-      { key: 'arabicText', header: 'Teks Arab / Matan', width: '200px', format: (val: any) => val || '-' },
-      { key: 'imageUrl', header: 'Gambar / Ilustrasi', width: '120px', format: (val: any) => val ? 'Ada Gambar' : '-' },
+      { key: 'topic', header: 'Topik', width: '160px' },
+      { key: 'type', header: 'Tipe', width: '120px' },
+      { key: 'difficulty', header: 'Level', width: '80px', align: 'center' },
+      { key: 'questionText', header: 'Pertanyaan', width: '280px' },
+      { key: 'arabicText', header: 'Teks Arab', width: '200px', format: (v: any) => v || '-' },
+      { key: 'imageUrl', header: 'Gambar', width: '100px', format: (v: any) => v ? '✓ Ada' : '-' },
       { key: 'defaultPoints', header: 'Poin', width: '60px', align: 'center' },
-      { 
-        key: 'options', 
-        header: 'Kunci Jawaban', 
-        width: '180px',
+      { key: 'options', header: 'Kunci', width: '180px',
         format: (_: any, q: BankQuestion) => {
           if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
-            const correctIdx = (q.options || []).findIndex((o) => o.isCorrect);
-            const correctOpt = (q.options || []).find((o) => o.isCorrect);
-            if (correctIdx !== undefined && correctIdx >= 0 && correctOpt) {
-              const imgNotice = correctOpt.imageUrl ? ' [Ada Gambar]' : '';
-              return `[${String.fromCharCode(65 + correctIdx)}] ${correctOpt.text}${imgNotice}`;
-            }
+            const ci = (q.options||[]).findIndex(o => o.isCorrect);
+            const co = (q.options||[]).find(o => o.isCorrect);
+            if (ci >= 0 && co) return `[${String.fromCharCode(65+ci)}] ${co.text}`;
             return '-';
           }
           if (q.type === 'JAWABAN_SINGKAT') return q.correctShortAnswer || '-';
-          return 'Rubrik Terlampir';
+          return 'Rubrik';
         }
       },
-      { key: 'explanation', header: 'Pembahasan', width: '200px', format: (val: any) => val || '-' }
+      { key: 'explanation', header: 'Pembahasan', width: '200px', format: (v: any) => v || '-' }
     ],
     metadata: {
-      'Total Butir Soal': `${filteredQuestions.length} Soal`,
-      'Mata Kuliah': selectedCourse ? `${selectedCourse} - ${activeCourseInfo?.name}` : 'Semua Mata Kuliah',
-      'Waktu Unduh': new Date().toLocaleString('id-ID')
+      'Total Soal': `${filteredQuestions.length}`,
+      'Mata Kuliah': selectedCourse ? `${selectedCourse} - ${activeCourseInfo?.name}` : 'Semua',
+      'Tanggal': new Date().toLocaleString('id-ID')
     }
   }), [filteredQuestions, selectedCourse, activeCourseInfo]);
 
-  // Table Columns Definition (Desktop)
-  const columns: Column<BankQuestion>[] = [
-    {
-      header: 'No',
-      width: '50px',
-      render: (_, index) => (
-        <span style={{ fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
-          {(currentPage - 1) * pageSize + index + 1}
-        </span>
-      )
-    },
-    {
-      header: 'Tipe & Tingkat',
-      width: '140px',
-      render: (q) => (
-        <div className="flex flex-col gap-1.5">
-          <Badge variant="default" style={{ fontSize: '10px', width: 'fit-content', fontWeight: 600 }}>
-            {q.type.replace('_', ' ')}
-          </Badge>
-          <Badge 
-            variant={q.difficulty === 'MUDAH' ? 'success' : q.difficulty === 'SEDANG' ? 'warning' : 'danger'}
-            style={{ fontSize: '10px', width: 'fit-content', padding: '1px 6px' }}
-          >
-            {q.difficulty}
-          </Badge>
-        </div>
-      )
-    },
-    {
-      header: 'Teks Pertanyaan & Materi',
-      render: (q) => {
-        const hasOptionImages = (q.options || []).some(o => !!o.imageUrl);
-        return (
-          <div className="flex flex-col gap-1.5">
-            <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.45 }}>
-              {q.questionText}
-            </div>
-            {q.arabicText && (
-              <div 
-                style={{
-                  fontFamily: "'Amiri', 'Traditional Arabic', serif",
-                  fontSize: '1.05rem',
-                  color: '#065f46',
-                  direction: 'rtl',
-                  textAlign: 'right',
-                  lineHeight: 1.6,
-                  backgroundColor: 'rgba(6, 95, 70, 0.04)',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  borderRight: '3px solid #059669'
-                }}
-              >
-                {q.arabicText}
-              </div>
-            )}
-            <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: '2px' }}>
-              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                Topik: <strong className="text-slate-700">{q.topic}</strong>
-              </span>
-              {q.imageUrl && (
-                <Badge variant="default" className="flex items-center gap-1 bg-emerald-50 text-emerald-800 border-emerald-200" style={{ fontSize: '10px' }}>
-                  <ImageIcon size={11} /> Gambar Soal
-                </Badge>
-              )}
-              {hasOptionImages && (
-                <Badge variant="default" className="flex items-center gap-1 bg-blue-50 text-blue-800 border-blue-200" style={{ fontSize: '10px' }}>
-                  <ImageIcon size={11} /> Opsi Bergambar
-                </Badge>
-              )}
-              {(q.tags || []).map((t, idx) => (
-                <span key={idx} style={{ fontSize: '10px', color: 'var(--text-muted)', backgroundColor: 'var(--bg-subtle)', padding: '1px 6px', borderRadius: '4px' }}>
-                  #{t}
-                </span>
-              ))}
-            </div>
-          </div>
-        );
-      }
-    },
-    {
-      header: 'Kunci / Rubrik',
-      width: '190px',
-      render: (q) => {
-        if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
-          const correctIdx = (q.options || []).findIndex((o) => o.isCorrect);
-          const correctOpt = (q.options || []).find((o) => o.isCorrect);
-          return (
-            <div className="flex flex-col gap-0.5">
-              <span className="text-emerald-700 font-bold text-xs flex items-center gap-1">
-                <CheckCircle2 size={12} /> Opsi [{String.fromCharCode(65 + (correctIdx >= 0 ? correctIdx : 0))}]
-              </span>
-              <div className="flex items-center gap-1.5">
-                {correctOpt?.imageUrl && (
-                  <img 
-                    src={correctOpt.imageUrl} 
-                    alt="Kunci Jawaban" 
-                    className="w-5 h-5 rounded object-cover border border-slate-300 shrink-0" 
-                  />
-                )}
-                <span className="text-xs text-slate-600 truncate" title={correctOpt?.text}>
-                  {correctOpt?.text || (correctOpt?.imageUrl ? '(Opsi Berupa Gambar)' : '-')}
-                </span>
-              </div>
-            </div>
-          );
-        }
-        if (q.type === 'JAWABAN_SINGKAT') {
-          return (
-            <div className="flex flex-col gap-0.5">
-              <span className="text-emerald-700 font-bold text-xs">Kata Kunci:</span>
-              <span className="text-xs text-slate-700 font-mono bg-slate-100 px-1.5 py-0.5 rounded w-fit">
-                {q.correctShortAnswer || '-'}
-              </span>
-            </div>
-          );
-        }
-        return (
-          <span className="text-xs text-amber-700 italic bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-            Rubrik Penilaian Terlampir
-          </span>
-        );
-      }
-    },
-    {
-      header: 'Bobot',
-      width: '80px',
-      render: (q) => (
-        <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 'var(--text-xs)', color: 'var(--color-primary-800)' }}>
-          {q.defaultPoints} Pts
-        </div>
-      )
-    },
-    {
-      header: 'Aksi',
-      width: '130px',
-      render: (q) => (
-        <div className="flex items-center justify-center gap-1">
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => {
-              setPreviewingQuestion(q);
-              setPreviewShowAnswer(false);
-              setPreviewModal(true);
-            }}
-            title="Pratinjau Butir Soal"
-            style={{ padding: '6px', color: 'var(--text-muted)' }}
-          >
-            <Eye size={15} />
-          </button>
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={() => handleOpenEdit(q)}
-            title="Edit Butir Soal"
-            style={{ padding: '6px' }}
-          >
-            <Edit size={14} color="var(--color-primary-700)" />
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm text-red-600 hover:bg-red-50"
-            onClick={() => handleOpenDelete(q)}
-            title="Hapus Butir Soal"
-            style={{ padding: '6px' }}
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
-      )
-    }
-  ];
+  // ============================================================
+  // RENDER
+  // ============================================================
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-5" style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
-      {/* =========================================================================
-          LEVEL 1: KATALOG KATEGORI / MATA KULIAH (WHEN NO COURSE IS SELECTED)
-          ========================================================================= */}
+      {/* ================================================================
+          LEVEL 1: KATALOG MATA KULIAH
+          ================================================================ */}
       {!selectedCourse ? (
-        <div className="flex flex-col gap-6 animate-fadeIn">
-          {/* Top Hero Banner */}
-          <div 
-            className="relative overflow-hidden rounded-2xl p-6 md:p-8 text-white shadow-xl"
-            style={{ 
-              background: 'linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}
-          >
-            <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-              <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-200 text-xs font-semibold uppercase tracking-wider mb-3 backdrop-blur-sm border border-emerald-400/30">
-                  <GraduationCap size={14} /> Repositori Bank Soal Terstandar
-                </div>
-                <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mb-2">
-                  {KAMUS_UI.BANK_SOAL} & Kurikulum Ujian
+        <div className="flex flex-col gap-5">
+
+          {/* === HEADER SECTION === */}
+          <div className="flex flex-col gap-4">
+            {/* Title Bar */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', margin: 0, lineHeight: 1.2 }}>
+                  📚 Bank Soal
                 </h1>
-                <p className="text-emerald-100 text-sm md:text-base leading-relaxed">
-                  Pusat pengelolaan dan kurasi butir soal terstandar berbasis Capaian Pembelajaran Mata Kuliah (CPMK). Pilih kategori mata kuliah di bawah untuk mengelola butir soal.
+                <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px' }}>
+                  Pilih mata kuliah untuk melihat dan mengelola soal ujian
                 </p>
               </div>
 
-              {/* Action Buttons in Hero */}
-              <div className="flex flex-wrap gap-2.5">
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  icon={Download} 
-                  onClick={exportQuestionBankExcelTemplate}
-                  className="bg-white/10 text-white hover:bg-white/20 border border-white/20 text-xs"
-                  title="Unduh Template Excel Format Resmi Bank Soal"
-                >
+              <div className="flex flex-wrap gap-2">
+                <Button variant="outline" size="sm" icon={Download} onClick={exportQuestionBankExcelTemplate} className="text-xs">
                   Template Excel
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  icon={Upload} 
-                  onClick={() => setImportModal(true)}
-                  className="bg-white/10 text-white hover:bg-white/20 border border-white/20 text-xs"
-                >
-                  Impor Excel
+                <Button variant="outline" size="sm" icon={Upload} onClick={() => setImportModal(true)} className="text-xs">
+                  Impor Soal
                 </Button>
                 <Button 
-                  variant="primary" 
-                  size="sm" 
-                  icon={Plus} 
-                  onClick={handleOpenCreate}
-                  className="bg-emerald-400 text-emerald-950 hover:bg-emerald-300 font-bold border-0 shadow-lg text-xs"
+                  variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}
+                  style={{ background: 'linear-gradient(135deg, #059669, #047857)' }}
+                  className="text-xs font-bold"
                 >
-                  Tambah Soal Baru
+                  Tambah Soal
                 </Button>
               </div>
             </div>
 
-            {/* Quick Metrics Strip */}
-            <div className="relative z-10 grid grid-cols-2 sm:grid-cols-4 gap-3 mt-6 pt-6 border-t border-emerald-600/40">
-              <div className="bg-emerald-950/40 rounded-xl p-3.5 backdrop-blur-sm border border-emerald-500/20">
-                <div className="text-xs text-emerald-200 font-medium">Total Bank Mata Kuliah</div>
-                <div className="text-2xl font-bold text-white mt-1">{globalMetrics.totalCourses} <span className="text-xs font-normal text-emerald-300">MK</span></div>
+            {/* Stats Summary Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '14px 16px' }}>
+                <div style={{ fontSize: '11px', color: '#166534', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mata Kuliah</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#065f46', marginTop: '2px' }}>{globalMetrics.totalCourses}</div>
               </div>
-              <div className="bg-emerald-950/40 rounded-xl p-3.5 backdrop-blur-sm border border-emerald-500/20">
-                <div className="text-xs text-emerald-200 font-medium">Total Butir Soal</div>
-                <div className="text-2xl font-bold text-white mt-1">{globalMetrics.totalQuestions} <span className="text-xs font-normal text-emerald-300">Soal</span></div>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '14px 16px' }}>
+                <div style={{ fontSize: '11px', color: '#166534', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Soal</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#065f46', marginTop: '2px' }}>{globalMetrics.totalQuestions}</div>
               </div>
-              <div className="bg-emerald-950/40 rounded-xl p-3.5 backdrop-blur-sm border border-emerald-500/20">
-                <div className="text-xs text-emerald-200 font-medium">Pilihan Ganda & B/S</div>
-                <div className="text-2xl font-bold text-white mt-1">{globalMetrics.totalPG + globalMetrics.totalBS} <span className="text-xs font-normal text-emerald-300">Objektif</span></div>
+              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '14px 16px' }}>
+                <div style={{ fontSize: '11px', color: '#1e40af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Objektif</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1d4ed8', marginTop: '2px' }}>
+                  {questions.filter(q => q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH').length}
+                </div>
               </div>
-              <div className="bg-emerald-950/40 rounded-xl p-3.5 backdrop-blur-sm border border-emerald-500/20">
-                <div className="text-xs text-emerald-200 font-medium">Isian & Esai Rubrik</div>
-                <div className="text-2xl font-bold text-white mt-1">{globalMetrics.totalJS + globalMetrics.totalEsai} <span className="text-xs font-normal text-emerald-300">Subjektif</span></div>
+              <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: '12px', padding: '14px 16px' }}>
+                <div style={{ fontSize: '11px', color: '#92400e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Subjektif</div>
+                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#b45309', marginTop: '2px' }}>
+                  {questions.filter(q => q.type === 'JAWABAN_SINGKAT' || q.type === 'ESAI').length}
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Search and Section Title */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div>
-              <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Folder size={18} className="text-emerald-700" />
-                Pilih Kategori Mata Kuliah
-              </h2>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Klik kartu mata kuliah di bawah untuk mengelola butir soal secara spesifik
-              </p>
-            </div>
-
-            <div className="w-full sm:w-80 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={15} />
-              <Input
-                placeholder="Cari kode MK atau nama mata kuliah..."
-                value={courseSearchQuery}
-                onChange={(e) => setCourseSearchQuery(e.target.value)}
-                className="pl-9 text-xs"
-              />
-            </div>
+          {/* === SEARCH BAR === */}
+          <div style={{ position: 'relative' }}>
+            <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+            <Input
+              placeholder="Cari mata kuliah... (contoh: Fiqih, PAI-301, Tafsir)"
+              value={courseSearchQuery}
+              onChange={(e) => setCourseSearchQuery(e.target.value)}
+              style={{ paddingLeft: '40px', fontSize: '0.85rem', borderRadius: '12px', height: '44px' }}
+            />
           </div>
 
-          {/* Grid of Course Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {/* === COURSE CARDS GRID === */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredCourses.map((st) => (
               <div
                 key={st.code}
                 onClick={() => setSelectedCourse(st.code)}
-                className="group relative bg-white rounded-2xl border border-slate-200 hover:border-emerald-500 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden p-5 flex flex-col justify-between"
-                style={{ minHeight: '200px' }}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '16px',
+                  padding: '20px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '12px',
+                  minHeight: '180px',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = '#059669';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.12)';
+                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLElement).style.transform = 'none';
+                }}
               >
-                {/* Top Badge & Code */}
-                <div>
-                  <div className="flex justify-between items-start gap-2 mb-2">
-                    <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-bold font-mono border border-emerald-200">
-                      {st.code}
-                    </span>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100/80 text-emerald-900 flex items-center gap-1 font-mono">
-                      <FileQuestion size={12} className="text-emerald-700" /> {st.total} Butir Soal
-                    </span>
-                  </div>
-
-                  {/* Course Title */}
-                  <h3 className="text-base font-bold text-slate-800 group-hover:text-emerald-700 transition-colors leading-snug mb-1">
-                    {st.name}
-                  </h3>
-                  <div className="text-xs text-slate-500 flex items-center gap-2 mb-3">
-                    <span>{st.prodi}</span>
-                    <span>•</span>
-                    <span>{st.credits} SKS</span>
-                    <span>•</span>
-                    <span>Sem. {st.semester}</span>
-                  </div>
+                {/* Card Top */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <span style={{ fontSize: '2rem', lineHeight: 1 }}>{st.icon}</span>
+                  <span style={{
+                    fontSize: '11px', fontWeight: 700, fontFamily: 'monospace',
+                    background: '#f0fdf4', color: '#065f46', padding: '3px 8px',
+                    borderRadius: '6px', border: '1px solid #bbf7d0'
+                  }}>
+                    {st.code}
+                  </span>
                 </div>
 
-                {/* Question Type Breakdown & Footer */}
-                <div className="pt-3 border-t border-slate-100">
-                  <div className="flex items-center justify-between text-xs text-slate-600 mb-3 flex-wrap gap-1">
-                    <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200 text-[11px]">PG: <strong>{st.pg}</strong></span>
-                    <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200 text-[11px]">B/S: <strong>{st.bs}</strong></span>
-                    <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200 text-[11px]">Isian: <strong>{st.js}</strong></span>
-                    <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200 text-[11px]">Esai: <strong>{st.esai}</strong></span>
-                  </div>
+                {/* Course Name */}
+                <div>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b', margin: 0, lineHeight: 1.3 }}>
+                    {st.name}
+                  </h3>
+                  <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
+                    {st.credits} SKS • Semester {st.semester}
+                  </p>
+                </div>
 
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800 bg-emerald-50/60 p-2 rounded-lg border border-emerald-100">
-                    <span>Akses Bank Soal</span>
-                    <span className="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                      Buka Bank Soal <ChevronRight size={14} />
-                    </span>
+                {/* Stats Row */}
+                <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                    {st.pg > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#f0fdf4', color: '#166534', padding: '2px 6px', borderRadius: '4px' }}>PG {st.pg}</span>}
+                    {st.bs > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#eff6ff', color: '#1e40af', padding: '2px 6px', borderRadius: '4px' }}>B/S {st.bs}</span>}
+                    {st.js > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#fefce8', color: '#92400e', padding: '2px 6px', borderRadius: '4px' }}>Isian {st.js}</span>}
+                    {st.esai > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#fef2f2', color: '#991b1b', padding: '2px 6px', borderRadius: '4px' }}>Esai {st.esai}</span>}
+                    {st.total === 0 && <span style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic' }}>Belum ada soal</span>}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, color: '#059669' }}>
+                    <span>{st.total}</span>
+                    <ChevronRight size={14} />
                   </div>
                 </div>
               </div>
@@ -932,13 +523,13 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
           </div>
 
           {filteredCourses.length === 0 && (
-            <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
-              <Folder size={40} className="mx-auto text-slate-300 mb-3" />
-              <h3 className="text-base font-bold text-slate-700">Mata Kuliah Tidak Ditemukan</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto mt-1">
-                Tidak ada kategori mata kuliah yang cocok dengan kata kunci "{courseSearchQuery}".
+            <div style={{ textAlign: 'center', padding: '48px 20px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+              <Folder size={36} style={{ color: '#cbd5e1', margin: '0 auto 12px' }} />
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#475569', margin: 0 }}>Tidak Ditemukan</h3>
+              <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '6px' }}>
+                Kata kunci "{courseSearchQuery}" tidak cocok.
               </p>
-              <Button variant="secondary" size="sm" onClick={() => setCourseSearchQuery('')} className="mt-3">
+              <Button variant="secondary" size="sm" onClick={() => setCourseSearchQuery('')} style={{ marginTop: '12px' }}>
                 Reset Pencarian
               </Button>
             </div>
@@ -946,328 +537,316 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
         </div>
       ) : (
 
-        /* =========================================================================
-            LEVEL 2: DAFTAR BUTIR SOAL PER MATA KULIAH (WHEN A COURSE IS SELECTED)
-            ========================================================================= */
-        <div className="flex flex-col gap-6 animate-fadeIn">
-          {/* Breadcrumb & Navigation Back */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        /* ================================================================
+            LEVEL 2: DAFTAR SOAL PER MATA KULIAH
+            ================================================================ */
+        <div className="flex flex-col gap-5">
+
+          {/* === HEADER === */}
+          <div className="flex flex-col gap-3">
+            {/* Back + Breadcrumb */}
             <div className="flex items-center gap-3">
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                icon={ArrowLeft} 
+              <button
                 onClick={() => setSelectedCourse(null)}
-                className="bg-white border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold shadow-xs"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '8px 14px', borderRadius: '10px', border: '1px solid #e2e8f0',
+                  background: '#fff', cursor: 'pointer', fontSize: '13px', fontWeight: 600,
+                  color: '#475569', transition: 'all 0.15s'
+                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#fff'; }}
               >
-                Kembali ke Daftar Mata Kuliah
-              </Button>
-              {onBack && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={onBack}
-                  className="text-xs text-slate-500"
-                >
-                  Ke Modul Kuis
-                </Button>
-              )}
-              <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500">
+                <ArrowLeft size={16} /> Kembali
+              </button>
+              <div style={{ fontSize: '12px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span>Bank Soal</span>
-                <span>/</span>
-                <span className="font-bold text-emerald-700 font-mono">{selectedCourse}</span>
+                <ChevronRight size={12} />
+                <span style={{ fontWeight: 700, color: '#059669', fontFamily: 'monospace' }}>{selectedCourse}</span>
               </div>
             </div>
 
-            <div className="flex gap-2 flex-wrap">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                icon={Download} 
-                onClick={exportQuestionBankExcelTemplate}
-                className="text-xs text-slate-700"
-              >
-                Template Excel
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                icon={Upload} 
-                onClick={() => setImportModal(true)}
-                className="text-xs"
-              >
-                Impor Excel
-              </Button>
-              <ExportDropdown 
-                config={bankQuestionExportConfig} 
-                buttonLabel="Ekspor Soal" 
-              />
-              <Button 
-                variant="primary" 
-                size="sm" 
-                icon={Plus} 
-                onClick={handleOpenCreate}
-                style={{ background: 'linear-gradient(135deg, #065f46 0%, #047857 100%)' }}
-                className="font-bold text-xs"
-              >
-                Tambah Soal Baru
-              </Button>
-            </div>
-          </div>
-
-          {/* Active Course Info Card Banner */}
-          <div 
-            className="p-5 md:p-6 rounded-2xl text-white shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4"
-            style={{ background: 'linear-gradient(135deg, #064e3b 0%, #047857 100%)' }}
-          >
-            <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="px-2.5 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 text-xs font-mono font-bold border border-emerald-400/30">
-                  {selectedCourse}
-                </span>
-                <span className="text-xs text-emerald-200">
-                  {activeCourseInfo?.prodi} • {activeCourseInfo?.credits} SKS • Semester {activeCourseInfo?.semester}
-                </span>
-              </div>
-              <h2 className="text-xl md:text-2xl font-bold text-white">
-                {activeCourseInfo?.name}
-              </h2>
-              <p className="text-xs text-emerald-100 mt-1">
-                Daftar butir soal kuis & ujian terstandar Capaian Pembelajaran Mata Kuliah
-              </p>
-            </div>
-
-            {/* Quick Counters for this course */}
-            <div className="flex gap-2 flex-wrap">
-              <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[75px]">
-                <div className="text-[10px] text-emerald-300 uppercase font-semibold">Total Soal</div>
-                <div className="text-lg font-bold text-white">{filteredQuestions.length}</div>
-              </div>
-              <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[65px]">
-                <div className="text-[10px] text-emerald-300 uppercase font-semibold">PG</div>
-                <div className="text-lg font-bold text-white">{activeCourseStats?.pg || 0}</div>
-              </div>
-              <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[65px]">
-                <div className="text-[10px] text-emerald-300 uppercase font-semibold">B/S</div>
-                <div className="text-lg font-bold text-white">{activeCourseStats?.bs || 0}</div>
-              </div>
-              <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[65px]">
-                <div className="text-[10px] text-emerald-300 uppercase font-semibold">Isian</div>
-                <div className="text-lg font-bold text-white">{activeCourseStats?.js || 0}</div>
-              </div>
-              <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[65px]">
-                <div className="text-[10px] text-emerald-300 uppercase font-semibold">Esai</div>
-                <div className="text-lg font-bold text-white">{activeCourseStats?.esai || 0}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Search and Filters Bar */}
-          <div className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between">
-            <div className="w-full md:w-96 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={15} />
-              <Input
-                placeholder="Cari teks soal, materi, topik, atau tagar..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 text-xs"
-              />
-            </div>
-
-            <div className="flex gap-2 w-full md:w-auto items-center flex-wrap">
-              <select
-                className="form-select text-xs py-2 px-3 rounded-lg border-slate-300 bg-white"
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-              >
-                <option value="SEMUA">Semua Tipe Soal</option>
-                <option value="PILIHAN_GANDA">Pilihan Ganda</option>
-                <option value="BENAR_SALAH">Benar / Salah</option>
-                <option value="JAWABAN_SINGKAT">Jawaban Singkat</option>
-                <option value="ESAI">Esai</option>
-              </select>
-
-              <select
-                className="form-select text-xs py-2 px-3 rounded-lg border-slate-300 bg-white"
-                value={filterDifficulty}
-                onChange={(e) => setFilterDifficulty(e.target.value)}
-              >
-                <option value="SEMUA">Semua Tingkat</option>
-                <option value="MUDAH">Mudah</option>
-                <option value="SEDANG">Sedang</option>
-                <option value="SULIT">Sulit</option>
-              </select>
-
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" icon={X} onClick={handleResetFilters} className="text-xs text-red-600">
-                  Reset
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* =========================================================================
-              TAMPILAN DESKTOP (TABLE VIEW)
-              ========================================================================= */}
-          <div className="hidden md:block">
-            <Card>
-              <Table 
-                columns={columns} 
-                data={paginatedQuestions} 
-                keyExtractor={(q) => q.id}
-                emptyMessage="Belum ada butir soal untuk mata kuliah ini. Silakan tambahkan soal baru atau impor file Excel."
-              />
-            </Card>
-          </div>
-
-          {/* =========================================================================
-              TAMPILAN MOBILE (CARDS VIEW)
-              ========================================================================= */}
-          <div className="block md:hidden flex flex-col gap-3">
-            {paginatedQuestions.map((q, idx) => {
-              const hasOptImages = (q.options || []).some(o => !!o.imageUrl);
-              return (
-                <div 
-                  key={q.id}
-                  className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
-                >
-                  {/* Header Card */}
-                  <div className="flex justify-between items-start gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center">
-                        {(currentPage - 1) * pageSize + idx + 1}
-                      </span>
-                      <Badge variant="default" style={{ fontSize: '10px' }}>
-                        {q.type.replace('_', ' ')}
-                      </Badge>
-                      <Badge 
-                        variant={q.difficulty === 'MUDAH' ? 'success' : q.difficulty === 'SEDANG' ? 'warning' : 'danger'}
-                        style={{ fontSize: '10px' }}
-                      >
-                        {q.difficulty}
-                      </Badge>
-                    </div>
-                    <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      {q.defaultPoints} Pts
+            {/* Course Info Banner */}
+            <div style={{
+              background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)',
+              borderRadius: '16px', padding: '20px 24px', color: '#fff',
+              display: 'flex', flexDirection: 'column', gap: '12px'
+            }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                <div style={{ flex: 1, minWidth: '240px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{activeCourseInfo?.icon}</span>
+                    <span style={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, background: 'rgba(255,255,255,0.15)', padding: '3px 8px', borderRadius: '6px' }}>
+                      {selectedCourse}
+                    </span>
+                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>
+                      {activeCourseInfo?.credits} SKS • Sem. {activeCourseInfo?.semester}
                     </span>
                   </div>
-
-                  {/* Question Text */}
-                  <div className="text-sm font-semibold text-slate-800 leading-snug">
-                    {q.questionText}
-                  </div>
-
-                  {/* Arabic Text if any */}
-                  {q.arabicText && (
-                    <div 
-                      style={{
-                        fontFamily: "'Amiri', 'Traditional Arabic', serif",
-                        fontSize: '1.05rem',
-                        color: '#065f46',
-                        direction: 'rtl',
-                        textAlign: 'right',
-                        lineHeight: 1.6,
-                        backgroundColor: 'rgba(6, 95, 70, 0.04)',
-                        padding: '4px 8px',
-                        borderRadius: '6px',
-                        borderRight: '3px solid #059669'
-                      }}
-                    >
-                      {q.arabicText}
-                    </div>
-                  )}
-
-                  {/* Question Image if any */}
-                  {q.imageUrl && (
-                    <div className="rounded-lg overflow-hidden border border-slate-200 max-h-36 bg-slate-50 flex justify-center p-1">
-                      <img src={q.imageUrl} alt="Ilustrasi" className="object-contain max-h-32 rounded" />
-                    </div>
-                  )}
-
-                  {/* Topic & Details */}
-                  <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
-                    <span>Topik: <strong>{q.topic}</strong></span>
-                    {q.imageUrl && (
-                      <Badge variant="default" style={{ fontSize: '9px' }}>
-                        <ImageIcon size={9} /> Gambar Soal
-                      </Badge>
-                    )}
-                    {hasOptImages && (
-                      <Badge variant="default" style={{ fontSize: '9px' }} className="bg-blue-50 text-blue-700">
-                        <ImageIcon size={9} /> Opsi Bergambar
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Correct Answer Snippet */}
-                  <div className="p-2.5 bg-slate-50 rounded-lg text-xs border border-slate-200">
-                    <span className="text-slate-500 font-medium">Kunci: </span>
-                    {q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH' ? (
-                      <strong className="text-emerald-700">
-                        [{String.fromCharCode(65 + ((q.options || []).findIndex(o => o.isCorrect) >= 0 ? (q.options || []).findIndex(o => o.isCorrect) : 0))}] {(q.options || []).find(o => o.isCorrect)?.text || '-'}
-                      </strong>
-                    ) : q.type === 'JAWABAN_SINGKAT' ? (
-                      <strong className="text-emerald-700 font-mono">{q.correctShortAnswer}</strong>
-                    ) : (
-                      <span className="text-amber-700 italic">Rubrik Terlampir</span>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      icon={Eye} 
-                      onClick={() => {
-                        setPreviewingQuestion(q);
-                        setPreviewShowAnswer(false);
-                        setPreviewModal(true);
-                      }}
-                      className="text-xs"
-                    >
-                      Pratinjau
-                    </Button>
-                    <Button 
-                      variant="secondary" 
-                      size="sm" 
-                      icon={Edit} 
-                      onClick={() => handleOpenEdit(q)}
-                      className="text-xs"
-                    >
-                      Edit
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      icon={Trash2} 
-                      onClick={() => handleOpenDelete(q)}
-                      className="text-xs text-red-600 hover:bg-red-50"
-                    >
-                      Hapus
-                    </Button>
-                  </div>
+                  <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>{activeCourseInfo?.name}</h2>
                 </div>
-              );
-            })}
 
-            {paginatedQuestions.length === 0 && (
-              <div className="text-center py-10 bg-white rounded-xl border border-slate-200 p-4">
-                <FileQuestion size={36} className="mx-auto text-slate-300 mb-2" />
-                <p className="font-bold text-slate-700 text-sm">Tidak Ada Butir Soal</p>
-                <p className="text-xs text-slate-500 mt-1">Belum ada butir soal yang sesuai dengan filter pencarian.</p>
-                <div className="mt-3 flex justify-center gap-2">
-                  <Button variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}>
-                    Tambah Soal Sekarang
-                  </Button>
+                {/* Quick Counters */}
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {[
+                    { label: 'Total', value: activeCourseStats?.total || 0 },
+                    { label: 'PG', value: activeCourseStats?.pg || 0 },
+                    { label: 'B/S', value: activeCourseStats?.bs || 0 },
+                    { label: 'Isian', value: activeCourseStats?.js || 0 },
+                    { label: 'Esai', value: activeCourseStats?.esai || 0 },
+                  ].map(c => (
+                    <div key={c.label} style={{
+                      background: 'rgba(255,255,255,0.12)', borderRadius: '10px',
+                      padding: '8px 12px', textAlign: 'center', minWidth: '55px',
+                      border: '1px solid rgba(255,255,255,0.1)'
+                    }}>
+                      <div style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>{c.label}</div>
+                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{c.value}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
+            </div>
+
+            {/* Action Buttons Row */}
+            <div className="flex gap-2 flex-wrap">
+              <Button variant="outline" size="sm" icon={Download} onClick={exportQuestionBankExcelTemplate} className="text-xs">Template</Button>
+              <Button variant="outline" size="sm" icon={Upload} onClick={() => setImportModal(true)} className="text-xs">Impor</Button>
+              <ExportDropdown config={bankQuestionExportConfig} buttonLabel="Ekspor" />
+              <div style={{ flex: 1 }} />
+              <Button 
+                variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}
+                style={{ background: 'linear-gradient(135deg, #059669, #047857)' }}
+                className="text-xs font-bold"
+              >
+                Tambah Soal
+              </Button>
+            </div>
+          </div>
+
+          {/* === FILTER BAR === */}
+          <div style={{
+            display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center',
+            background: '#f8fafc', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0'
+          }}>
+            <div style={{ position: 'relative', flex: '1 1 250px' }}>
+              <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
+              <Input
+                placeholder="Cari soal, topik, atau tag..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ paddingLeft: '36px', fontSize: '0.8rem', borderRadius: '10px' }}
+              />
+            </div>
+            <select
+              className="form-select"
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              style={{ fontSize: '0.8rem', padding: '8px 12px', borderRadius: '10px', borderColor: '#e2e8f0', minWidth: '140px' }}
+            >
+              <option value="SEMUA">Semua Tipe</option>
+              <option value="PILIHAN_GANDA">Pilihan Ganda</option>
+              <option value="BENAR_SALAH">Benar / Salah</option>
+              <option value="JAWABAN_SINGKAT">Isian Singkat</option>
+              <option value="ESAI">Esai</option>
+            </select>
+            <select
+              className="form-select"
+              value={filterDifficulty}
+              onChange={(e) => setFilterDifficulty(e.target.value)}
+              style={{ fontSize: '0.8rem', padding: '8px 12px', borderRadius: '10px', borderColor: '#e2e8f0', minWidth: '120px' }}
+            >
+              <option value="SEMUA">Semua Level</option>
+              <option value="MUDAH">Mudah</option>
+              <option value="SEDANG">Sedang</option>
+              <option value="SULIT">Sulit</option>
+            </select>
+            {hasActiveFilters && (
+              <button
+                onClick={handleResetFilters}
+                style={{ fontSize: '12px', color: '#ef4444', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <X size={14} /> Reset
+              </button>
             )}
           </div>
 
-          {/* Pagination Controls */}
+          {/* === QUESTIONS LIST (CARD-BASED, WORKS FOR ALL DEVICES) === */}
+          {paginatedQuestions.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px 20px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
+              <FileQuestion size={40} style={{ color: '#cbd5e1', margin: '0 auto 12px' }} />
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#475569', margin: 0 }}>Belum Ada Soal</h3>
+              <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '6px', maxWidth: '360px', margin: '6px auto 0' }}>
+                {hasActiveFilters ? 'Tidak ada soal yang sesuai filter. Coba ubah pencarian Anda.' : 'Mata kuliah ini belum memiliki soal. Mulai tambahkan soal pertama.'}
+              </p>
+              <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                {hasActiveFilters && <Button variant="secondary" size="sm" onClick={handleResetFilters}>Reset Filter</Button>}
+                <Button variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}>Tambah Soal</Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {paginatedQuestions.map((q, idx) => {
+                const qNum = (currentPage - 1) * pageSize + idx + 1;
+                const correctIdx = (q.options || []).findIndex(o => o.isCorrect);
+                const correctOpt = (q.options || []).find(o => o.isCorrect);
+                const hasOptImages = (q.options || []).some(o => !!o.imageUrl);
+                const diffCfg = DIFFICULTY_CONFIG[q.difficulty] || DIFFICULTY_CONFIG['SEDANG'];
+                const typeLabel = TIPE_LABEL[q.type] || q.type;
+
+                return (
+                  <div
+                    key={q.id}
+                    style={{
+                      background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px',
+                      padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px',
+                      transition: 'border-color 0.15s'
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#cbd5e1'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; }}
+                  >
+                    {/* Row 1: Number + Badges + Points */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{
+                          width: '28px', height: '28px', borderRadius: '8px',
+                          background: '#f0fdf4', color: '#065f46', fontWeight: 800,
+                          fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          border: '1px solid #bbf7d0', flexShrink: 0
+                        }}>
+                          {qNum}
+                        </span>
+                        <span style={{
+                          fontSize: '11px', fontWeight: 600, padding: '3px 8px',
+                          borderRadius: '6px', background: '#f1f5f9', color: '#475569'
+                        }}>
+                          {typeLabel}
+                        </span>
+                        <span style={{
+                          fontSize: '11px', fontWeight: 600, padding: '3px 8px',
+                          borderRadius: '6px', background: diffCfg.bg, color: diffCfg.color, border: `1px solid ${diffCfg.border}`
+                        }}>
+                          {diffCfg.label}
+                        </span>
+                        {q.imageUrl && (
+                          <span style={{ fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <ImageIcon size={10} /> Gambar
+                          </span>
+                        )}
+                        {hasOptImages && (
+                          <span style={{ fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#eff6ff', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <ImageIcon size={10} /> Opsi Gambar
+                          </span>
+                        )}
+                      </div>
+                      <span style={{
+                        fontSize: '12px', fontWeight: 800, color: '#065f46',
+                        background: '#f0fdf4', padding: '4px 10px', borderRadius: '8px',
+                        border: '1px solid #bbf7d0'
+                      }}>
+                        {q.defaultPoints} Poin
+                      </span>
+                    </div>
+
+                    {/* Row 2: Question Text */}
+                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1e293b', lineHeight: 1.5 }}>
+                      {q.questionText}
+                    </div>
+
+                    {/* Arabic text */}
+                    {q.arabicText && (
+                      <div style={{
+                        fontFamily: "'Amiri', 'Traditional Arabic', serif",
+                        fontSize: '1.1rem', color: '#065f46', direction: 'rtl', textAlign: 'right',
+                        lineHeight: 1.7, background: '#f0fdf4', padding: '10px 14px',
+                        borderRadius: '10px', borderRight: '4px solid #059669'
+                      }}>
+                        {q.arabicText}
+                      </div>
+                    )}
+
+                    {/* Question image */}
+                    {q.imageUrl && (
+                      <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'center', padding: '8px', maxHeight: '160px' }}>
+                        <img src={q.imageUrl} alt="Ilustrasi soal" style={{ maxHeight: '144px', objectFit: 'contain', borderRadius: '8px' }} />
+                      </div>
+                    )}
+
+                    {/* Row 3: Topic + Answer Key */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                          Topik: <strong style={{ color: '#475569' }}>{q.topic}</strong>
+                        </span>
+                        {(q.tags || []).slice(0, 3).map((t, ti) => (
+                          <span key={ti} style={{ fontSize: '10px', color: '#64748b', background: '#f1f5f9', padding: '1px 6px', borderRadius: '4px' }}>#{t}</span>
+                        ))}
+                      </div>
+                      <div style={{
+                        fontSize: '11px', fontWeight: 600, padding: '4px 10px',
+                        borderRadius: '8px', background: '#f0fdf4', color: '#065f46', border: '1px solid #d1fae5'
+                      }}>
+                        {(q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') ? (
+                          <span>Kunci: <strong>[{String.fromCharCode(65 + (correctIdx >= 0 ? correctIdx : 0))}]</strong> {correctOpt?.text ? ` ${correctOpt.text.substring(0, 30)}${correctOpt.text.length > 30 ? '...' : ''}` : ''}</span>
+                        ) : q.type === 'JAWABAN_SINGKAT' ? (
+                          <span>Kunci: <strong style={{ fontFamily: 'monospace' }}>{q.correctShortAnswer}</strong></span>
+                        ) : (
+                          <span style={{ color: '#b45309', background: '#fef3c7', padding: '2px 6px', borderRadius: '4px', border: '1px solid #fde68a' }}>Rubrik Esai</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Row 4: Action Buttons */}
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                      <button
+                        onClick={() => { setPreviewingQuestion(q); setPreviewShowAnswer(false); setPreviewModal(true); }}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px',
+                          borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff',
+                          cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: '#475569',
+                          transition: 'all 0.15s'
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#fff'; }}
+                      >
+                        <Eye size={14} /> Lihat
+                      </button>
+                      <button
+                        onClick={() => handleOpenEdit(q)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px',
+                          borderRadius: '8px', border: '1px solid #d1fae5', background: '#f0fdf4',
+                          cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: '#065f46',
+                          transition: 'all 0.15s'
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#dcfce7'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#f0fdf4'; }}
+                      >
+                        <Edit size={14} /> Edit
+                      </button>
+                      <button
+                        onClick={() => handleOpenDelete(q)}
+                        style={{
+                          display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px',
+                          borderRadius: '8px', border: '1px solid #fecaca', background: '#fff',
+                          cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: '#dc2626',
+                          transition: 'all 0.15s'
+                        }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#fef2f2'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#fff'; }}
+                      >
+                        <Trash2 size={14} /> Hapus
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Pagination */}
           {filteredQuestions.length > 0 && (
-            <div className="bg-white p-3 rounded-xl border border-slate-200">
+            <div style={{ background: '#fff', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -1275,496 +854,338 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                 pageSize={pageSize}
                 onPageChange={setCurrentPage}
                 onPageSizeChange={setPageSize}
-                itemLabel="butir soal"
+                itemLabel="soal"
               />
             </div>
           )}
         </div>
       )}
 
-      {/* =========================================================================
-          MODAL PRATINJAU BUTIR SOAL (PREVIEW DENGAN GAMBAR SOAL & GAMBAR OPSI)
-          ========================================================================= */}
+
+      {/* ================================================================
+          MODAL: PRATINJAU SOAL
+          ================================================================ */}
       {previewModal && previewingQuestion && (
-        <Modal
-          isOpen={previewModal}
-          onClose={() => setPreviewModal(false)}
-          title={`Pratinjau Butir Soal (${previewingQuestion.courseCode})`}
-          maxWidth="640px"
-        >
+        <Modal isOpen={previewModal} onClose={() => setPreviewModal(false)} title="Pratinjau Soal" maxWidth="640px">
           <div className="flex flex-col gap-4">
-            <div className="flex justify-between items-center pb-2 border-b border-slate-200">
-              <div className="flex items-center gap-2">
-                <Badge variant="primary">{previewingQuestion.courseCode}</Badge>
-                <Badge variant="default">{previewingQuestion.type.replace('_', ' ')}</Badge>
-                <Badge 
-                  variant={previewingQuestion.difficulty === 'MUDAH' ? 'success' : previewingQuestion.difficulty === 'SEDANG' ? 'warning' : 'danger'}
-                >
-                  {previewingQuestion.difficulty}
-                </Badge>
+            {/* Header Info */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'monospace', background: '#f0fdf4', color: '#065f46', padding: '3px 8px', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
+                  {previewingQuestion.courseCode}
+                </span>
+                <span style={{ fontSize: '11px', fontWeight: 600, background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '6px' }}>
+                  {TIPE_LABEL[previewingQuestion.type] || previewingQuestion.type}
+                </span>
+                <span style={{
+                  fontSize: '11px', fontWeight: 600, padding: '3px 8px', borderRadius: '6px',
+                  ...(DIFFICULTY_CONFIG[previewingQuestion.difficulty] ? {
+                    background: DIFFICULTY_CONFIG[previewingQuestion.difficulty].bg,
+                    color: DIFFICULTY_CONFIG[previewingQuestion.difficulty].color,
+                    border: `1px solid ${DIFFICULTY_CONFIG[previewingQuestion.difficulty].border}`
+                  } : {})
+                }}>
+                  {DIFFICULTY_CONFIG[previewingQuestion.difficulty]?.label || previewingQuestion.difficulty}
+                </span>
               </div>
-              <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                Bobot: {previewingQuestion.defaultPoints} Poin
+              <span style={{ fontSize: '12px', fontWeight: 800, color: '#065f46', background: '#f0fdf4', padding: '4px 12px', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
+                {previewingQuestion.defaultPoints} Poin
               </span>
             </div>
 
             {/* Question Text */}
-            <div className="text-base font-semibold text-slate-800 leading-relaxed">
+            <div style={{ fontSize: '1rem', fontWeight: 600, color: '#1e293b', lineHeight: 1.6 }}>
               {previewingQuestion.questionText}
             </div>
 
-            {/* Arabic Text if any */}
+            {/* Arabic */}
             {previewingQuestion.arabicText && (
-              <div 
-                style={{
-                  fontFamily: "'Amiri', 'Traditional Arabic', serif",
-                  fontSize: '1.25rem',
-                  color: '#065f46',
-                  direction: 'rtl',
-                  textAlign: 'right',
-                  lineHeight: 1.8,
-                  backgroundColor: 'rgba(6, 95, 70, 0.05)',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  borderRight: '4px solid #059669'
-                }}
-              >
+              <div style={{
+                fontFamily: "'Amiri', 'Traditional Arabic', serif", fontSize: '1.25rem',
+                color: '#065f46', direction: 'rtl', textAlign: 'right', lineHeight: 1.8,
+                background: '#f0fdf4', padding: '14px 18px', borderRadius: '12px', borderRight: '4px solid #059669'
+              }}>
                 {previewingQuestion.arabicText}
               </div>
             )}
 
-            {/* Question Image Preview if any */}
+            {/* Image */}
             {previewingQuestion.imageUrl && (
-              <div className="rounded-xl overflow-hidden border border-slate-200 max-h-64 flex justify-center bg-slate-50 p-2">
-                <img 
-                  src={previewingQuestion.imageUrl} 
-                  alt="Ilustrasi Soal" 
-                  className="object-contain max-h-60 rounded-lg"
-                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
-                />
+              <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'center', padding: '10px', maxHeight: '240px' }}>
+                <img src={previewingQuestion.imageUrl} alt="Ilustrasi" style={{ maxHeight: '220px', objectFit: 'contain', borderRadius: '8px' }}
+                  onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }} />
               </div>
             )}
 
-            {/* Options for Multiple Choice / True False (Menampilkan Teks & Gambar Opsi) */}
+            {/* Options */}
             {(previewingQuestion.type === 'PILIHAN_GANDA' || previewingQuestion.type === 'BENAR_SALAH') && previewingQuestion.options && (
-              <div className="flex flex-col gap-2.5 mt-2">
-                {previewingQuestion.options.map((opt, oIdx) => {
-                  const isCorrect = opt.isCorrect;
-                  return (
-                    <div 
-                      key={opt.id || oIdx}
-                      className={`p-3 rounded-xl border transition-all flex flex-col gap-2 ${
-                        previewShowAnswer && isCorrect 
-                          ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-semibold' 
-                          : 'bg-white border-slate-200 text-slate-700'
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                          previewShowAnswer && isCorrect 
-                            ? 'bg-emerald-600 text-white' 
-                            : 'bg-slate-100 text-slate-600'
-                        }`}>
-                          {String.fromCharCode(65 + oIdx)}
-                        </span>
-                        <span className="text-sm pt-0.5 flex-1">{opt.text}</span>
-                        {previewShowAnswer && isCorrect && (
-                          <CheckCircle2 size={16} className="ml-auto text-emerald-600 shrink-0 mt-0.5" />
-                        )}
-                      </div>
-                      
-                      {/* Opsi Gambar jika ada */}
-                      {opt.imageUrl && (
-                        <div className="ml-9 rounded-lg overflow-hidden border border-slate-200 max-h-40 bg-white p-1.5 max-w-xs">
-                          <img 
-                            src={opt.imageUrl} 
-                            alt={`Opsi ${String.fromCharCode(65 + oIdx)}`} 
-                            className="object-contain max-h-36 rounded"
-                          />
-                        </div>
-                      )}
+              <div className="flex flex-col gap-2">
+                {previewingQuestion.options.map((opt, oIdx) => (
+                  <div
+                    key={opt.id || oIdx}
+                    style={{
+                      padding: '12px 14px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '8px',
+                      border: `1.5px solid ${previewShowAnswer && opt.isCorrect ? '#059669' : '#e2e8f0'}`,
+                      background: previewShowAnswer && opt.isCorrect ? '#f0fdf4' : '#fff',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                      <span style={{
+                        width: '28px', height: '28px', borderRadius: '50%', flexShrink: 0,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '12px', fontWeight: 800,
+                        background: previewShowAnswer && opt.isCorrect ? '#059669' : '#f1f5f9',
+                        color: previewShowAnswer && opt.isCorrect ? '#fff' : '#475569'
+                      }}>
+                        {String.fromCharCode(65 + oIdx)}
+                      </span>
+                      <span style={{ fontSize: '0.9rem', paddingTop: '3px', flex: 1, color: '#1e293b' }}>{opt.text}</span>
+                      {previewShowAnswer && opt.isCorrect && <CheckCircle2 size={18} style={{ color: '#059669', flexShrink: 0, marginTop: '2px' }} />}
                     </div>
-                  );
-                })}
+                    {opt.imageUrl && (
+                      <div style={{ marginLeft: '38px', borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#fff', padding: '6px', maxWidth: '280px', maxHeight: '160px' }}>
+                        <img src={opt.imageUrl} alt={`Opsi ${String.fromCharCode(65 + oIdx)}`} style={{ maxHeight: '148px', objectFit: 'contain', borderRadius: '6px' }} />
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
 
             {/* Short Answer */}
             {previewingQuestion.type === 'JAWABAN_SINGKAT' && (
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs">
-                <span className="text-slate-500 block mb-1">Kunci Jawaban Singkat:</span>
-                <span className="font-mono font-bold text-sm text-emerald-800 bg-white px-2 py-1 rounded border">
-                  {previewShowAnswer ? previewingQuestion.correctShortAnswer : '•••••••• (Klik Buka Kunci)'}
-                </span>
+              <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '6px' }}>Kunci Jawaban:</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace', color: '#065f46', background: '#fff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', width: 'fit-content' }}>
+                  {previewShowAnswer ? previewingQuestion.correctShortAnswer : '••••••••'}
+                </div>
               </div>
             )}
 
-            {/* Essay Rubric */}
+            {/* Essay */}
             {previewingQuestion.type === 'ESAI' && (
-              <div className="p-3.5 bg-amber-50 rounded-xl border border-amber-200 text-xs">
-                <span className="font-bold text-amber-800 block mb-1">Panduan Rubrik Penilaian Dosen:</span>
-                <p className="text-amber-900 leading-relaxed">
-                  {previewingQuestion.essayRubric || 'Tidak ada rubrik khusus yang dicantumkan.'}
+              <div style={{ padding: '12px 16px', background: '#fefce8', borderRadius: '12px', border: '1px solid #fde68a' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#92400e', marginBottom: '6px' }}>Rubrik Penilaian:</div>
+                <p style={{ fontSize: '0.85rem', color: '#78350f', lineHeight: 1.6, margin: 0 }}>
+                  {previewingQuestion.essayRubric || 'Tidak ada rubrik khusus.'}
                 </p>
               </div>
             )}
 
-            {/* Explanation & Discussion */}
+            {/* Explanation */}
             {previewShowAnswer && previewingQuestion.explanation && (
-              <div className="p-3.5 bg-emerald-50/70 rounded-xl border border-emerald-200 text-xs mt-2">
-                <span className="font-bold text-emerald-800 block mb-1">Pembahasan / Rujukan Dalil:</span>
-                <p className="text-emerald-900 leading-relaxed">
-                  {previewingQuestion.explanation}
-                </p>
+              <div style={{ padding: '12px 16px', background: '#f0fdf4', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#166534', marginBottom: '6px' }}>💡 Pembahasan:</div>
+                <p style={{ fontSize: '0.85rem', color: '#065f46', lineHeight: 1.6, margin: 0 }}>{previewingQuestion.explanation}</p>
               </div>
             )}
 
-            {/* Toggle Answer Key */}
-            <div className="flex justify-between items-center pt-3 border-t border-slate-200 mt-2">
+            {/* Footer */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '4px' }}>
               <button
-                type="button"
                 onClick={() => setPreviewShowAnswer(!previewShowAnswer)}
-                className="text-xs font-bold text-emerald-700 hover:text-emerald-800 flex items-center gap-1.5"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  fontSize: '13px', fontWeight: 700, color: '#059669',
+                  background: 'none', border: 'none', cursor: 'pointer'
+                }}
               >
-                <Sparkles size={14} />
-                {previewShowAnswer ? 'Sembunyikan Kunci & Pembahasan' : 'Tampilkan Kunci & Pembahasan'}
+                <Sparkles size={16} />
+                {previewShowAnswer ? 'Sembunyikan Jawaban' : 'Tampilkan Jawaban'}
               </button>
-
               <div className="flex gap-2">
-                <Button 
-                  variant="secondary" 
-                  size="sm" 
-                  icon={Edit} 
-                  onClick={() => {
-                    setPreviewModal(false);
-                    handleOpenEdit(previewingQuestion);
-                  }}
-                >
-                  Edit Soal
+                <Button variant="secondary" size="sm" icon={Edit}
+                  onClick={() => { setPreviewModal(false); handleOpenEdit(previewingQuestion); }}>
+                  Edit
                 </Button>
-                <Button variant="primary" size="sm" onClick={() => setPreviewModal(false)}>
-                  Tutup
-                </Button>
+                <Button variant="primary" size="sm" onClick={() => setPreviewModal(false)}
+                  style={{ background: '#059669' }}>Tutup</Button>
               </div>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* =========================================================================
-          MODAL HAPUS BUTIR SOAL (DELETE CONFIRMATION)
-          ========================================================================= */}
+
+      {/* ================================================================
+          MODAL: HAPUS SOAL
+          ================================================================ */}
       {deleteConfirmModal && deletingQuestion && (
-        <Modal
-          isOpen={deleteConfirmModal}
-          onClose={() => setDeleteConfirmModal(false)}
-          title="Konfirmasi Hapus Butir Soal"
-          maxWidth="480px"
-        >
+        <Modal isOpen={deleteConfirmModal} onClose={() => setDeleteConfirmModal(false)} title="Hapus Soal?" maxWidth="460px">
           <div className="flex flex-col gap-4">
-            <div className="p-3.5 bg-red-50 text-red-800 rounded-xl border border-red-200 text-xs flex items-start gap-2.5">
-              <Trash2 size={18} className="text-red-600 shrink-0 mt-0.5" />
-              <div>
-                <strong>Tindakan ini tidak dapat dibatalkan!</strong> Butir soal akan dihapus secara permanen dari Bank Soal repositori STAI AL-ITTIHAD.
-              </div>
+            <div style={{ padding: '14px', background: '#fef2f2', borderRadius: '12px', border: '1px solid #fecaca', fontSize: '13px', color: '#991b1b', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <Trash2 size={20} style={{ color: '#dc2626', flexShrink: 0, marginTop: '1px' }} />
+              <div>Soal ini akan dihapus <strong>secara permanen</strong> dan tidak dapat dikembalikan.</div>
             </div>
-
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700">
-              <div className="text-[11px] text-slate-500 uppercase font-semibold mb-1">Mata Kuliah: {deletingQuestion.courseCode}</div>
-              <p className="font-semibold text-slate-900 leading-snug line-clamp-3">
-                "{deletingQuestion.questionText}"
-              </p>
-              <div className="mt-2 text-[11px] text-slate-500">
-                Topik: <strong>{deletingQuestion.topic}</strong> • Tipe: <strong>{deletingQuestion.type}</strong>
-              </div>
+            <div style={{ padding: '12px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '13px' }}>
+              <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>{deletingQuestion.courseCode} • {TIPE_LABEL[deletingQuestion.type]}</div>
+              <p style={{ fontWeight: 600, color: '#1e293b', lineHeight: 1.4, margin: 0 }}>"{deletingQuestion.questionText}"</p>
             </div>
-
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-200">
-              <Button variant="secondary" onClick={() => setDeleteConfirmModal(false)}>
-                Batal
-              </Button>
-              <Button 
-                variant="primary" 
-                onClick={handleExecuteDelete}
-                className="bg-red-600 hover:bg-red-700 text-white font-bold border-0"
-              >
-                Hapus Permanen
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+              <Button variant="secondary" onClick={() => setDeleteConfirmModal(false)}>Batal</Button>
+              <Button variant="primary" onClick={handleExecuteDelete}
+                style={{ background: '#dc2626', fontWeight: 700 }}>
+                Ya, Hapus Soal
               </Button>
             </div>
           </div>
         </Modal>
       )}
 
-      {/* =========================================================================
-          MODAL TAMBAH / EDIT BUTIR SOAL DENGAN FITUR UPLOAD GAMBAR SOAL & OPSI
-          ========================================================================= */}
+
+      {/* ================================================================
+          MODAL: TAMBAH / EDIT SOAL
+          ================================================================ */}
       {editModal && (
-        <Modal
-          isOpen={editModal}
-          onClose={() => setEditModal(false)}
-          title={editingQuestionId ? 'Edit Butir Soal' : 'Tambah Butir Soal Baru'}
-          maxWidth="720px"
-        >
+        <Modal isOpen={editModal} onClose={() => setEditModal(false)}
+          title={editingQuestionId ? '✏️ Edit Soal' : '➕ Tambah Soal Baru'} maxWidth="700px">
           <form onSubmit={handleSaveQuestion} className="flex flex-col gap-4">
+            {/* Row: Mata Kuliah + Topik */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="form-label font-bold text-xs">Mata Kuliah Target</label>
-                <select
-                  className="form-select text-xs"
-                  value={courseCode}
-                  onChange={(e) => setCourseCode(e.target.value)}
-                  required
-                >
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Mata Kuliah</label>
+                <select className="form-select" value={courseCode} onChange={(e) => setCourseCode(e.target.value)} required
+                  style={{ fontSize: '13px', borderRadius: '10px' }}>
                   {Object.entries(COURSES_INFO).map(([code, info]) => (
-                    <option key={code} value={code}>
-                      {code} — {info.name}
-                    </option>
+                    <option key={code} value={code}>{info.icon} {code} — {info.name}</option>
                   ))}
                 </select>
               </div>
-
               <div>
-                <label className="form-label font-bold text-xs">Topik / CPMK Pembahasan</label>
-                <Input
-                  required
-                  placeholder="misal: Kaidah Lughawiyah Ushul Fiqih"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                />
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Topik / Materi</label>
+                <Input required placeholder="contoh: Kaidah Fiqhiyyah" value={topic} onChange={(e) => setTopic(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
             </div>
 
+            {/* Row: Tipe + Level + Poin */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="form-label font-bold text-xs">Tipe Soal</label>
-                <select
-                  className="form-select text-xs"
-                  value={qType}
-                  onChange={(e) => setQType(e.target.value as QuestionType)}
-                >
-                  <option value="PILIHAN_GANDA">Pilihan Ganda (5 Opsi A-E)</option>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Tipe Soal</label>
+                <select className="form-select" value={qType} onChange={(e) => setQType(e.target.value as QuestionType)}
+                  style={{ fontSize: '13px', borderRadius: '10px' }}>
+                  <option value="PILIHAN_GANDA">Pilihan Ganda (A-E)</option>
                   <option value="BENAR_SALAH">Benar / Salah</option>
-                  <option value="JAWABAN_SINGKAT">Jawaban Singkat (Isian)</option>
+                  <option value="JAWABAN_SINGKAT">Isian Singkat</option>
                   <option value="ESAI">Esai (Uraian)</option>
                 </select>
               </div>
-
               <div>
-                <label className="form-label font-bold text-xs">Tingkat Kesulitan</label>
-                <select
-                  className="form-select text-xs"
-                  value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value as QuestionDifficulty)}
-                >
-                  <option value="MUDAH">Mudah</option>
-                  <option value="SEDANG">Sedang</option>
-                  <option value="SULIT">Sulit</option>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Tingkat Kesulitan</label>
+                <select className="form-select" value={difficulty} onChange={(e) => setDifficulty(e.target.value as QuestionDifficulty)}
+                  style={{ fontSize: '13px', borderRadius: '10px' }}>
+                  <option value="MUDAH">🟢 Mudah</option>
+                  <option value="SEDANG">🟡 Sedang</option>
+                  <option value="SULIT">🔴 Sulit</option>
                 </select>
               </div>
-
               <div>
-                <label className="form-label font-bold text-xs">Bobot Poin Standar</label>
-                <Input
-                  type="number"
-                  min={1}
-                  max={100}
-                  required
-                  value={points}
-                  onChange={(e) => setPoints(Number(e.target.value) || 0)}
-                />
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Bobot Poin</label>
+                <Input type="number" min={1} max={100} required value={points} onChange={(e) => setPoints(Number(e.target.value) || 0)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
             </div>
 
-            {/* Teks Pertanyaan */}
+            {/* Pertanyaan */}
             <div>
-              <label className="form-label font-bold text-xs">Teks Pertanyaan / Soal</label>
-              <textarea
-                className="form-textarea text-xs"
-                rows={3}
-                required
-                placeholder="Tuliskan narasi pertanyaan atau kasus secara jelas..."
-                value={questionText}
-                onChange={(e) => setQuestionText(e.target.value)}
-              />
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Teks Pertanyaan</label>
+              <textarea className="form-textarea" rows={3} required placeholder="Tuliskan pertanyaan secara jelas..."
+                value={questionText} onChange={(e) => setQuestionText(e.target.value)}
+                style={{ fontSize: '13px', borderRadius: '10px' }} />
             </div>
 
-            {/* Teks Arab / Matan */}
+            {/* Teks Arab */}
             <div>
-              <label className="form-label font-bold text-xs">Teks Arab / Ayat / Hadits / Matan Kitab (Opsional)</label>
-              <textarea
-                className="form-textarea text-base"
-                rows={2}
-                placeholder="أدخل النص العربي أو المتن هنا..."
-                dir="rtl"
-                style={{ fontFamily: "'Amiri', 'Traditional Arabic', serif", color: '#065f46' }}
-                value={arabicText}
-                onChange={(e) => setArabicText(e.target.value)}
-              />
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Teks Arab / Ayat / Hadits <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span></label>
+              <textarea className="form-textarea" rows={2} placeholder="أدخل النص العربي هنا..." dir="rtl"
+                style={{ fontFamily: "'Amiri', 'Traditional Arabic', serif", fontSize: '1rem', color: '#065f46', borderRadius: '10px' }}
+                value={arabicText} onChange={(e) => setArabicText(e.target.value)} />
             </div>
 
-            {/* FITUR UPLOAD GAMBAR SOAL */}
-            <div className="flex flex-col gap-2 p-3.5 rounded-xl border border-slate-200 bg-slate-50/80">
-              <div className="flex justify-between items-center">
-                <label className="form-label font-bold text-xs text-slate-800 flex items-center gap-1.5" style={{ margin: 0 }}>
-                  <ImageIcon size={14} className="text-emerald-700" />
-                  Gambar / Bagan Ilustrasi Soal (Opsional)
+            {/* Upload Gambar Soal */}
+            <div style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+                  <ImageIcon size={14} style={{ color: '#059669' }} /> Gambar Soal <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span>
                 </label>
                 {imageUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setImageUrl('')}
-                    className="text-[11px] text-red-600 hover:text-red-700 font-semibold flex items-center gap-1"
-                  >
-                    <Trash2 size={12} /> Hapus Gambar
+                  <button type="button" onClick={() => setImageUrl('')} style={{ fontSize: '11px', color: '#dc2626', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <Trash2 size={12} /> Hapus
                   </button>
                 )}
               </div>
-
               {imageUrl ? (
-                <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-white p-2.5 flex flex-col items-center gap-2">
-                  <img 
-                    src={imageUrl} 
-                    alt="Pratinjau Soal" 
-                    className="max-h-48 object-contain rounded-lg shadow-xs"
-                  />
-                  <div className="flex items-center gap-2 w-full pt-1">
-                    <Input
-                      placeholder="Atau ubah tautan URL gambar..."
-                      value={imageUrl}
-                      onChange={(e) => setImageUrl(e.target.value)}
-                      className="text-xs flex-1"
-                    />
-                    <label className="btn btn-secondary btn-sm cursor-pointer text-xs flex items-center gap-1 shrink-0">
-                      <Upload size={13} /> Ganti File
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        className="hidden" 
-                        onChange={handleQuestionImageUpload} 
-                      />
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', background: '#fff', borderRadius: '10px', border: '1px solid #e2e8f0', padding: '10px' }}>
+                  <img src={imageUrl} alt="Preview" style={{ maxHeight: '180px', objectFit: 'contain', borderRadius: '8px' }} />
+                  <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                    <Input placeholder="URL gambar..." value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={{ fontSize: '12px', flex: 1, borderRadius: '8px' }} />
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: '#475569', whiteSpace: 'nowrap' }}>
+                      <Upload size={13} /> Ganti
+                      <input type="file" accept="image/*" className="hidden" onChange={handleQuestionImageUpload} />
                     </label>
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col sm:flex-row items-center gap-2">
-                  <label className="w-full sm:w-auto btn btn-secondary btn-sm cursor-pointer text-xs flex items-center justify-center gap-1.5 shrink-0 bg-white border-slate-300 hover:bg-slate-50 shadow-xs py-2">
-                    <Upload size={14} className="text-emerald-700" />
-                    <span className="font-semibold text-slate-700">Unggah Gambar Soal (File)</span>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      className="hidden" 
-                      onChange={handleQuestionImageUpload} 
-                    />
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
+                    <Upload size={14} style={{ color: '#059669' }} /> Unggah Gambar
+                    <input type="file" accept="image/*" className="hidden" onChange={handleQuestionImageUpload} />
                   </label>
-                  <span className="text-xs text-slate-400">atau</span>
-                  <Input
-                    placeholder="Tempel tautan URL gambar langsung..."
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    className="text-xs flex-1"
-                  />
+                  <span style={{ fontSize: '11px', color: '#94a3b8' }}>atau</span>
+                  <Input placeholder="Tempel URL gambar..." value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={{ fontSize: '12px', flex: 1, borderRadius: '8px', minWidth: '180px' }} />
                 </div>
               )}
             </div>
 
-            {/* FITUR UPLOAD GAMBAR UNTUK OPSI PILIHAN GANDA (A – E) */}
+            {/* Opsi Pilihan Ganda A-E */}
             {qType === 'PILIHAN_GANDA' && (
-              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <label className="form-label font-bold text-xs text-slate-800" style={{ margin: 0 }}>
-                      5 Opsi Jawaban & Kunci Benar (A – E)
-                    </label>
-                    <p className="text-[11px] text-slate-500 mt-0.5">
-                      Dapat diisi teks, gambar ilustrasi (diagram/grafik/arab), atau keduanya
-                    </p>
-                  </div>
-                  <span className="text-[11px] text-emerald-800 bg-emerald-100/80 font-semibold px-2 py-0.5 rounded">
-                    Pilih radio untuk kunci benar
+              <div style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', margin: 0 }}>Opsi Jawaban (A–E)</label>
+                  <span style={{ fontSize: '10px', color: '#059669', fontWeight: 600, background: '#f0fdf4', padding: '2px 8px', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
+                    Klik radio = kunci benar
                   </span>
                 </div>
-                
                 {[
-                  { key: 'optA', label: 'A', val: optA, setVal: setOptA, img: optAImage, setImg: setOptAImage, req: true },
-                  { key: 'optB', label: 'B', val: optB, setVal: setOptB, img: optBImage, setImg: setOptBImage, req: true },
-                  { key: 'optC', label: 'C', val: optC, setVal: setOptC, img: optCImage, setImg: setOptCImage, req: false },
-                  { key: 'optD', label: 'D', val: optD, setVal: setOptD, img: optDImage, setImg: setOptDImage, req: false },
-                  { key: 'optE', label: 'E', val: optE, setVal: setOptE, img: optEImage, setImg: setOptEImage, req: false },
+                  { label: 'A', val: optA, setVal: setOptA, img: optAImage, setImg: setOptAImage },
+                  { label: 'B', val: optB, setVal: setOptB, img: optBImage, setImg: setOptBImage },
+                  { label: 'C', val: optC, setVal: setOptC, img: optCImage, setImg: setOptCImage },
+                  { label: 'D', val: optD, setVal: setOptD, img: optDImage, setImg: setOptDImage },
+                  { label: 'E', val: optE, setVal: setOptE, img: optEImage, setImg: setOptEImage },
                 ].map((item, idx) => (
-                  <div 
-                    key={item.key} 
-                    className={`p-2.5 rounded-xl border transition-all flex flex-col gap-2 ${
-                      correctOptIndex === idx 
-                        ? 'bg-emerald-50/80 border-emerald-500 shadow-xs' 
-                        : 'bg-white border-slate-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <input 
-                        type="radio" 
-                        name="correctOptBank" 
-                        checked={correctOptIndex === idx} 
-                        onChange={() => setCorrectOptIndex(idx)} 
-                        title={`Jadikan Kunci Benar ${item.label}`}
-                        style={{ width: '18px', height: '18px', accentColor: '#047857', cursor: 'pointer', flexShrink: 0 }}
-                      />
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                        correctOptIndex === idx ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'
-                      }`}>
-                        {item.label}
-                      </span>
-                      <div className="flex-1">
-                        <Input 
-                          placeholder={`Teks Opsi ${item.label}${item.req ? ' (Wajib)' : ' (Opsional jika ada gambar)'}`} 
-                          value={item.val} 
-                          onChange={(e) => item.setVal(e.target.value)} 
-                          className="text-xs"
-                          style={{
-                            borderColor: correctOptIndex === idx ? '#059669' : undefined,
-                            backgroundColor: correctOptIndex === idx ? '#ffffff' : undefined
-                          }}
-                        />
-                      </div>
-
-                      {/* Tombol Upload Gambar Opsi */}
-                      <label 
-                        className={`btn btn-sm cursor-pointer text-xs flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border ${
-                          item.img 
-                            ? 'bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold' 
-                            : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
-                        }`}
-                        title={`Unggah gambar untuk Opsi ${item.label}`}
-                      >
-                        <ImageIcon size={14} className={item.img ? 'text-emerald-700' : 'text-slate-600'} />
-                        <span className="hidden sm:inline">{item.img ? 'Ganti Gbr' : '+ Gambar'}</span>
-                        <input 
-                          type="file" 
-                          accept="image/*" 
-                          className="hidden" 
-                          onChange={(e) => handleOptionImageUpload(e, item.setImg, item.label)} 
-                        />
+                  <div key={item.label} style={{
+                    padding: '10px 12px', borderRadius: '10px', marginBottom: '6px', display: 'flex', flexDirection: 'column', gap: '6px',
+                    border: `1.5px solid ${correctOptIndex === idx ? '#059669' : '#e2e8f0'}`,
+                    background: correctOptIndex === idx ? '#f0fdf4' : '#fff'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <input type="radio" name="correctOpt" checked={correctOptIndex === idx} onChange={() => setCorrectOptIndex(idx)}
+                        style={{ width: '18px', height: '18px', accentColor: '#059669', cursor: 'pointer', flexShrink: 0 }} />
+                      <span style={{
+                        width: '26px', height: '26px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: '12px', fontWeight: 800, flexShrink: 0,
+                        background: correctOptIndex === idx ? '#059669' : '#f1f5f9',
+                        color: correctOptIndex === idx ? '#fff' : '#475569'
+                      }}>{item.label}</span>
+                      <Input placeholder={`Teks opsi ${item.label}`} value={item.val} onChange={(e) => item.setVal(e.target.value)}
+                        style={{ fontSize: '13px', flex: 1, borderRadius: '8px', borderColor: correctOptIndex === idx ? '#059669' : undefined }} />
+                      <label style={{
+                        display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 8px', borderRadius: '8px', cursor: 'pointer', fontSize: '11px', fontWeight: 600, flexShrink: 0,
+                        border: `1px solid ${item.img ? '#bbf7d0' : '#e2e8f0'}`,
+                        background: item.img ? '#f0fdf4' : '#fff', color: item.img ? '#065f46' : '#64748b'
+                      }}>
+                        <ImageIcon size={13} /> <span className="hidden sm:inline">{item.img ? '✓' : '+Gbr'}</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleOptionImageUpload(e, item.setImg, item.label)} />
                       </label>
                     </div>
-
-                    {/* Preview Thumbnail Gambar Opsi jika ada */}
                     {item.img && (
-                      <div className="flex items-center justify-between gap-2 p-2 bg-slate-50 rounded-lg border border-slate-200 ml-8">
-                        <div className="flex items-center gap-2">
-                          <img 
-                            src={item.img} 
-                            alt={`Gambar Opsi ${item.label}`} 
-                            className="w-14 h-14 object-contain rounded border border-slate-300 bg-white"
-                          />
-                          <span className="text-[11px] text-slate-600 font-medium">Gambar Opsi {item.label} aktif</span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginLeft: '52px', padding: '6px 8px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <img src={item.img} alt={`Opsi ${item.label}`} style={{ width: '48px', height: '48px', objectFit: 'contain', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#fff' }} />
+                          <span style={{ fontSize: '11px', color: '#64748b' }}>Gambar opsi {item.label}</span>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => item.setImg('')}
-                          className="text-xs text-red-600 hover:text-red-700 p-1 flex items-center gap-1 font-semibold"
-                          title="Hapus gambar opsi ini"
-                        >
-                          <Trash2 size={13} /> Hapus
+                        <button type="button" onClick={() => item.setImg('')}
+                          style={{ fontSize: '11px', color: '#dc2626', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <Trash2 size={12} /> Hapus
                         </button>
                       </div>
                     )}
@@ -1773,21 +1194,16 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               </div>
             )}
 
-            {/* Opsi Jawaban: Benar / Salah */}
+            {/* Benar / Salah */}
             {qType === 'BENAR_SALAH' && (
-              <div className="flex flex-col gap-2 p-3.5 rounded-xl border border-slate-200 bg-slate-50">
-                <label className="form-label font-bold text-xs">Kunci Jawaban yang Benar</label>
-                <div className="flex gap-6">
+              <div style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '10px' }}>Kunci Jawaban</label>
+                <div style={{ display: 'flex', gap: '16px' }}>
                   {['Benar', 'Salah'].map((opt, li) => (
-                    <label key={opt} className="flex items-center gap-2 cursor-pointer text-sm">
-                      <input 
-                        type="radio" 
-                        name="correctBSBank" 
-                        checked={correctOptIndex === li} 
-                        onChange={() => setCorrectOptIndex(li)} 
-                        style={{ width: '18px', height: '18px', accentColor: '#047857' }}
-                      />
-                      <span className={correctOptIndex === li ? 'font-bold text-emerald-800' : 'text-slate-700'}>{opt}</span>
+                    <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+                      <input type="radio" name="correctBS" checked={correctOptIndex === li} onChange={() => setCorrectOptIndex(li)}
+                        style={{ width: '18px', height: '18px', accentColor: '#059669' }} />
+                      <span style={{ fontWeight: correctOptIndex === li ? 700 : 400, color: correctOptIndex === li ? '#065f46' : '#475569' }}>{opt}</span>
                     </label>
                   ))}
                 </div>
@@ -1797,72 +1213,55 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
             {/* Jawaban Singkat */}
             {qType === 'JAWABAN_SINGKAT' && (
               <div>
-                <label className="form-label font-bold text-xs">Kunci Kata Kunci Jawaban Singkat</label>
-                <Input
-                  required
-                  placeholder="Ketik kata kunci jawaban yang tepat (tidak sensitif huruf besar/kecil)"
-                  value={shortAnswer}
-                  onChange={(e) => setShortAnswer(e.target.value)}
-                />
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Kunci Jawaban</label>
+                <Input required placeholder="Kata kunci jawaban yang tepat" value={shortAnswer} onChange={(e) => setShortAnswer(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
             )}
 
-            {/* Esai Rubrik */}
+            {/* Esai */}
             {qType === 'ESAI' && (
               <div>
-                <label className="form-label font-bold text-xs">Panduan Rubrik Penilaian Dosen</label>
-                <textarea
-                  className="form-textarea text-xs"
-                  rows={2}
-                  placeholder="Kriteria penilaian esai (misal: Bobot definisi 40%, contoh kasus 60%)..."
-                  value={essayRubric}
-                  onChange={(e) => setEssayRubric(e.target.value)}
-                />
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Rubrik Penilaian</label>
+                <textarea className="form-textarea" rows={2} placeholder="Kriteria penilaian esai..."
+                  value={essayRubric} onChange={(e) => setEssayRubric(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
             )}
 
+            {/* Pembahasan */}
             <div>
-              <label className="form-label text-xs">Penjelasan / Pembahasan Soal (Opsional)</label>
-              <textarea
-                className="form-textarea text-xs"
-                rows={2}
-                placeholder="Penjelasan kaidah atau dalil rujukan..."
-                value={explanation}
-                onChange={(e) => setExplanation(e.target.value)}
-              />
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Pembahasan <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span></label>
+              <textarea className="form-textarea" rows={2} placeholder="Penjelasan, dalil, atau rujukan..."
+                value={explanation} onChange={(e) => setExplanation(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
             </div>
 
+            {/* Tags */}
             <div>
-              <label className="form-label text-xs">Tagar / Kata Kunci (Pisahkan koma)</label>
-              <Input
-                placeholder="misal: Fiqih, Ushul, Kaidah Amar"
-                value={tags}
-                onChange={(e) => setTags(e.target.value)}
-              />
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Tag <span style={{ fontWeight: 400, color: '#94a3b8' }}>(pisahkan koma)</span></label>
+              <Input placeholder="contoh: Fiqih, Ushul, Kaidah" value={tags} onChange={(e) => setTags(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
             </div>
 
-            <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-slate-200">
-              <Button variant="secondary" type="button" onClick={() => setEditModal(false)}>
-                Batal
-              </Button>
-              <Button variant="primary" type="submit" style={{ background: 'linear-gradient(135deg, #065f46 0%, #047857 100%)' }}>
-                {editingQuestionId ? 'Simpan Perubahan' : 'Simpan ke Bank Soal'}
+            {/* Actions */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '4px' }}>
+              <Button variant="secondary" type="button" onClick={() => setEditModal(false)}>Batal</Button>
+              <Button variant="primary" type="submit" style={{ background: 'linear-gradient(135deg, #059669, #047857)', fontWeight: 700 }}>
+                {editingQuestionId ? 'Simpan Perubahan' : 'Simpan Soal'}
               </Button>
             </div>
           </form>
         </Modal>
       )}
 
-      {/* =========================================================================
-          MODAL IMPOR BUTIR SOAL EXCEL
-          ========================================================================= */}
+
+      {/* ================================================================
+          MODAL: IMPOR EXCEL
+          ================================================================ */}
       {importModal && (
         <DataImportModal<ImportQuestionInput>
           isOpen={importModal}
           onClose={() => setImportModal(false)}
           schema={QUESTION_BANK_IMPORT_SCHEMA}
           onImport={handleBulkImportQuestions}
-          customTitle="Pusat Impor Bank Soal Kurikulum (Format Excel Terstandar)"
+          customTitle="Impor Soal dari File Excel"
         />
       )}
     </div>
