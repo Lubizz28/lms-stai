@@ -269,171 +269,311 @@ export const ManualRollCallModal: React.FC<ManualRollCallModalProps> = ({
           ))}
         </div>
 
-        {/* Scrollable Student List */}
+        {/* Responsive Student Attendance List: Desktop Table + Mobile Cards */}
         <div 
           style={{ 
-            maxHeight: '380px', 
+            maxHeight: '420px', 
             overflowY: 'auto', 
             border: '1px solid var(--border-default)', 
             borderRadius: 'var(--radius-lg)' 
           }}
         >
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)' }}>
-            <thead>
-              <tr style={{ backgroundColor: 'var(--color-slate-50)', borderBottom: '1px solid var(--border-default)', position: 'sticky', top: 0, zIndex: 5 }}>
-                <th style={{ padding: '8px 12px', textAlign: 'left', width: '35%' }}>Nama Mahasiswa & NIM</th>
-                <th style={{ padding: '8px 12px', textAlign: 'center', width: '38%' }}>Status Kehadiran</th>
-                <th style={{ padding: '8px 12px', textAlign: 'left', width: '27%' }}>Catatan / Dispensasi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.length === 0 ? (
-                <tr>
-                  <td colSpan={3} style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--text-muted)' }}>
-                    Tidak ada mahasiswa yang sesuai dengan pencarian atau filter.
-                  </td>
-                </tr>
-              ) : (
-                filteredStudents.map((st, idx) => {
+          {filteredStudents.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: 'var(--space-6)', color: 'var(--text-muted)' }}>
+              Tidak ada mahasiswa yang sesuai dengan pencarian atau filter.
+            </div>
+          ) : (
+            <>
+              {/* DESKTOP TABLE VIEW (>=640px) */}
+              <table className="hidden sm:table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: 'var(--text-xs)' }}>
+                <thead>
+                  <tr style={{ backgroundColor: 'var(--color-slate-50)', borderBottom: '1px solid var(--border-default)', position: 'sticky', top: 0, zIndex: 5 }}>
+                    <th style={{ padding: '10px 12px', textAlign: 'left', width: '35%' }}>Nama Mahasiswa & NIM</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'center', width: '38%' }}>Status Kehadiran</th>
+                    <th style={{ padding: '10px 12px', textAlign: 'left', width: '27%' }}>Catatan / Dispensasi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStudents.map((st, idx) => {
+                    const current = recordsMap[st.studentId] || { status: st.status || 'ALPA', notes: '' };
+                    const currentStatus = current.status;
+
+                    return (
+                      <tr 
+                        key={st.studentId}
+                        style={{ 
+                          borderBottom: '1px solid var(--border-default)',
+                          backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--color-slate-50)'
+                        }}
+                      >
+                        <td style={{ padding: '10px 12px' }}>
+                          <div style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                            {st.studentName}
+                          </div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace', marginTop: '2px' }}>
+                            NIM: {st.studentNim}
+                          </div>
+                        </td>
+
+                        {/* Status Toggle Buttons */}
+                        <td style={{ padding: '10px 12px', textAlign: 'center' }}>
+                          <div className="inline-flex rounded-md shadow-xs" role="group">
+                            <button
+                              type="button"
+                              onClick={() => handleSetStatus(st.studentId, 'HADIR')}
+                              style={{
+                                padding: '5px 10px',
+                                fontSize: '11px',
+                                fontWeight: currentStatus === 'HADIR' ? 700 : 500,
+                                borderTopLeftRadius: 'var(--radius-sm)',
+                                borderBottomLeftRadius: 'var(--radius-sm)',
+                                border: '1px solid var(--border-strong)',
+                                borderRight: 'none',
+                                backgroundColor: currentStatus === 'HADIR' ? 'var(--color-success-600)' : 'var(--bg-surface)',
+                                color: currentStatus === 'HADIR' ? '#ffffff' : 'var(--text-secondary)',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                              }}
+                              title="Tandai Hadir"
+                            >
+                              <CheckCircle2 size={12} />
+                              Hadir
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleSetStatus(st.studentId, 'SAKIT')}
+                              style={{
+                                padding: '5px 10px',
+                                fontSize: '11px',
+                                fontWeight: currentStatus === 'SAKIT' ? 700 : 500,
+                                border: '1px solid var(--border-strong)',
+                                borderRight: 'none',
+                                backgroundColor: currentStatus === 'SAKIT' ? '#0284c7' : 'var(--bg-surface)',
+                                color: currentStatus === 'SAKIT' ? '#ffffff' : 'var(--text-secondary)',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                              }}
+                              title="Tandai Sakit"
+                            >
+                              <Stethoscope size={12} />
+                              Sakit
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleSetStatus(st.studentId, 'IZIN')}
+                              style={{
+                                padding: '5px 10px',
+                                fontSize: '11px',
+                                fontWeight: currentStatus === 'IZIN' ? 700 : 500,
+                                border: '1px solid var(--border-strong)',
+                                borderRight: 'none',
+                                backgroundColor: currentStatus === 'IZIN' ? '#d97706' : 'var(--bg-surface)',
+                                color: currentStatus === 'IZIN' ? '#ffffff' : 'var(--text-secondary)',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                              }}
+                              title="Tandai Izin"
+                            >
+                              <Clock size={12} />
+                              Izin
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleSetStatus(st.studentId, 'ALPA')}
+                              style={{
+                                padding: '5px 10px',
+                                fontSize: '11px',
+                                fontWeight: currentStatus === 'ALPA' ? 700 : 500,
+                                borderTopRightRadius: 'var(--radius-sm)',
+                                borderBottomRightRadius: 'var(--radius-sm)',
+                                border: '1px solid var(--border-strong)',
+                                backgroundColor: currentStatus === 'ALPA' ? 'var(--color-danger-600)' : 'var(--bg-surface)',
+                                color: currentStatus === 'ALPA' ? '#ffffff' : 'var(--text-secondary)',
+                                cursor: 'pointer',
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '3px'
+                              }}
+                              title="Tandai Alpa"
+                            >
+                              <AlertCircle size={12} />
+                              Alpa
+                            </button>
+                          </div>
+                        </td>
+
+                        {/* Notes input */}
+                        <td style={{ padding: '10px 12px' }}>
+                          <input
+                            type="text"
+                            placeholder="Catatan..."
+                            value={current.notes || ''}
+                            onChange={(e) => handleSetNotes(st.studentId, e.target.value)}
+                            style={{
+                              width: '100%',
+                              padding: '5px 8px',
+                              fontSize: '11px',
+                              borderRadius: 'var(--radius-sm)',
+                              border: '1px solid var(--border-default)',
+                              backgroundColor: 'var(--bg-surface)'
+                            }}
+                          />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+
+              {/* MOBILE CARDS VIEW (<640px) */}
+              <div className="block sm:hidden divide-y divide-gray-200">
+                {filteredStudents.map((st) => {
                   const current = recordsMap[st.studentId] || { status: st.status || 'ALPA', notes: '' };
                   const currentStatus = current.status;
 
                   return (
-                    <tr 
-                      key={st.studentId}
-                      style={{ 
-                        borderBottom: '1px solid var(--border-default)',
-                        backgroundColor: idx % 2 === 0 ? 'var(--bg-surface)' : 'var(--color-slate-50)'
-                      }}
-                    >
-                      <td style={{ padding: '8px 12px' }}>
-                        <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                          {st.studentName}
+                    <div key={st.studentId} style={{ padding: '12px', backgroundColor: 'var(--bg-surface)' }}>
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                            {st.studentName}
+                          </div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+                            NIM: {st.studentNim}
+                          </div>
                         </div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-                          NIM: {st.studentNim}
-                        </div>
-                      </td>
+                        <Badge 
+                          variant={
+                            currentStatus === 'HADIR' ? 'success' :
+                            currentStatus === 'SAKIT' ? 'info' :
+                            currentStatus === 'IZIN' ? 'warning' : 'danger'
+                          }
+                        >
+                          {currentStatus}
+                        </Badge>
+                      </div>
 
-                      {/* Status Toggle Buttons */}
-                      <td style={{ padding: '8px 12px', textAlign: 'center' }}>
-                        <div className="inline-flex rounded-md shadow-xs" role="group">
-                          <button
-                            type="button"
-                            onClick={() => handleSetStatus(st.studentId, 'HADIR')}
-                            style={{
-                              padding: '5px 9px',
-                              fontSize: '11px',
-                              fontWeight: currentStatus === 'HADIR' ? 700 : 500,
-                              borderTopLeftRadius: 'var(--radius-sm)',
-                              borderBottomLeftRadius: 'var(--radius-sm)',
-                              border: '1px solid var(--border-strong)',
-                              borderRight: 'none',
-                              backgroundColor: currentStatus === 'HADIR' ? 'var(--color-success-600)' : 'var(--bg-surface)',
-                              color: currentStatus === 'HADIR' ? '#ffffff' : 'var(--text-secondary)',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px'
-                            }}
-                            title="Tandai Hadir"
-                          >
-                            <CheckCircle2 size={12} />
-                            Hadir
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleSetStatus(st.studentId, 'SAKIT')}
-                            style={{
-                              padding: '5px 9px',
-                              fontSize: '11px',
-                              fontWeight: currentStatus === 'SAKIT' ? 700 : 500,
-                              border: '1px solid var(--border-strong)',
-                              borderRight: 'none',
-                              backgroundColor: currentStatus === 'SAKIT' ? '#0284c7' : 'var(--bg-surface)',
-                              color: currentStatus === 'SAKIT' ? '#ffffff' : 'var(--text-secondary)',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px'
-                            }}
-                            title="Tandai Sakit"
-                          >
-                            <Stethoscope size={12} />
-                            Sakit
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleSetStatus(st.studentId, 'IZIN')}
-                            style={{
-                              padding: '5px 9px',
-                              fontSize: '11px',
-                              fontWeight: currentStatus === 'IZIN' ? 700 : 500,
-                              border: '1px solid var(--border-strong)',
-                              borderRight: 'none',
-                              backgroundColor: currentStatus === 'IZIN' ? '#d97706' : 'var(--bg-surface)',
-                              color: currentStatus === 'IZIN' ? '#ffffff' : 'var(--text-secondary)',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px'
-                            }}
-                            title="Tandai Izin"
-                          >
-                            <Clock size={12} />
-                            Izin
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleSetStatus(st.studentId, 'ALPA')}
-                            style={{
-                              padding: '5px 9px',
-                              fontSize: '11px',
-                              fontWeight: currentStatus === 'ALPA' ? 700 : 500,
-                              borderTopRightRadius: 'var(--radius-sm)',
-                              borderBottomRightRadius: 'var(--radius-sm)',
-                              border: '1px solid var(--border-strong)',
-                              backgroundColor: currentStatus === 'ALPA' ? 'var(--color-danger-600)' : 'var(--bg-surface)',
-                              color: currentStatus === 'ALPA' ? '#ffffff' : 'var(--text-secondary)',
-                              cursor: 'pointer',
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '3px'
-                            }}
-                            title="Tandai Alpa"
-                          >
-                            <AlertCircle size={12} />
-                            Alpa
-                          </button>
-                        </div>
-                      </td>
-
-                      {/* Notes input */}
-                      <td style={{ padding: '8px 12px' }}>
-                        <input
-                          type="text"
-                          placeholder="Catatan..."
-                          value={current.notes || ''}
-                          onChange={(e) => handleSetNotes(st.studentId, e.target.value)}
+                      {/* Mobile Touch Action Pills */}
+                      <div className="grid grid-cols-4 gap-1 mb-2">
+                        <button
+                          type="button"
+                          onClick={() => handleSetStatus(st.studentId, 'HADIR')}
                           style={{
-                            width: '100%',
-                            padding: '4px 8px',
+                            padding: '8px 4px',
                             fontSize: '11px',
-                            borderRadius: 'var(--radius-sm)',
-                            border: '1px solid var(--border-default)',
-                            backgroundColor: 'var(--bg-surface)'
+                            fontWeight: currentStatus === 'HADIR' ? 700 : 500,
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--border-strong)',
+                            backgroundColor: currentStatus === 'HADIR' ? 'var(--color-success-600)' : 'var(--bg-surface)',
+                            color: currentStatus === 'HADIR' ? '#ffffff' : 'var(--text-secondary)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '2px',
+                            cursor: 'pointer'
                           }}
-                        />
-                      </td>
-                    </tr>
+                        >
+                          <CheckCircle2 size={14} />
+                          <span>Hadir</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleSetStatus(st.studentId, 'SAKIT')}
+                          style={{
+                            padding: '8px 4px',
+                            fontSize: '11px',
+                            fontWeight: currentStatus === 'SAKIT' ? 700 : 500,
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--border-strong)',
+                            backgroundColor: currentStatus === 'SAKIT' ? '#0284c7' : 'var(--bg-surface)',
+                            color: currentStatus === 'SAKIT' ? '#ffffff' : 'var(--text-secondary)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '2px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Stethoscope size={14} />
+                          <span>Sakit</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleSetStatus(st.studentId, 'IZIN')}
+                          style={{
+                            padding: '8px 4px',
+                            fontSize: '11px',
+                            fontWeight: currentStatus === 'IZIN' ? 700 : 500,
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--border-strong)',
+                            backgroundColor: currentStatus === 'IZIN' ? '#d97706' : 'var(--bg-surface)',
+                            color: currentStatus === 'IZIN' ? '#ffffff' : 'var(--text-secondary)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '2px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <Clock size={14} />
+                          <span>Izin</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleSetStatus(st.studentId, 'ALPA')}
+                          style={{
+                            padding: '8px 4px',
+                            fontSize: '11px',
+                            fontWeight: currentStatus === 'ALPA' ? 700 : 500,
+                            borderRadius: 'var(--radius-md)',
+                            border: '1px solid var(--border-strong)',
+                            backgroundColor: currentStatus === 'ALPA' ? 'var(--color-danger-600)' : 'var(--bg-surface)',
+                            color: currentStatus === 'ALPA' ? '#ffffff' : 'var(--text-secondary)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: '2px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <AlertCircle size={14} />
+                          <span>Alpa</span>
+                        </button>
+                      </div>
+
+                      {/* Mobile Notes Input */}
+                      <input
+                        type="text"
+                        placeholder="Catatan dispensasi / izin..."
+                        value={current.notes || ''}
+                        onChange={(e) => handleSetNotes(st.studentId, e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '6px 10px',
+                          fontSize: '11px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '1px solid var(--border-default)',
+                          backgroundColor: 'var(--bg-surface)'
+                        }}
+                      />
+                    </div>
                   );
-                })
-              )}
-            </tbody>
-          </table>
+                })}
+              </div>
+            </>
+          )}
         </div>
 
         {/* Modal Footer Actions */}

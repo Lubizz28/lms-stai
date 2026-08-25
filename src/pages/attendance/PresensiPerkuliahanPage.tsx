@@ -601,7 +601,7 @@ export const PresensiPerkuliahanPage: React.FC = () => {
       </div>
 
       {/* =====================================================================
-          COURSE & MEETING SELECTOR BAR
+          COURSE & MEETING SELECTOR BAR + 16-MEETING VISUAL TIMELINE STRIP
           ===================================================================== */}
       <Card style={{ border: '1px solid var(--border-default)', boxShadow: 'var(--shadow-sm)' }}>
         <CardBody style={{ padding: 'var(--space-4)' }}>
@@ -715,7 +715,7 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                           sessionData.session.sessionStatus === 'DITUTUP' ? 'var(--color-slate-700)' : 'var(--color-warning-dark)'
                       }}
                     >
-                      {sessionData.session.sessionStatus === 'DIBUKA' ? '🟢 Sesi Aktif / Dibuka' :
+                      {sessionData.session.sessionStatus === 'DIBUKA' ? '🟢 Sesi Dibuka' :
                        sessionData.session.sessionStatus === 'DITUTUP' ? '🔒 Sesi Ditutup' : '⏳ Belum Dibuka'}
                     </span>
                   </div>
@@ -730,6 +730,71 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                 </div>
               )}
             </div>
+
+            {/* 4. Interactive 16-Meeting Timeline Strip */}
+            {meetings.length > 0 && (
+              <div className="lg:col-span-12 mt-1 pt-3 border-t border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between mb-2">
+                  <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                    Pintasan 16 Sesi Pertemuan Semester:
+                  </span>
+                  <span style={{ fontSize: '11px', color: 'var(--color-primary-700)', fontWeight: 600 }}>
+                    Sesi #{selectedMeeting?.meetingNumber || currentMeetingIndex + 1} Aktif
+                  </span>
+                </div>
+                <div 
+                  className="flex items-center gap-1.5 overflow-x-auto pb-1"
+                  style={{ WebkitOverflowScrolling: 'touch' }}
+                >
+                  {meetings.map((m) => {
+                    const isCurrent = m.id === selectedMeetingId;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setSelectedMeetingId(m.id)}
+                        style={{
+                          padding: '5px 9px',
+                          borderRadius: 'var(--radius-md)',
+                          fontSize: '11px',
+                          fontWeight: isCurrent ? 700 : 500,
+                          backgroundColor: isCurrent ? 'var(--color-primary-700)' : 'var(--bg-surface)',
+                          color: isCurrent ? '#ffffff' : 'var(--text-secondary)',
+                          border: isCurrent ? '1px solid var(--color-primary-800)' : '1px solid var(--border-default)',
+                          boxShadow: isCurrent ? '0 2px 6px rgba(5, 150, 105, 0.25)' : 'none',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          flexShrink: 0,
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <span 
+                          style={{
+                            width: '16px',
+                            height: '16px',
+                            borderRadius: '50%',
+                            backgroundColor: isCurrent ? '#ffffff' : 'var(--color-slate-100)',
+                            color: isCurrent ? 'var(--color-primary-800)' : 'var(--text-muted)',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '9px',
+                            fontWeight: 800
+                          }}
+                        >
+                          {m.meetingNumber}
+                        </span>
+                        <span style={{ whiteSpace: 'nowrap' }}>
+                          P#{m.meetingNumber}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </CardBody>
       </Card>
@@ -1196,9 +1261,10 @@ export const PresensiPerkuliahanPage: React.FC = () => {
               </div>
             </div>
 
-            {/* TABLE BODY */}
+            {/* TABLE & MOBILE CARDS BODY */}
             <CardBody style={{ padding: 0 }}>
-              <div className="table-container" style={{ margin: 0, borderRadius: 0, border: 'none' }}>
+              {/* 1. DESKTOP TABLE VIEW (>=768px) */}
+              <div className="hidden md:block table-container" style={{ margin: 0, borderRadius: 0, border: 'none', overflowX: 'auto' }}>
                 <table className="data-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ backgroundColor: 'var(--color-slate-50)', borderBottom: '1px solid var(--border-default)' }}>
@@ -1562,6 +1628,193 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                     )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* 2. MOBILE STUDENT CARDS VIEW (<768px) */}
+              <div className="block md:hidden divide-y divide-gray-100 dark:divide-gray-800">
+                {filteredStudents.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--text-muted)' }}>
+                    <Users size={32} style={{ margin: '0 auto 8px', color: 'var(--text-disabled)' }} />
+                    <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)' }}>Tidak ada data presensi</div>
+                  </div>
+                ) : (
+                  filteredStudents.map((st) => {
+                    const avatarBg = getAvatarGradient(st.studentName);
+                    const initials = getInitials(st.studentName);
+
+                    return (
+                      <div key={st.studentId} style={{ padding: '14px 16px', backgroundColor: 'var(--bg-surface)' }}>
+                        <div className="flex items-start justify-between gap-3 mb-2.5">
+                          <div className="flex items-center gap-3">
+                            <div 
+                              style={{
+                                width: '38px',
+                                height: '38px',
+                                borderRadius: '50%',
+                                background: avatarBg,
+                                color: '#ffffff',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '11px',
+                                fontWeight: 800,
+                                flexShrink: 0
+                              }}
+                            >
+                              {initials}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                                {st.studentName}
+                              </div>
+                              <div className="flex items-center gap-2 mt-0.5">
+                                <span style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--color-primary-800)', fontWeight: 600 }}>
+                                  {st.studentNim}
+                                </span>
+                                {st.recordedAt && (
+                                  <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                                    • {new Date(st.recordedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex flex-col items-end gap-1">
+                            <Badge
+                              variant={
+                                st.status === 'HADIR' ? 'success' :
+                                st.status === 'SAKIT' ? 'info' :
+                                st.status === 'IZIN' ? 'warning' : 'danger'
+                              }
+                              style={{ fontSize: '11px', fontWeight: 700 }}
+                            >
+                              {st.status}
+                            </Badge>
+                            {st.method && (
+                              <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                                {st.method === 'QR_SCAN' ? 'QR Scan' :
+                                 st.method === 'PASSCODE' ? 'Passcode' :
+                                 st.method === 'MANUAL_DOSEN' ? 'Manual Dosen' : 'Surat Izin'}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Quick 1-Touch Action Buttons for Lecturer on Mobile */}
+                        {isLecturer && (
+                          <div className="grid grid-cols-4 gap-1.5 mt-3 pt-2.5 border-t border-gray-100 dark:border-gray-800">
+                            <button
+                              type="button"
+                              onClick={() => handleQuickStatusChange(st.studentId, 'HADIR', st.studentName)}
+                              style={{
+                                padding: '8px 4px',
+                                fontSize: '11px',
+                                fontWeight: st.status === 'HADIR' ? 800 : 600,
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--border-strong)',
+                                backgroundColor: st.status === 'HADIR' ? 'var(--color-success-600)' : 'var(--bg-surface)',
+                                color: st.status === 'HADIR' ? '#ffffff' : 'var(--text-secondary)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '3px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <CheckCircle2 size={15} />
+                              <span>Hadir</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleQuickStatusChange(st.studentId, 'SAKIT', st.studentName)}
+                              style={{
+                                padding: '8px 4px',
+                                fontSize: '11px',
+                                fontWeight: st.status === 'SAKIT' ? 800 : 600,
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--border-strong)',
+                                backgroundColor: st.status === 'SAKIT' ? '#0284c7' : 'var(--bg-surface)',
+                                color: st.status === 'SAKIT' ? '#ffffff' : 'var(--text-secondary)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '3px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Stethoscope size={15} />
+                              <span>Sakit</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleQuickStatusChange(st.studentId, 'IZIN', st.studentName)}
+                              style={{
+                                padding: '8px 4px',
+                                fontSize: '11px',
+                                fontWeight: st.status === 'IZIN' ? 800 : 600,
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--border-strong)',
+                                backgroundColor: st.status === 'IZIN' ? '#d97706' : 'var(--bg-surface)',
+                                color: st.status === 'IZIN' ? '#ffffff' : 'var(--text-secondary)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '3px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <Clock size={15} />
+                              <span>Izin</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => handleQuickStatusChange(st.studentId, 'ALPA', st.studentName)}
+                              style={{
+                                padding: '8px 4px',
+                                fontSize: '11px',
+                                fontWeight: st.status === 'ALPA' ? 800 : 600,
+                                borderRadius: 'var(--radius-md)',
+                                border: '1px solid var(--border-strong)',
+                                backgroundColor: st.status === 'ALPA' ? 'var(--color-danger-600)' : 'var(--bg-surface)',
+                                color: st.status === 'ALPA' ? '#ffffff' : 'var(--text-secondary)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '3px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              <AlertCircle size={15} />
+                              <span>Alpa</span>
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Mobile Notes / Attachment */}
+                        {(st.notes || st.attachmentUrl) && (
+                          <div className="mt-2 text-xs flex items-center justify-between gap-2" style={{ color: 'var(--text-secondary)' }}>
+                            {st.notes && <span className="truncate italic">"{st.notes}"</span>}
+                            {st.attachmentUrl && (
+                              <a 
+                                href={st.attachmentUrl} 
+                                target="_blank" 
+                                rel="noreferrer" 
+                                style={{ color: 'var(--color-primary-700)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}
+                              >
+                                <ExternalLink size={11} />
+                                Surat
+                              </a>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </CardBody>
 
@@ -1929,9 +2182,10 @@ export const PresensiPerkuliahanPage: React.FC = () => {
               </div>
             </div>
 
-            {/* MATRIX TABLE BODY */}
+            {/* MATRIX TABLE & MOBILE CARDS BODY */}
             <CardBody style={{ padding: 0 }}>
-              <div className="table-container" style={{ margin: 0, border: 'none', overflowX: 'auto' }}>
+              {/* 1. DESKTOP MATRIX TABLE VIEW (>=768px) */}
+              <div className="hidden md:block table-container" style={{ margin: 0, border: 'none', overflowX: 'auto' }}>
                 <table className="data-table" style={{ fontSize: 'var(--text-xs)', width: '100%', borderCollapse: 'collapse' }}>
                   <thead>
                     <tr style={{ backgroundColor: 'var(--color-slate-50)', borderBottom: '2px solid var(--border-default)' }}>
@@ -2053,9 +2307,10 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                               </div>
                             </td>
 
-                            {/* Meeting Statuses */}
+                            {/* Meeting cells */}
                             {classSummary.meetings.map(m => {
-                              const st = row.meetingStatuses[m.meetingNumber];
+                              const st = row.meetingStatuses[m.meetingNumber] || row.meetingStatuses[m.id];
+
                               return (
                                 <td 
                                   key={m.id} 
@@ -2064,7 +2319,7 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                                     padding: '4px 2px',
                                     borderLeft: '1px solid var(--border-subtle)'
                                   }}
-                                  title={`P#${m.meetingNumber}: ${st || 'ALPA'}`}
+                                  title={`P#${m.meetingNumber}: ${st || 'Belum Terisi'}`}
                                 >
                                   {st === 'HADIR' ? (
                                     <span 
@@ -2172,12 +2427,12 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                                 </div>
                                 <div style={{ height: '4px', backgroundColor: 'var(--color-slate-200)', borderRadius: 'var(--radius-full)', overflow: 'hidden' }}>
                                   <div 
-                                    style={{
-                                      height: '100%',
-                                      width: `${row.percentage}%`,
+                                    style={{ 
+                                      height: '100%', 
+                                      width: `${row.percentage}%`, 
                                       backgroundColor: row.percentage >= 75 ? 'var(--color-success-main)' : 'var(--color-danger-main)',
                                       borderRadius: 'var(--radius-full)'
-                                    }}
+                                    }} 
                                   />
                                 </div>
                               </div>
@@ -2230,6 +2485,144 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                     )}
                   </tbody>
                 </table>
+              </div>
+
+              {/* 2. MOBILE RECAP CARDS VIEW (<768px) */}
+              <div className="block md:hidden divide-y divide-gray-100 dark:divide-gray-800">
+                {filteredRecapRows.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: 'var(--space-8)', color: 'var(--text-muted)' }}>
+                    <FileSpreadsheet size={32} style={{ margin: '0 auto 8px', color: 'var(--text-disabled)' }} />
+                    <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)' }}>Tidak ada data rekapitulasi</div>
+                  </div>
+                ) : (
+                  filteredRecapRows.map((row) => {
+                    const avatarBg = getAvatarGradient(row.studentName);
+                    const initials = getInitials(row.studentName);
+
+                    return (
+                      <div key={row.studentId} style={{ padding: '14px 16px', backgroundColor: 'var(--bg-surface)' }}>
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <div className="flex items-center gap-3">
+                            <div 
+                              style={{
+                                width: '36px',
+                                height: '36px',
+                                borderRadius: '50%',
+                                background: avatarBg,
+                                color: '#ffffff',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '11px',
+                                fontWeight: 800,
+                                flexShrink: 0
+                              }}
+                            >
+                              {initials}
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, fontSize: 'var(--text-sm)', color: 'var(--text-primary)' }}>
+                                {row.studentName}
+                              </div>
+                              <div style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--color-primary-800)', fontWeight: 600 }}>
+                                NIM: {row.studentNim}
+                              </div>
+                            </div>
+                          </div>
+
+                          <span 
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              backgroundColor: row.isEligibleForExam ? 'var(--color-success-bg)' : 'var(--color-danger-bg)',
+                              color: row.isEligibleForExam ? 'var(--color-success-text)' : 'var(--color-danger-text)',
+                              border: `1px solid ${row.isEligibleForExam ? 'var(--color-success-border)' : 'var(--color-danger-border)'}`,
+                              padding: '2px 8px',
+                              borderRadius: 'var(--radius-full)',
+                              fontSize: '10px',
+                              fontWeight: 700
+                            }}
+                          >
+                            {row.isEligibleForExam ? <CheckCircle2 size={11} /> : <AlertCircle size={11} />}
+                            {row.isEligibleForExam ? 'LAYAK UAS' : 'DISPENSASI'}
+                          </span>
+                        </div>
+
+                        {/* Progress bar & Percent */}
+                        <div className="flex items-center justify-between mt-2 text-xs">
+                          <span style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>Persentase Kehadiran:</span>
+                          <span style={{ fontWeight: 800, color: row.percentage >= 75 ? 'var(--color-success-dark)' : 'var(--color-danger-dark)' }}>
+                            {row.percentage}% ({row.hadir}/{row.totalMeetings} Pertemuan)
+                          </span>
+                        </div>
+                        <div style={{ height: '5px', backgroundColor: 'var(--color-slate-100)', borderRadius: 'var(--radius-full)', marginTop: '4px', overflow: 'hidden' }}>
+                          <div 
+                            style={{ 
+                              height: '100%', 
+                              width: `${row.percentage}%`, 
+                              backgroundColor: row.percentage >= 75 ? 'var(--color-success-main)' : 'var(--color-danger-main)',
+                              borderRadius: 'var(--radius-full)'
+                            }} 
+                          />
+                        </div>
+
+                        {/* H / S / I / A badge breakdown */}
+                        <div className="grid grid-cols-4 gap-1 mt-3 pt-2 border-t border-gray-100 dark:border-gray-800 text-center text-xs">
+                          <div style={{ padding: '4px', borderRadius: 'var(--radius-sm)', backgroundColor: '#f0fdf4', color: '#166534', fontWeight: 700 }}>
+                            Hadir: {row.hadir}
+                          </div>
+                          <div style={{ padding: '4px', borderRadius: 'var(--radius-sm)', backgroundColor: '#f0f9ff', color: '#075985', fontWeight: 700 }}>
+                            Sakit: {row.sakit}
+                          </div>
+                          <div style={{ padding: '4px', borderRadius: 'var(--radius-sm)', backgroundColor: '#fffbeb', color: '#92400e', fontWeight: 700 }}>
+                            Izin: {row.izin}
+                          </div>
+                          <div style={{ padding: '4px', borderRadius: 'var(--radius-sm)', backgroundColor: '#fef2f2', color: '#991b1b', fontWeight: 700 }}>
+                            Alpa: {row.alpa}
+                          </div>
+                        </div>
+
+                        {/* 16-Meeting Micro-dot timeline */}
+                        <div className="mt-2.5 pt-2 border-t border-gray-100 dark:border-gray-800">
+                          <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginBottom: '4px', fontWeight: 600 }}>
+                            Rekam 16 Pertemuan:
+                          </div>
+                          <div className="flex items-center gap-1 overflow-x-auto pb-1">
+                            {classSummary.meetings.map(m => {
+                              const st = row.meetingStatuses[m.meetingNumber] || row.meetingStatuses[m.id];
+                              return (
+                                <span
+                                  key={m.id}
+                                  title={`P#${m.meetingNumber}: ${st || 'Belum'}`}
+                                  style={{
+                                    width: '16px',
+                                    height: '16px',
+                                    borderRadius: '3px',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '9px',
+                                    fontWeight: 800,
+                                    backgroundColor: 
+                                      st === 'HADIR' ? 'var(--color-success-600)' :
+                                      st === 'SAKIT' ? '#0284c7' :
+                                      st === 'IZIN' ? '#d97706' :
+                                      st === 'ALPA' ? 'var(--color-danger-600)' : 'var(--color-slate-200)',
+                                    color: st ? '#ffffff' : 'var(--text-muted)',
+                                    flexShrink: 0
+                                  }}
+                                >
+                                  {m.meetingNumber}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </CardBody>
 
