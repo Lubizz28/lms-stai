@@ -15,7 +15,7 @@ import {
   Image as ImageIcon, 
   ChevronRight, 
   Sparkles, 
-  GraduationCap 
+  GraduationCap
 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -24,7 +24,7 @@ import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { Table, Column } from '../../components/ui/Table';
 import { Pagination } from '../../components/ui/Pagination';
-import { BankQuestion, QuestionType, QuestionDifficulty, ImportQuestionInput } from '../../types/quiz';
+import { BankQuestion, QuestionType, QuestionDifficulty, ImportQuestionInput, QuizOption } from '../../types/quiz';
 import { quizService } from '../../services/quizService';
 import { useToast } from '../../components/feedback/ToastContext';
 import { KAMUS_UI } from '../../constants/dictionary';
@@ -87,13 +87,19 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
   const [explanation, setExplanation] = useState('');
   const [tags, setTags] = useState('');
 
-  // Pilihan Ganda Form states (5 Opsi A, B, C, D, E)
+  // Pilihan Ganda Form states (5 Opsi A, B, C, D, E dengan Teks & Gambar)
   const [optA, setOptA] = useState('');
+  const [optAImage, setOptAImage] = useState('');
   const [optB, setOptB] = useState('');
+  const [optBImage, setOptBImage] = useState('');
   const [optC, setOptC] = useState('');
+  const [optCImage, setOptCImage] = useState('');
   const [optD, setOptD] = useState('');
+  const [optDImage, setOptDImage] = useState('');
   const [optE, setOptE] = useState('');
+  const [optEImage, setOptEImage] = useState('');
   const [correctOptIndex, setCorrectOptIndex] = useState(0);
+
   const [shortAnswer, setShortAnswer] = useState('');
   const [essayRubric, setEssayRubric] = useState('');
 
@@ -117,6 +123,42 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     setFilterType('SEMUA');
     setFilterDifficulty('SEMUA');
     setCurrentPage(1);
+  };
+
+  // Helper Upload Gambar Soal (Base64)
+  const handleQuestionImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.warning('Ukuran Terlalu Besar', 'Maksimal ukuran file gambar adalah 5MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (typeof ev.target?.result === 'string') {
+        setImageUrl(ev.target.result);
+        toast.success('Gambar Soal Dimuat', 'Gambar ilustrasi butir soal berhasil diunggah.');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Helper Upload Gambar Opsi Pilihan Ganda (Base64)
+  const handleOptionImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImg: (val: string) => void, optLabel: string) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      toast.warning('Ukuran Terlalu Besar', 'Maksimal ukuran file gambar opsi adalah 5MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      if (typeof ev.target?.result === 'string') {
+        setImg(ev.target.result);
+        toast.success(`Gambar Opsi ${optLabel} Dimuat`, `Gambar untuk Opsi ${optLabel} berhasil diunggah.`);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   // Group questions by course code for summary stats
@@ -237,10 +279,15 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     setImageUrl('');
     setPoints(20);
     setOptA('');
+    setOptAImage('');
     setOptB('');
+    setOptBImage('');
     setOptC('');
+    setOptCImage('');
     setOptD('');
+    setOptDImage('');
     setOptE('');
+    setOptEImage('');
     setCorrectOptIndex(0);
     setShortAnswer('');
     setEssayRubric('');
@@ -266,18 +313,28 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
       const opts = q.options || [];
       setOptA(opts[0]?.text || '');
+      setOptAImage(opts[0]?.imageUrl || '');
       setOptB(opts[1]?.text || '');
+      setOptBImage(opts[1]?.imageUrl || '');
       setOptC(opts[2]?.text || '');
+      setOptCImage(opts[2]?.imageUrl || '');
       setOptD(opts[3]?.text || '');
+      setOptDImage(opts[3]?.imageUrl || '');
       setOptE(opts[4]?.text || '');
+      setOptEImage(opts[4]?.imageUrl || '');
       const correctIdx = opts.findIndex((o) => o.isCorrect);
       setCorrectOptIndex(correctIdx >= 0 ? correctIdx : 0);
     } else {
       setOptA('');
+      setOptAImage('');
       setOptB('');
+      setOptBImage('');
       setOptC('');
+      setOptCImage('');
       setOptD('');
+      setOptDImage('');
       setOptE('');
+      setOptEImage('');
       setCorrectOptIndex(0);
     }
 
@@ -320,7 +377,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
         return;
       }
 
-      let options: { id: string; text: string; isCorrect: boolean }[] | undefined;
+      let options: QuizOption[] | undefined;
 
       if (qType === 'BENAR_SALAH') {
         options = [
@@ -329,19 +386,24 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
         ];
       } else if (qType === 'PILIHAN_GANDA') {
         const rawOptions = [
-          { id: `opt-${Date.now()}-1`, text: optA.trim(), isCorrect: correctOptIndex === 0 },
-          { id: `opt-${Date.now()}-2`, text: optB.trim(), isCorrect: correctOptIndex === 1 },
-          { id: `opt-${Date.now()}-3`, text: optC.trim(), isCorrect: correctOptIndex === 2 },
-          { id: `opt-${Date.now()}-4`, text: optD.trim(), isCorrect: correctOptIndex === 3 },
-          { id: `opt-${Date.now()}-5`, text: optE.trim(), isCorrect: correctOptIndex === 4 },
-        ].filter((o) => o.text !== '');
+          { id: `opt-${Date.now()}-1`, text: optA.trim(), imageUrl: optAImage.trim() || undefined, isCorrect: correctOptIndex === 0 },
+          { id: `opt-${Date.now()}-2`, text: optB.trim(), imageUrl: optBImage.trim() || undefined, isCorrect: correctOptIndex === 1 },
+          { id: `opt-${Date.now()}-3`, text: optC.trim(), imageUrl: optCImage.trim() || undefined, isCorrect: correctOptIndex === 2 },
+          { id: `opt-${Date.now()}-4`, text: optD.trim(), imageUrl: optDImage.trim() || undefined, isCorrect: correctOptIndex === 3 },
+          { id: `opt-${Date.now()}-5`, text: optE.trim(), imageUrl: optEImage.trim() || undefined, isCorrect: correctOptIndex === 4 },
+        ].filter((o) => o.text !== '' || !!o.imageUrl);
 
-        if (rawOptions.length < 2) {
-          toast.warning('Opsi Kurang', 'Soal pilihan ganda minimal harus memiliki 2 opsi jawaban.');
+        const mappedOptions = rawOptions.map((o, idx) => ({
+          ...o,
+          text: o.text || `Pilihan ${String.fromCharCode(65 + idx)}`
+        }));
+
+        if (mappedOptions.length < 2) {
+          toast.warning('Opsi Kurang', 'Soal pilihan ganda minimal harus memiliki 2 opsi jawaban (teks atau gambar).');
           return;
         }
 
-        options = rawOptions;
+        options = mappedOptions;
       }
 
       const questionPayload = {
@@ -384,7 +446,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
 
     validRows.forEach((row, idx) => {
       try {
-        let options: { id: string; text: string; isCorrect: boolean }[] | undefined;
+        let options: QuizOption[] | undefined;
         let shortAnswer: string | undefined;
         let essayRubric: string | undefined;
         const cleanKey = (row.correctKey || '').trim().toUpperCase();
@@ -401,12 +463,12 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
         } else {
           // PILIHAN GANDA (5 Opsi A-E)
           const rawOpts = [
-            { text: (row.optA || '').trim(), key: 'A' },
-            { text: (row.optB || '').trim(), key: 'B' },
-            { text: (row.optC || '').trim(), key: 'C' },
-            { text: (row.optD || '').trim(), key: 'D' },
-            { text: (row.optE || '').trim(), key: 'E' },
-          ].filter((o) => o.text !== '');
+            { text: (row.optA || '').trim(), imageUrl: row.optAImage?.trim() || undefined, key: 'A' },
+            { text: (row.optB || '').trim(), imageUrl: row.optBImage?.trim() || undefined, key: 'B' },
+            { text: (row.optC || '').trim(), imageUrl: row.optCImage?.trim() || undefined, key: 'C' },
+            { text: (row.optD || '').trim(), imageUrl: row.optDImage?.trim() || undefined, key: 'D' },
+            { text: (row.optE || '').trim(), imageUrl: row.optEImage?.trim() || undefined, key: 'E' },
+          ].filter((o) => o.text !== '' || !!o.imageUrl);
 
           if (rawOpts.length < 2) {
             failedCount += 1;
@@ -416,7 +478,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
 
           options = rawOpts.map((opt, oIdx) => ({
             id: `opt-imp-${Date.now()}-${idx}-${oIdx}`,
-            text: opt.text,
+            text: opt.text || `Pilihan ${String.fromCharCode(65 + oIdx)}`,
+            imageUrl: opt.imageUrl,
             isCorrect: opt.key === cleanKey || opt.text.toUpperCase() === cleanKey || String.fromCharCode(65 + oIdx) === cleanKey
           }));
         }
@@ -515,7 +578,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
             const correctIdx = q.options?.findIndex((o) => o.isCorrect);
             const correctOpt = q.options?.find((o) => o.isCorrect);
             if (correctIdx !== undefined && correctIdx >= 0 && correctOpt) {
-              return `[${String.fromCharCode(65 + correctIdx)}] ${correctOpt.text}`;
+              const imgNotice = correctOpt.imageUrl ? ' [Ada Gambar]' : '';
+              return `[${String.fromCharCode(65 + correctIdx)}] ${correctOpt.text}${imgNotice}`;
             }
             return '-';
           }
@@ -562,50 +626,58 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     },
     {
       header: 'Teks Pertanyaan & Materi',
-      render: (q) => (
-        <div className="flex flex-col gap-1.5">
-          <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.45 }}>
-            {q.questionText}
-          </div>
-          {q.arabicText && (
-            <div 
-              style={{
-                fontFamily: "'Amiri', 'Traditional Arabic', serif",
-                fontSize: '1.05rem',
-                color: '#065f46',
-                direction: 'rtl',
-                textAlign: 'right',
-                lineHeight: 1.6,
-                backgroundColor: 'rgba(6, 95, 70, 0.04)',
-                padding: '4px 8px',
-                borderRadius: '6px',
-                borderRight: '3px solid #059669'
-              }}
-            >
-              {q.arabicText}
+      render: (q) => {
+        const hasOptionImages = q.options?.some(o => !!o.imageUrl);
+        return (
+          <div className="flex flex-col gap-1.5">
+            <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.45 }}>
+              {q.questionText}
             </div>
-          )}
-          <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: '2px' }}>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-              Topik: <strong className="text-slate-700">{q.topic}</strong>
-            </span>
-            {q.imageUrl && (
-              <Badge variant="default" className="flex items-center gap-1" style={{ fontSize: '10px' }}>
-                <ImageIcon size={10} /> Gambar Referensi
-              </Badge>
+            {q.arabicText && (
+              <div 
+                style={{
+                  fontFamily: "'Amiri', 'Traditional Arabic', serif",
+                  fontSize: '1.05rem',
+                  color: '#065f46',
+                  direction: 'rtl',
+                  textAlign: 'right',
+                  lineHeight: 1.6,
+                  backgroundColor: 'rgba(6, 95, 70, 0.04)',
+                  padding: '4px 8px',
+                  borderRadius: '6px',
+                  borderRight: '3px solid #059669'
+                }}
+              >
+                {q.arabicText}
+              </div>
             )}
-            {q.tags?.map((t, idx) => (
-              <span key={idx} style={{ fontSize: '10px', color: 'var(--text-muted)', backgroundColor: 'var(--bg-subtle)', padding: '1px 6px', borderRadius: '4px' }}>
-                #{t}
+            <div className="flex items-center gap-2 flex-wrap" style={{ marginTop: '2px' }}>
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                Topik: <strong className="text-slate-700">{q.topic}</strong>
               </span>
-            ))}
+              {q.imageUrl && (
+                <Badge variant="default" className="flex items-center gap-1 bg-emerald-50 text-emerald-800 border-emerald-200" style={{ fontSize: '10px' }}>
+                  <ImageIcon size={11} /> Gambar Soal
+                </Badge>
+              )}
+              {hasOptionImages && (
+                <Badge variant="default" className="flex items-center gap-1 bg-blue-50 text-blue-800 border-blue-200" style={{ fontSize: '10px' }}>
+                  <ImageIcon size={11} /> Opsi Bergambar
+                </Badge>
+              )}
+              {q.tags?.map((t, idx) => (
+                <span key={idx} style={{ fontSize: '10px', color: 'var(--text-muted)', backgroundColor: 'var(--bg-subtle)', padding: '1px 6px', borderRadius: '4px' }}>
+                  #{t}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       header: 'Kunci / Rubrik',
-      width: '180px',
+      width: '190px',
       render: (q) => {
         if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
           const correctIdx = q.options?.findIndex((o) => o.isCorrect);
@@ -615,9 +687,18 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               <span className="text-emerald-700 font-bold text-xs flex items-center gap-1">
                 <CheckCircle2 size={12} /> Opsi [{String.fromCharCode(65 + (correctIdx ?? 0))}]
               </span>
-              <span className="text-xs text-slate-600 truncate" title={correctOpt?.text}>
-                {correctOpt?.text || '-'}
-              </span>
+              <div className="flex items-center gap-1.5">
+                {correctOpt?.imageUrl && (
+                  <img 
+                    src={correctOpt.imageUrl} 
+                    alt="Kunci Jawaban" 
+                    className="w-5 h-5 rounded object-cover border border-slate-300 shrink-0" 
+                  />
+                )}
+                <span className="text-xs text-slate-600 truncate" title={correctOpt?.text}>
+                  {correctOpt?.text || (correctOpt?.imageUrl ? '(Opsi Berupa Gambar)' : '-')}
+                </span>
+              </div>
             </div>
           );
         }
@@ -740,7 +821,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                 </Button>
                 <Button 
                   variant="primary" 
-                  size="sm"
+                  size="sm" 
                   icon={Plus} 
                   onClick={handleOpenCreate}
                   className="bg-emerald-400 text-emerald-950 hover:bg-emerald-300 font-bold border-0 shadow-lg text-xs"
@@ -781,7 +862,9 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               <p className="text-xs text-slate-500 mt-0.5">
                 Klik kartu mata kuliah untuk membuka repositori butir soal spesifik
               </p>
-            </div>            <div className="w-full sm:w-80 relative">
+            </div>
+
+            <div className="w-full sm:w-80 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={15} />
               <Input
                 placeholder="Cari kode MK atau nama mata kuliah..."
@@ -1032,117 +1115,132 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               TAMPILAN MOBILE (CARDS VIEW)
               ========================================================================= */}
           <div className="block md:hidden flex flex-col gap-3">
-            {paginatedQuestions.map((q, idx) => (
-              <div 
-                key={q.id}
-                className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
-              >
-                {/* Header Card */}
-                <div className="flex justify-between items-start gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center">
-                      {(currentPage - 1) * pageSize + idx + 1}
+            {paginatedQuestions.map((q, idx) => {
+              const hasOptImages = q.options?.some(o => !!o.imageUrl);
+              return (
+                <div 
+                  key={q.id}
+                  className="p-4 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col gap-3"
+                >
+                  {/* Header Card */}
+                  <div className="flex justify-between items-start gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-slate-100 text-slate-700 text-xs font-bold flex items-center justify-center">
+                        {(currentPage - 1) * pageSize + idx + 1}
+                      </span>
+                      <Badge variant="default" style={{ fontSize: '10px' }}>
+                        {q.type.replace('_', ' ')}
+                      </Badge>
+                      <Badge 
+                        variant={q.difficulty === 'MUDAH' ? 'success' : q.difficulty === 'SEDANG' ? 'warning' : 'danger'}
+                        style={{ fontSize: '10px' }}
+                      >
+                        {q.difficulty}
+                      </Badge>
+                    </div>
+                    <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                      {q.defaultPoints} Pts
                     </span>
-                    <Badge variant="default" style={{ fontSize: '10px' }}>
-                      {q.type.replace('_', ' ')}
-                    </Badge>
-                    <Badge 
-                      variant={q.difficulty === 'MUDAH' ? 'success' : q.difficulty === 'SEDANG' ? 'warning' : 'danger'}
-                      style={{ fontSize: '10px' }}
+                  </div>
+
+                  {/* Question Text */}
+                  <div className="text-sm font-semibold text-slate-800 leading-snug">
+                    {q.questionText}
+                  </div>
+
+                  {/* Arabic Text if any */}
+                  {q.arabicText && (
+                    <div 
+                      style={{
+                        fontFamily: "'Amiri', 'Traditional Arabic', serif",
+                        fontSize: '1.05rem',
+                        color: '#065f46',
+                        direction: 'rtl',
+                        textAlign: 'right',
+                        lineHeight: 1.6,
+                        backgroundColor: 'rgba(6, 95, 70, 0.04)',
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        borderRight: '3px solid #059669'
+                      }}
                     >
-                      {q.difficulty}
-                    </Badge>
-                  </div>
-                  <span className="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                    {q.defaultPoints} Pts
-                  </span>
-                </div>
+                      {q.arabicText}
+                    </div>
+                  )}
 
-                {/* Question Text */}
-                <div className="text-sm font-semibold text-slate-800 leading-snug">
-                  {q.questionText}
-                </div>
-
-                {/* Arabic Text if any */}
-                {q.arabicText && (
-                  <div 
-                    style={{
-                      fontFamily: "'Amiri', 'Traditional Arabic', serif",
-                      fontSize: '1.05rem',
-                      color: '#065f46',
-                      direction: 'rtl',
-                      textAlign: 'right',
-                      lineHeight: 1.6,
-                      backgroundColor: 'rgba(6, 95, 70, 0.04)',
-                      padding: '4px 8px',
-                      borderRadius: '6px',
-                      borderRight: '3px solid #059669'
-                    }}
-                  >
-                    {q.arabicText}
-                  </div>
-                )}
-
-                {/* Topic & Details */}
-                <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
-                  <span>Topik: <strong>{q.topic}</strong></span>
+                  {/* Question Image if any */}
                   {q.imageUrl && (
-                    <Badge variant="default" style={{ fontSize: '9px' }}>
-                      <ImageIcon size={9} /> Gambar
-                    </Badge>
+                    <div className="rounded-lg overflow-hidden border border-slate-200 max-h-36 bg-slate-50 flex justify-center p-1">
+                      <img src={q.imageUrl} alt="Ilustrasi" className="object-contain max-h-32 rounded" />
+                    </div>
                   )}
-                </div>
 
-                {/* Correct Answer Snippet */}
-                <div className="p-2.5 bg-slate-50 rounded-lg text-xs border border-slate-200">
-                  <span className="text-slate-500 font-medium">Kunci: </span>
-                  {q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH' ? (
-                    <strong className="text-emerald-700">
-                      [{String.fromCharCode(65 + (q.options?.findIndex(o => o.isCorrect) ?? 0))}] {q.options?.find(o => o.isCorrect)?.text || '-'}
-                    </strong>
-                  ) : q.type === 'JAWABAN_SINGKAT' ? (
-                    <strong className="text-emerald-700 font-mono">{q.correctShortAnswer}</strong>
-                  ) : (
-                    <span className="text-amber-700 italic">Rubrik Terlampir</span>
-                  )}
-                </div>
+                  {/* Topic & Details */}
+                  <div className="flex items-center gap-2 flex-wrap text-xs text-slate-500">
+                    <span>Topik: <strong>{q.topic}</strong></span>
+                    {q.imageUrl && (
+                      <Badge variant="default" style={{ fontSize: '9px' }}>
+                        <ImageIcon size={9} /> Gambar Soal
+                      </Badge>
+                    )}
+                    {hasOptImages && (
+                      <Badge variant="default" style={{ fontSize: '9px' }} className="bg-blue-50 text-blue-700">
+                        <ImageIcon size={9} /> Opsi Bergambar
+                      </Badge>
+                    )}
+                  </div>
 
-                {/* Action Buttons */}
-                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    icon={Eye} 
-                    onClick={() => {
-                      setPreviewingQuestion(q);
-                      setPreviewShowAnswer(false);
-                      setPreviewModal(true);
-                    }}
-                    className="text-xs"
-                  >
-                    Pratinjau
-                  </Button>
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    icon={Edit} 
-                    onClick={() => handleOpenEdit(q)}
-                    className="text-xs"
-                  >
-                    Edit
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    icon={Trash2} 
-                    onClick={() => handleOpenDelete(q)}
-                    className="text-xs text-red-600 hover:bg-red-50"
-                  >
-                    Hapus
-                  </Button>
+                  {/* Correct Answer Snippet */}
+                  <div className="p-2.5 bg-slate-50 rounded-lg text-xs border border-slate-200">
+                    <span className="text-slate-500 font-medium">Kunci: </span>
+                    {q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH' ? (
+                      <strong className="text-emerald-700">
+                        [{String.fromCharCode(65 + (q.options?.findIndex(o => o.isCorrect) ?? 0))}] {q.options?.find(o => o.isCorrect)?.text || '-'}
+                      </strong>
+                    ) : q.type === 'JAWABAN_SINGKAT' ? (
+                      <strong className="text-emerald-700 font-mono">{q.correctShortAnswer}</strong>
+                    ) : (
+                      <span className="text-amber-700 italic">Rubrik Terlampir</span>
+                    )}
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      icon={Eye} 
+                      onClick={() => {
+                        setPreviewingQuestion(q);
+                        setPreviewShowAnswer(false);
+                        setPreviewModal(true);
+                      }}
+                      className="text-xs"
+                    >
+                      Pratinjau
+                    </Button>
+                    <Button 
+                      variant="secondary" 
+                      size="sm" 
+                      icon={Edit} 
+                      onClick={() => handleOpenEdit(q)}
+                      className="text-xs"
+                    >
+                      Edit
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      icon={Trash2} 
+                      onClick={() => handleOpenDelete(q)}
+                      className="text-xs text-red-600 hover:bg-red-50"
+                    >
+                      Hapus
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {paginatedQuestions.length === 0 && (
               <div className="text-center py-10 bg-white rounded-xl border border-slate-200 p-4">
@@ -1171,7 +1269,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
       )}
 
       {/* =========================================================================
-          MODAL PRATINJAU BUTIR SOAL (PREVIEW)
+          MODAL PRATINJAU BUTIR SOAL (PREVIEW DENGAN GAMBAR SOAL & GAMBAR OPSI)
           ========================================================================= */}
       {previewModal && previewingQuestion && (
         <Modal
@@ -1221,42 +1319,55 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               </div>
             )}
 
-            {/* Image Preview if any */}
+            {/* Question Image Preview if any */}
             {previewingQuestion.imageUrl && (
-              <div className="rounded-xl overflow-hidden border border-slate-200 max-h-64 flex justify-center bg-slate-50">
+              <div className="rounded-xl overflow-hidden border border-slate-200 max-h-64 flex justify-center bg-slate-50 p-2">
                 <img 
                   src={previewingQuestion.imageUrl} 
                   alt="Ilustrasi Soal" 
-                  className="object-contain max-h-64"
+                  className="object-contain max-h-60 rounded-lg"
                   onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
                 />
               </div>
             )}
 
-            {/* Options for Multiple Choice / True False */}
+            {/* Options for Multiple Choice / True False (Menampilkan Teks & Gambar Opsi) */}
             {(previewingQuestion.type === 'PILIHAN_GANDA' || previewingQuestion.type === 'BENAR_SALAH') && previewingQuestion.options && (
-              <div className="flex flex-col gap-2 mt-2">
+              <div className="flex flex-col gap-2.5 mt-2">
                 {previewingQuestion.options.map((opt, oIdx) => {
                   const isCorrect = opt.isCorrect;
                   return (
                     <div 
                       key={opt.id || oIdx}
-                      className={`p-3 rounded-xl border transition-all flex items-start gap-3 ${
+                      className={`p-3 rounded-xl border transition-all flex flex-col gap-2 ${
                         previewShowAnswer && isCorrect 
                           ? 'bg-emerald-50 border-emerald-500 text-emerald-950 font-semibold' 
                           : 'bg-white border-slate-200 text-slate-700'
                       }`}
                     >
-                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                        previewShowAnswer && isCorrect 
-                          ? 'bg-emerald-600 text-white' 
-                          : 'bg-slate-100 text-slate-600'
-                      }`}>
-                        {String.fromCharCode(65 + oIdx)}
-                      </span>
-                      <span className="text-sm pt-0.5">{opt.text}</span>
-                      {previewShowAnswer && isCorrect && (
-                        <CheckCircle2 size={16} className="ml-auto text-emerald-600 shrink-0 mt-0.5" />
+                      <div className="flex items-start gap-3">
+                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                          previewShowAnswer && isCorrect 
+                            ? 'bg-emerald-600 text-white' 
+                            : 'bg-slate-100 text-slate-600'
+                        }`}>
+                          {String.fromCharCode(65 + oIdx)}
+                        </span>
+                        <span className="text-sm pt-0.5 flex-1">{opt.text}</span>
+                        {previewShowAnswer && isCorrect && (
+                          <CheckCircle2 size={16} className="ml-auto text-emerald-600 shrink-0 mt-0.5" />
+                        )}
+                      </div>
+                      
+                      {/* Opsi Gambar jika ada */}
+                      {opt.imageUrl && (
+                        <div className="ml-9 rounded-lg overflow-hidden border border-slate-200 max-h-40 bg-white p-1.5 max-w-xs">
+                          <img 
+                            src={opt.imageUrl} 
+                            alt={`Opsi ${String.fromCharCode(65 + oIdx)}`} 
+                            className="object-contain max-h-36 rounded"
+                          />
+                        </div>
                       )}
                     </div>
                   );
@@ -1371,14 +1482,14 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
       )}
 
       {/* =========================================================================
-          MODAL TAMBAH / EDIT BUTIR SOAL
+          MODAL TAMBAH / EDIT BUTIR SOAL DENGAN FITUR UPLOAD GAMBAR SOAL & OPSI
           ========================================================================= */}
       {editModal && (
         <Modal
           isOpen={editModal}
           onClose={() => setEditModal(false)}
           title={editingQuestionId ? 'Edit Butir Soal' : 'Tambah Butir Soal Baru'}
-          maxWidth="700px"
+          maxWidth="720px"
         >
           <form onSubmit={handleSaveQuestion} className="flex flex-col gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1450,6 +1561,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               </div>
             </div>
 
+            {/* Teks Pertanyaan */}
             <div>
               <label className="form-label font-bold text-xs">Teks Pertanyaan / Soal</label>
               <textarea
@@ -1476,50 +1588,172 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               />
             </div>
 
-            {/* URL Gambar */}
-            <div>
-              <label className="form-label text-xs">URL Gambar / Bagan Ilustrasi (Opsional)</label>
-              <Input
-                placeholder="https://example.com/diagram-ushul.png"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-              />
+            {/* FITUR UPLOAD GAMBAR SOAL */}
+            <div className="flex flex-col gap-2 p-3.5 rounded-xl border border-slate-200 bg-slate-50/80">
+              <div className="flex justify-between items-center">
+                <label className="form-label font-bold text-xs text-slate-800 flex items-center gap-1.5" style={{ margin: 0 }}>
+                  <ImageIcon size={14} className="text-emerald-700" />
+                  Gambar / Bagan Ilustrasi Soal (Opsional)
+                </label>
+                {imageUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setImageUrl('')}
+                    className="text-[11px] text-red-600 hover:text-red-700 font-semibold flex items-center gap-1"
+                  >
+                    <Trash2 size={12} /> Hapus Gambar
+                  </button>
+                )}
+              </div>
+
+              {imageUrl ? (
+                <div className="relative rounded-xl overflow-hidden border border-slate-300 bg-white p-2.5 flex flex-col items-center gap-2">
+                  <img 
+                    src={imageUrl} 
+                    alt="Pratinjau Soal" 
+                    className="max-h-48 object-contain rounded-lg shadow-xs"
+                  />
+                  <div className="flex items-center gap-2 w-full pt-1">
+                    <Input
+                      placeholder="Atau ubah tautan URL gambar..."
+                      value={imageUrl}
+                      onChange={(e) => setImageUrl(e.target.value)}
+                      className="text-xs flex-1"
+                    />
+                    <label className="btn btn-secondary btn-sm cursor-pointer text-xs flex items-center gap-1 shrink-0">
+                      <Upload size={13} /> Ganti File
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handleQuestionImageUpload} 
+                      />
+                    </label>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col sm:flex-row items-center gap-2">
+                  <label className="w-full sm:w-auto btn btn-secondary btn-sm cursor-pointer text-xs flex items-center justify-center gap-1.5 shrink-0 bg-white border-slate-300 hover:bg-slate-50 shadow-xs py-2">
+                    <Upload size={14} className="text-emerald-700" />
+                    <span className="font-semibold text-slate-700">Unggah Gambar Soal (File)</span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      className="hidden" 
+                      onChange={handleQuestionImageUpload} 
+                    />
+                  </label>
+                  <span className="text-xs text-slate-400">atau</span>
+                  <Input
+                    placeholder="Tempel tautan URL gambar langsung..."
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className="text-xs flex-1"
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Opsi Jawaban: Pilihan Ganda */}
+            {/* FITUR UPLOAD GAMBAR UNTUK OPSI PILIHAN GANDA (A – E) */}
             {qType === 'PILIHAN_GANDA' && (
-              <div className="flex flex-col gap-2.5 p-3.5 rounded-xl border border-slate-200 bg-slate-50">
+              <div className="flex flex-col gap-3 p-3.5 rounded-xl border border-slate-200 bg-slate-50">
                 <div className="flex justify-between items-center">
-                  <label className="form-label font-bold text-xs" style={{ margin: 0 }}>5 Opsi Jawaban & Kunci Benar (A – E)</label>
-                  <span className="text-[11px] text-slate-500">Klik radio untuk memilih kunci jawaban benar</span>
+                  <div>
+                    <label className="form-label font-bold text-xs text-slate-800" style={{ margin: 0 }}>
+                      5 Opsi Jawaban & Kunci Benar (A – E)
+                    </label>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Dapat diisi teks, gambar ilustrasi (diagram/grafik/arab), atau keduanya
+                    </p>
+                  </div>
+                  <span className="text-[11px] text-emerald-800 bg-emerald-100/80 font-semibold px-2 py-0.5 rounded">
+                    Pilih radio untuk kunci benar
+                  </span>
                 </div>
                 
                 {[
-                  { key: 'optA', label: 'A', val: optA, set: setOptA, req: true },
-                  { key: 'optB', label: 'B', val: optB, set: setOptB, req: true },
-                  { key: 'optC', label: 'C', val: optC, set: setOptC, req: false },
-                  { key: 'optD', label: 'D', val: optD, set: setOptD, req: false },
-                  { key: 'optE', label: 'E', val: optE, set: setOptE, req: false },
+                  { key: 'optA', label: 'A', val: optA, setVal: setOptA, img: optAImage, setImg: setOptAImage, req: true },
+                  { key: 'optB', label: 'B', val: optB, setVal: setOptB, img: optBImage, setImg: setOptBImage, req: true },
+                  { key: 'optC', label: 'C', val: optC, setVal: setOptC, img: optCImage, setImg: setOptCImage, req: false },
+                  { key: 'optD', label: 'D', val: optD, setVal: setOptD, img: optDImage, setImg: setOptDImage, req: false },
+                  { key: 'optE', label: 'E', val: optE, setVal: setOptE, img: optEImage, setImg: setOptEImage, req: false },
                 ].map((item, idx) => (
-                  <div key={item.key} className="flex items-center gap-2">
-                    <input 
-                      type="radio" 
-                      name="correctOptBank" 
-                      checked={correctOptIndex === idx} 
-                      onChange={() => setCorrectOptIndex(idx)} 
-                      title={`Jadikan Kunci Benar ${item.label}`}
-                      style={{ width: '18px', height: '18px', accentColor: '#047857', cursor: 'pointer' }}
-                    />
-                    <Input 
-                      placeholder={`Opsi ${item.label}${item.req ? ' (Wajib)' : ' (Opsional)'}`} 
-                      required={item.req}
-                      value={item.val} 
-                      onChange={(e) => item.set(e.target.value)} 
-                      style={{
-                        borderColor: correctOptIndex === idx ? '#059669' : undefined,
-                        backgroundColor: correctOptIndex === idx ? '#ecfdf5' : undefined
-                      }}
-                    />
+                  <div 
+                    key={item.key} 
+                    className={`p-2.5 rounded-xl border transition-all flex flex-col gap-2 ${
+                      correctOptIndex === idx 
+                        ? 'bg-emerald-50/80 border-emerald-500 shadow-xs' 
+                        : 'bg-white border-slate-200'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <input 
+                        type="radio" 
+                        name="correctOptBank" 
+                        checked={correctOptIndex === idx} 
+                        onChange={() => setCorrectOptIndex(idx)} 
+                        title={`Jadikan Kunci Benar ${item.label}`}
+                        style={{ width: '18px', height: '18px', accentColor: '#047857', cursor: 'pointer', flexShrink: 0 }}
+                      />
+                      <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                        correctOptIndex === idx ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        {item.label}
+                      </span>
+                      <div className="flex-1">
+                        <Input 
+                          placeholder={`Teks Opsi ${item.label}${item.req ? ' (Wajib)' : ' (Opsional jika ada gambar)'}`} 
+                          value={item.val} 
+                          onChange={(e) => item.setVal(e.target.value)} 
+                          className="text-xs"
+                          style={{
+                            borderColor: correctOptIndex === idx ? '#059669' : undefined,
+                            backgroundColor: correctOptIndex === idx ? '#ffffff' : undefined
+                          }}
+                        />
+                      </div>
+
+                      {/* Tombol Upload Gambar Opsi */}
+                      <label 
+                        className={`btn btn-sm cursor-pointer text-xs flex items-center gap-1 shrink-0 px-2.5 py-1.5 rounded-lg border ${
+                          item.img 
+                            ? 'bg-emerald-100 border-emerald-300 text-emerald-800 font-semibold' 
+                            : 'bg-slate-100 hover:bg-slate-200 border-slate-300 text-slate-700'
+                        }`}
+                        title={`Unggah gambar untuk Opsi ${item.label}`}
+                      >
+                        <ImageIcon size={14} className={item.img ? 'text-emerald-700' : 'text-slate-600'} />
+                        <span className="hidden sm:inline">{item.img ? 'Ganti Gbr' : '+ Gambar'}</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={(e) => handleOptionImageUpload(e, item.setImg, item.label)} 
+                        />
+                      </label>
+                    </div>
+
+                    {/* Preview Thumbnail Gambar Opsi jika ada */}
+                    {item.img && (
+                      <div className="flex items-center justify-between gap-2 p-2 bg-slate-50 rounded-lg border border-slate-200 ml-8">
+                        <div className="flex items-center gap-2">
+                          <img 
+                            src={item.img} 
+                            alt={`Gambar Opsi ${item.label}`} 
+                            className="w-14 h-14 object-contain rounded border border-slate-300 bg-white"
+                          />
+                          <span className="text-[11px] text-slate-600 font-medium">Gambar Opsi {item.label} aktif</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => item.setImg('')}
+                          className="text-xs text-red-600 hover:text-red-700 p-1 flex items-center gap-1 font-semibold"
+                          title="Hapus gambar opsi ini"
+                        >
+                          <Trash2 size={13} /> Hapus
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

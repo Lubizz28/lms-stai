@@ -22,6 +22,7 @@ import {
   AlertTriangle,
   Check,
   X,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardSubtitle, CardBody } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -71,10 +72,15 @@ interface DraftQuestion {
   topic: string;
   tags: string;
   optA: string;
+  optAImage: string;
   optB: string;
+  optBImage: string;
   optC: string;
+  optCImage: string;
   optD: string;
+  optDImage: string;
   optE: string;
+  optEImage: string;
   correctOptIndex: number;
   shortAnswer: string;
   essayRubric: string;
@@ -94,7 +100,11 @@ function createBlankQuestion(idx: number): DraftQuestion {
     explanation: '',
     topic: '',
     tags: '',
-    optA: '', optB: '', optC: '', optD: '', optE: '',
+    optA: '', optAImage: '',
+    optB: '', optBImage: '',
+    optC: '', optCImage: '',
+    optD: '', optDImage: '',
+    optE: '', optEImage: '',
     correctOptIndex: 0,
     shortAnswer: '',
     essayRubric: '',
@@ -104,8 +114,8 @@ function createBlankQuestion(idx: number): DraftQuestion {
 }
 
 function bankQuestionToDraft(bq: BankQuestion): DraftQuestion {
-  const optTexts = bq.options?.map((o) => o.text) ?? [];
-  const correctIdx = bq.options?.findIndex((o) => o.isCorrect) ?? 0;
+  const opts = bq.options ?? [];
+  const correctIdx = opts.findIndex((o) => o.isCorrect) ?? 0;
   return {
     id: `draft-bq-${bq.id}-${Date.now()}`,
     type: bq.type,
@@ -117,11 +127,16 @@ function bankQuestionToDraft(bq: BankQuestion): DraftQuestion {
     explanation: bq.explanation || '',
     topic: bq.topic,
     tags: bq.tags?.join(', ') || '',
-    optA: optTexts[0] || '',
-    optB: optTexts[1] || '',
-    optC: optTexts[2] || '',
-    optD: optTexts[3] || '',
-    optE: optTexts[4] || '',
+    optA: opts[0]?.text || '',
+    optAImage: opts[0]?.imageUrl || '',
+    optB: opts[1]?.text || '',
+    optBImage: opts[1]?.imageUrl || '',
+    optC: opts[2]?.text || '',
+    optCImage: opts[2]?.imageUrl || '',
+    optD: opts[3]?.text || '',
+    optDImage: opts[3]?.imageUrl || '',
+    optE: opts[4]?.text || '',
+    optEImage: opts[4]?.imageUrl || '',
     correctOptIndex: correctIdx >= 0 ? correctIdx : 0,
     shortAnswer: bq.correctShortAnswer || '',
     essayRubric: bq.essayRubric || '',
@@ -134,15 +149,17 @@ function draftToQuizQuestionItem(dq: DraftQuestion, idx: number): QuizQuestionIt
   let options;
   if (dq.type === 'PILIHAN_GANDA') {
     const raw = [
-      { text: dq.optA, key: 0 },
-      { text: dq.optB, key: 1 },
-      { text: dq.optC, key: 2 },
-      { text: dq.optD, key: 3 },
-      { text: dq.optE, key: 4 },
-    ].filter((o) => o.text.trim() !== '');
+      { text: dq.optA, imageUrl: dq.optAImage, key: 0 },
+      { text: dq.optB, imageUrl: dq.optBImage, key: 1 },
+      { text: dq.optC, imageUrl: dq.optCImage, key: 2 },
+      { text: dq.optD, imageUrl: dq.optDImage, key: 3 },
+      { text: dq.optE, imageUrl: dq.optEImage, key: 4 },
+    ].filter((o) => o.text.trim() !== '' || !!o.imageUrl);
+
     options = raw.map((o, i) => ({
       id: `opt-${dq.id}-${i}`,
-      text: o.text.trim(),
+      text: o.text.trim() || `Pilihan ${String.fromCharCode(65 + i)}`,
+      imageUrl: o.imageUrl || undefined,
       isCorrect: o.key === dq.correctOptIndex,
     }));
     if (options.length > 0 && !options.some((o) => o.isCorrect)) {
@@ -400,33 +417,59 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({
               </div>
               {(['A', 'B', 'C', 'D', 'E'] as const).map((letter, li) => {
                 const valKey = `opt${letter}` as keyof DraftQuestion;
+                const imgKey = `opt${letter}Image` as keyof DraftQuestion;
                 const val = dq[valKey] as string;
+                const imgVal = dq[imgKey] as string;
                 const isCorrect = dq.correctOptIndex === li;
                 return (
-                  <div key={letter} className="flex items-center gap-2">
-                    <button type="button" onClick={() => onChange(dq.id, { correctOptIndex: li })}
-                      title={`Kunci jawaban: Opsi ${letter}`}
-                      style={{
-                        width: '34px', height: '34px', flexShrink: 0,
-                        borderRadius: 'var(--radius-full)',
-                        border: `2px solid ${isCorrect ? 'var(--color-success-main)' : 'var(--border-default)'}`,
-                        backgroundColor: isCorrect ? 'var(--color-success-bg)' : 'var(--bg-surface)',
-                        color: isCorrect ? 'var(--color-success-main)' : 'var(--text-muted)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        cursor: 'pointer', fontWeight: 'bold', fontSize: 'var(--text-xs)', transition: 'all 150ms'
-                      }}>
-                      {isCorrect ? <Check size={14} /> : letter}
-                    </button>
-                    <Input
-                      placeholder={`Opsi ${letter}${li < 2 ? ' (Wajib)' : ' (Opsional)'}`}
-                      value={val}
-                      onChange={(e) => onChange(dq.id, { [valKey]: e.target.value } as any)}
-                      style={{
-                        flex: 1,
-                        borderColor: isCorrect ? 'var(--color-success-border)' : undefined,
-                        backgroundColor: isCorrect ? 'var(--color-success-bg)' : undefined,
-                        fontSize: 'var(--text-sm)'
-                      }} />
+                  <div key={letter} className="flex flex-col gap-1 p-2 rounded border bg-white" style={{ borderColor: isCorrect ? 'var(--color-success-border)' : 'var(--border-default)' }}>
+                    <div className="flex items-center gap-2">
+                      <button type="button" onClick={() => onChange(dq.id, { correctOptIndex: li })}
+                        title={`Kunci jawaban: Opsi ${letter}`}
+                        style={{
+                          width: '34px', height: '34px', flexShrink: 0,
+                          borderRadius: 'var(--radius-full)',
+                          border: `2px solid ${isCorrect ? 'var(--color-success-main)' : 'var(--border-default)'}`,
+                          backgroundColor: isCorrect ? 'var(--color-success-bg)' : 'var(--bg-surface)',
+                          color: isCorrect ? 'var(--color-success-main)' : 'var(--text-muted)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          cursor: 'pointer', fontWeight: 'bold', fontSize: 'var(--text-xs)', transition: 'all 150ms'
+                        }}>
+                        {isCorrect ? <Check size={14} /> : letter}
+                      </button>
+                      <Input
+                        placeholder={`Teks Opsi ${letter}${li < 2 ? ' (Wajib)' : ' (Opsional)'}`}
+                        value={val}
+                        onChange={(e) => onChange(dq.id, { [valKey]: e.target.value } as any)}
+                        style={{ flex: 1, fontSize: 'var(--text-sm)' }} />
+                      <label className="btn btn-secondary btn-sm cursor-pointer text-xs flex items-center gap-1 shrink-0" title={`Unggah gambar opsi ${letter}`}>
+                        <ImageIcon size={13} />
+                        <span className="hidden sm:inline">{imgVal ? 'Ganti Gbr' : '+ Gbr'}</span>
+                        <input type="file" accept="image/*" style={{ display: 'none' }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onload = (ev) => {
+                                if (typeof ev.target?.result === 'string') onChange(dq.id, { [imgKey]: ev.target.result } as any);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }} />
+                      </label>
+                    </div>
+                    {imgVal && (
+                      <div className="flex items-center justify-between gap-2 p-1.5 bg-slate-50 rounded border border-slate-200 ml-10">
+                        <div className="flex items-center gap-2">
+                          <img src={imgVal} alt={`Gambar Opsi ${letter}`} className="w-10 h-10 object-contain rounded border bg-white" />
+                          <span className="text-[11px] text-slate-600 font-medium">Gambar Opsi {letter} aktif</span>
+                        </div>
+                        <button type="button" onClick={() => onChange(dq.id, { [imgKey]: '' } as any)}
+                          className="text-xs text-red-600 hover:text-red-700 p-1 flex items-center gap-1 font-semibold">
+                          <X size={12} /> Hapus
+                        </button>
+                      </div>
+                    )}
                   </div>
                 );
               })}

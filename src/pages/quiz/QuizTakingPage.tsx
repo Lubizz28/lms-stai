@@ -915,19 +915,35 @@ export const QuizTakingPage: React.FC<QuizTakingPageProps> = ({ quizId, onFinish
                     <label
                       key={opt.id}
                       className={`cbt-touch-option ${isSelected ? 'selected' : ''}`}
+                      style={{
+                        flexDirection: opt.imageUrl ? 'column' : 'row',
+                        alignItems: opt.imageUrl ? 'flex-start' : 'center',
+                        gap: opt.imageUrl ? '8px' : '10px'
+                      }}
                     >
-                      <input
-                        type="radio"
-                        name={`q-option-${currentQ.id}`}
-                        value={opt.id}
-                        checked={isSelected}
-                        onChange={() => handleAnswerChange({ selectedOptionId: opt.id })}
-                        style={{ marginTop: '3px', width: '18px', height: '18px', accentColor: 'var(--color-primary-700)' }}
-                      />
-                      <span style={{ fontWeight: 'bold', minWidth: '20px', fontSize: 'var(--text-sm)' }}>{labelLetter}.</span>
-                      <span style={{ fontSize: 'var(--text-sm)', color: isSelected ? 'var(--color-primary-950)' : 'var(--text-primary)', lineHeight: 1.4 }}>
-                        {opt.text}
-                      </span>
+                      <div className="flex items-center gap-2.5 w-full">
+                        <input
+                          type="radio"
+                          name={`q-option-${currentQ.id}`}
+                          value={opt.id}
+                          checked={isSelected}
+                          onChange={() => handleAnswerChange({ selectedOptionId: opt.id })}
+                          style={{ width: '18px', height: '18px', accentColor: 'var(--color-primary-700)', flexShrink: 0 }}
+                        />
+                        <span style={{ fontWeight: 'bold', minWidth: '20px', fontSize: 'var(--text-sm)' }}>{labelLetter}.</span>
+                        <span style={{ fontSize: 'var(--text-sm)', color: isSelected ? 'var(--color-primary-950)' : 'var(--text-primary)', lineHeight: 1.4 }}>
+                          {opt.text}
+                        </span>
+                      </div>
+                      {opt.imageUrl && (
+                        <div className="ml-8 rounded-lg overflow-hidden border border-slate-200 bg-white p-1 max-h-48">
+                          <img 
+                            src={opt.imageUrl} 
+                            alt={`Opsi ${labelLetter}`} 
+                            className="object-contain max-h-44 rounded"
+                          />
+                        </div>
+                      )}
                     </label>
                   );
                 })}

@@ -19,6 +19,7 @@ export type AttemptStatus =
 export interface QuizOption {
   id: string;
   text: string;
+  imageUrl?: string; // URL / Base64 gambar ilustrasi opsi jawaban
   isCorrect: boolean;
 }
 
@@ -35,6 +36,11 @@ export interface ImportQuestionInput {
   optC?: string;
   optD?: string;
   optE?: string;
+  optAImage?: string;
+  optBImage?: string;
+  optCImage?: string;
+  optDImage?: string;
+  optEImage?: string;
   correctKey: string;
   defaultPoints?: number;
   explanation?: string;
