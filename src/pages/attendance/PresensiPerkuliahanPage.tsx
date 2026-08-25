@@ -27,7 +27,8 @@ import {
   Layers,
   Percent,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
+  ClipboardList
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardSubtitle, CardBody } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
@@ -43,6 +44,7 @@ import { attendanceService } from '../../services/attendanceService';
 import { exportAttendanceMeetingExcel, exportSemesterRecapMatrixExcel } from '../../utils/excelUtils';
 import { DynamicQrModal } from '../../components/attendance/DynamicQrModal';
 import { StudentAttendanceModal } from '../../components/attendance/StudentAttendanceModal';
+import { ManualRollCallModal } from '../../components/attendance/ManualRollCallModal';
 import { 
   MeetingAttendanceData, 
   ClassAttendanceSummaryData, 
@@ -106,6 +108,7 @@ export const PresensiPerkuliahanPage: React.FC = () => {
   const [isStudentScanModalOpen, setIsStudentScanModalOpen] = useState<boolean>(false);
   const [isBapModalOpen, setIsBapModalOpen] = useState<boolean>(false);
   const [isManualEditModalOpen, setIsManualEditModalOpen] = useState<boolean>(false);
+  const [isRollCallModalOpen, setIsRollCallModalOpen] = useState<boolean>(false);
   const [isPrintBapModalOpen, setIsPrintBapModalOpen] = useState<boolean>(false);
   const [isPrintRecapModalOpen, setIsPrintRecapModalOpen] = useState<boolean>(false);
 
@@ -304,6 +307,48 @@ export const PresensiPerkuliahanPage: React.FC = () => {
       await loadClassSummary(selectedClassId);
     } catch (err: any) {
       toast.danger('Gagal Memperbarui', err.message);
+    }
+  };
+
+  // Quick 1-Click Status Toggle by Lecturer on table row
+  const handleQuickStatusChange = async (studentId: string, status: AttendanceStatus, studentName: string) => {
+    if (!selectedMeetingId) return;
+    try {
+      if (sessionData) {
+        setSessionData({
+          ...sessionData,
+          students: sessionData.students.map(s => s.studentId === studentId ? { ...s, status, method: 'MANUAL_DOSEN' } : s)
+        });
+      }
+      await attendanceService.updateStudentManual(selectedMeetingId, studentId, { status });
+      toast.success('Presensi Manual Disimpan', `${studentName} ditandai ${status}.`);
+      await loadMeetingSession(selectedMeetingId);
+      await loadClassSummary(selectedClassId);
+    } catch (err: any) {
+      toast.danger('Gagal Mengubah Status', err.message);
+      await loadMeetingSession(selectedMeetingId);
+    }
+  };
+
+  // Batch Save from Manual Roll Call Modal
+  const handleSaveBatchManual = async (updatedRecords: Array<{ studentId: string; status: AttendanceStatus; notes?: string }>) => {
+    if (!selectedMeetingId) return;
+    try {
+      setIsLoading(true);
+      for (const rec of updatedRecords) {
+        await attendanceService.updateStudentManual(selectedMeetingId, rec.studentId, {
+          status: rec.status,
+          notes: rec.notes
+        });
+      }
+      toast.success('Rekap Presensi Manual Disimpan', `Presensi untuk ${updatedRecords.length} mahasiswa berhasil disimpan.`);
+      setIsRollCallModalOpen(false);
+      await loadMeetingSession(selectedMeetingId);
+      await loadClassSummary(selectedClassId);
+    } catch (err: any) {
+      toast.danger('Gagal Menyimpan Rekap Presensi', err.message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1012,6 +1057,15 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                 {isLecturer && (
                   <div className="flex flex-wrap items-center gap-2">
                     <Button
+                      variant="primary"
+                      size="sm"
+                      icon={ClipboardList}
+                      onClick={() => setIsRollCallModalOpen(true)}
+                      title="Buka Lembar Presensi Manual & Panggilan Kelas (Roll Call)"
+                    >
+                      Absensi Manual (Roll Call)
+                    </Button>
+                    <Button
                       variant="outline"
                       size="sm"
                       icon={Check}
@@ -1254,82 +1308,160 @@ export const PresensiPerkuliahanPage: React.FC = () => {
                               </div>
                             </td>
 
-                            <td style={{ textAlign: 'center', padding: '10px 12px' }}>
-                              {st.status === 'HADIR' && (
-                                <span 
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    backgroundColor: 'var(--color-success-bg)',
-                                    color: 'var(--color-success-text)',
-                                    border: '1px solid var(--color-success-border)',
-                                    padding: '4px 10px',
-                                    borderRadius: 'var(--radius-full)',
-                                    fontSize: '11px',
-                                    fontWeight: 700
-                                  }}
-                                >
-                                  <CheckCircle2 size={13} color="var(--color-success-main)" />
-                                  HADIR
-                                </span>
-                              )}
-                              {st.status === 'SAKIT' && (
-                                <span 
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    backgroundColor: 'var(--color-info-bg)',
-                                    color: 'var(--color-info-text)',
-                                    border: '1px solid var(--color-info-border)',
-                                    padding: '4px 10px',
-                                    borderRadius: 'var(--radius-full)',
-                                    fontSize: '11px',
-                                    fontWeight: 700
-                                  }}
-                                >
-                                  <Stethoscope size={13} color="var(--color-info-main)" />
-                                  SAKIT
-                                </span>
-                              )}
-                              {st.status === 'IZIN' && (
-                                <span 
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    backgroundColor: 'var(--color-warning-bg)',
-                                    color: 'var(--color-warning-text)',
-                                    border: '1px solid var(--color-warning-border)',
-                                    padding: '4px 10px',
-                                    borderRadius: 'var(--radius-full)',
-                                    fontSize: '11px',
-                                    fontWeight: 700
-                                  }}
-                                >
-                                  <Clock size={13} color="var(--color-warning-main)" />
-                                  IZIN
-                                </span>
-                              )}
-                              {st.status === 'ALPA' && (
-                                <span 
-                                  style={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    gap: '5px',
-                                    backgroundColor: 'var(--color-danger-bg)',
-                                    color: 'var(--color-danger-text)',
-                                    border: '1px solid var(--color-danger-border)',
-                                    padding: '4px 10px',
-                                    borderRadius: 'var(--radius-full)',
-                                    fontSize: '11px',
-                                    fontWeight: 700
-                                  }}
-                                >
-                                  <AlertCircle size={13} color="var(--color-danger-main)" />
-                                  ALPA
-                                </span>
+                            <td style={{ textAlign: 'center', padding: '8px 12px' }}>
+                              {isLecturer ? (
+                                <div className="inline-flex rounded-md shadow-2xs" role="group">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(st.studentId, 'HADIR', st.studentName)}
+                                    style={{
+                                      padding: '4px 8px',
+                                      fontSize: '11px',
+                                      fontWeight: st.status === 'HADIR' ? 700 : 500,
+                                      borderTopLeftRadius: 'var(--radius-sm)',
+                                      borderBottomLeftRadius: 'var(--radius-sm)',
+                                      border: '1px solid var(--border-strong)',
+                                      borderRight: 'none',
+                                      backgroundColor: st.status === 'HADIR' ? 'var(--color-success-600)' : 'var(--bg-surface)',
+                                      color: st.status === 'HADIR' ? '#ffffff' : 'var(--text-secondary)',
+                                      cursor: 'pointer'
+                                    }}
+                                    title="Tandai Hadir (Manual Dosen)"
+                                  >
+                                    Hadir
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(st.studentId, 'SAKIT', st.studentName)}
+                                    style={{
+                                      padding: '4px 8px',
+                                      fontSize: '11px',
+                                      fontWeight: st.status === 'SAKIT' ? 700 : 500,
+                                      border: '1px solid var(--border-strong)',
+                                      borderRight: 'none',
+                                      backgroundColor: st.status === 'SAKIT' ? '#0284c7' : 'var(--bg-surface)',
+                                      color: st.status === 'SAKIT' ? '#ffffff' : 'var(--text-secondary)',
+                                      cursor: 'pointer'
+                                    }}
+                                    title="Tandai Sakit (Manual Dosen)"
+                                  >
+                                    Sakit
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(st.studentId, 'IZIN', st.studentName)}
+                                    style={{
+                                      padding: '4px 8px',
+                                      fontSize: '11px',
+                                      fontWeight: st.status === 'IZIN' ? 700 : 500,
+                                      border: '1px solid var(--border-strong)',
+                                      borderRight: 'none',
+                                      backgroundColor: st.status === 'IZIN' ? '#d97706' : 'var(--bg-surface)',
+                                      color: st.status === 'IZIN' ? '#ffffff' : 'var(--text-secondary)',
+                                      cursor: 'pointer'
+                                    }}
+                                    title="Tandai Izin (Manual Dosen)"
+                                  >
+                                    Izin
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(st.studentId, 'ALPA', st.studentName)}
+                                    style={{
+                                      padding: '4px 8px',
+                                      fontSize: '11px',
+                                      fontWeight: st.status === 'ALPA' ? 700 : 500,
+                                      borderTopRightRadius: 'var(--radius-sm)',
+                                      borderBottomRightRadius: 'var(--radius-sm)',
+                                      border: '1px solid var(--border-strong)',
+                                      backgroundColor: st.status === 'ALPA' ? 'var(--color-danger-600)' : 'var(--bg-surface)',
+                                      color: st.status === 'ALPA' ? '#ffffff' : 'var(--text-secondary)',
+                                      cursor: 'pointer'
+                                    }}
+                                    title="Tandai Alpa (Manual Dosen)"
+                                  >
+                                    Alpa
+                                  </button>
+                                </div>
+                              ) : (
+                                <>
+                                  {st.status === 'HADIR' && (
+                                    <span 
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px',
+                                        backgroundColor: 'var(--color-success-bg)',
+                                        color: 'var(--color-success-text)',
+                                        border: '1px solid var(--color-success-border)',
+                                        padding: '4px 10px',
+                                        borderRadius: 'var(--radius-full)',
+                                        fontSize: '11px',
+                                        fontWeight: 700
+                                      }}
+                                    >
+                                      <CheckCircle2 size={13} color="var(--color-success-main)" />
+                                      HADIR
+                                    </span>
+                                  )}
+                                  {st.status === 'SAKIT' && (
+                                    <span 
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px',
+                                        backgroundColor: 'var(--color-info-bg)',
+                                        color: 'var(--color-info-text)',
+                                        border: '1px solid var(--color-info-border)',
+                                        padding: '4px 10px',
+                                        borderRadius: 'var(--radius-full)',
+                                        fontSize: '11px',
+                                        fontWeight: 700
+                                      }}
+                                    >
+                                      <Stethoscope size={13} color="var(--color-info-main)" />
+                                      SAKIT
+                                    </span>
+                                  )}
+                                  {st.status === 'IZIN' && (
+                                    <span 
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px',
+                                        backgroundColor: 'var(--color-warning-bg)',
+                                        color: 'var(--color-warning-text)',
+                                        border: '1px solid var(--color-warning-border)',
+                                        padding: '4px 10px',
+                                        borderRadius: 'var(--radius-full)',
+                                        fontSize: '11px',
+                                        fontWeight: 700
+                                      }}
+                                    >
+                                      <Clock size={13} color="var(--color-warning-main)" />
+                                      IZIN
+                                    </span>
+                                  )}
+                                  {st.status === 'ALPA' && (
+                                    <span 
+                                      style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: '5px',
+                                        backgroundColor: 'var(--color-danger-bg)',
+                                        color: 'var(--color-danger-text)',
+                                        border: '1px solid var(--color-danger-border)',
+                                        padding: '4px 10px',
+                                        borderRadius: 'var(--radius-full)',
+                                        fontSize: '11px',
+                                        fontWeight: 700
+                                      }}
+                                    >
+                                      <AlertCircle size={13} color="var(--color-danger-main)" />
+                                      ALPA
+                                    </span>
+                                  )}
+                                </>
                               )}
                             </td>
 
@@ -2363,6 +2495,23 @@ export const PresensiPerkuliahanPage: React.FC = () => {
           </form>
         )}
       </Modal>
+
+      {/* =====================================================================
+          MODAL: MANUAL ROLL CALL (BATCH ABSENSI DOSEN)
+          ===================================================================== */}
+      {sessionData && (
+        <ManualRollCallModal
+          isOpen={isRollCallModalOpen}
+          onClose={() => setIsRollCallModalOpen(false)}
+          meetingNumber={sessionData.meeting.meetingNumber}
+          meetingTitle={sessionData.meeting.title}
+          courseName={sessionData.meeting.courseName}
+          className={sessionData.meeting.className}
+          students={sessionData.students}
+          onSaveBatch={handleSaveBatchManual}
+          isLoading={isLoading}
+        />
+      )}
 
       {/* =====================================================================
           MODAL: CETAK BAP & DAFTAR HADIR SESI PERTEMUAN (RESMI)
