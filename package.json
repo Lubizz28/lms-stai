@@ -12,7 +12,8 @@
     "docker:down": "docker compose down",
     "docker:logs": "docker compose logs -f",
     "tunnel:url": "node scripts/get-ngrok-url.js",
-    "tunnel:start": "powershell -ExecutionPolicy Bypass -File ./tunnel.ps1"
+    "tunnel:start": "powershell -ExecutionPolicy Bypass -File ./tunnel.ps1",
+    "git:sync": "powershell -ExecutionPolicy Bypass -File ./scripts/git-sync.ps1"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
