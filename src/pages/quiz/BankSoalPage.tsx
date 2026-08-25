@@ -104,7 +104,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
   const [essayRubric, setEssayRubric] = useState('');
 
   const loadQuestions = () => {
-    setQuestions(quizService.getBankQuestions());
+    const list = quizService.getBankQuestions();
+    setQuestions(list);
   };
 
   useEffect(() => {
@@ -239,9 +240,6 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     const totalBS = questions.filter(q => q.type === 'BENAR_SALAH').length;
     const totalJS = questions.filter(q => q.type === 'JAWABAN_SINGKAT').length;
     const totalEsai = questions.filter(q => q.type === 'ESAI').length;
-    const totalMudah = questions.filter(q => q.difficulty === 'MUDAH').length;
-    const totalSedang = questions.filter(q => q.difficulty === 'SEDANG').length;
-    const totalSulit = questions.filter(q => q.difficulty === 'SULIT').length;
 
     return {
       totalCourses,
@@ -249,21 +247,20 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
       totalPG,
       totalBS,
       totalJS,
-      totalEsai,
-      totalMudah,
-      totalSedang,
-      totalSulit
+      totalEsai
     };
   }, [questions, courseStats]);
 
   // Filtered Course Catalog (Level 1)
   const filteredCourses = useMemo(() => {
     return Object.values(courseStats).filter(st => {
-      const matchesSearch = 
-        st.code.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
-        st.name.toLowerCase().includes(courseSearchQuery.toLowerCase()) ||
-        st.prodi.toLowerCase().includes(courseSearchQuery.toLowerCase());
-      return matchesSearch;
+      const q = courseSearchQuery.toLowerCase().trim();
+      if (!q) return true;
+      return (
+        st.code.toLowerCase().includes(q) ||
+        st.name.toLowerCase().includes(q) ||
+        st.prodi.toLowerCase().includes(q)
+      );
     });
   }, [courseStats, courseSearchQuery]);
 
@@ -299,16 +296,16 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
   // Open Edit Modal
   const handleOpenEdit = (q: BankQuestion) => {
     setEditingQuestionId(q.id);
-    setCourseCode(q.courseCode);
-    setTopic(q.topic);
-    setQType(q.type);
-    setDifficulty(q.difficulty);
-    setQuestionText(q.questionText);
+    setCourseCode(q.courseCode || selectedCourse || 'PAI-301');
+    setTopic(q.topic || '');
+    setQType(q.type || 'PILIHAN_GANDA');
+    setDifficulty(q.difficulty || 'SEDANG');
+    setQuestionText(q.questionText || '');
     setArabicText(q.arabicText || '');
     setImageUrl(q.imageUrl || '');
-    setPoints(q.defaultPoints);
+    setPoints(q.defaultPoints || 20);
     setExplanation(q.explanation || '');
-    setTags(q.tags?.join(', ') || '');
+    setTags((q.tags || []).join(', '));
 
     if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
       const opts = q.options || [];
@@ -530,11 +527,17 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     if (!selectedCourse) return [];
 
     return questions.filter((q) => {
-      const matchesCourse = q.courseCode === selectedCourse;
-      const matchesSearch = 
-        q.questionText.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        q.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        q.tags.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase()));
+      const matchesCourse = (q.courseCode || 'PAI-301') === selectedCourse;
+      const sQuery = searchQuery.toLowerCase().trim();
+      
+      const qText = (q.questionText || '').toLowerCase();
+      const qTopic = (q.topic || '').toLowerCase();
+      const qTags = (q.tags || []).map((t) => (t || '').toLowerCase());
+
+      const matchesSearch = !sQuery ||
+        qText.includes(sQuery) ||
+        qTopic.includes(sQuery) ||
+        qTags.some((t) => t.includes(sQuery));
 
       const matchesType = filterType === 'SEMUA' || q.type === filterType;
       const matchesDifficulty = filterDifficulty === 'SEMUA' || q.difficulty === filterDifficulty;
@@ -575,8 +578,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
         width: '180px',
         format: (_: any, q: BankQuestion) => {
           if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
-            const correctIdx = q.options?.findIndex((o) => o.isCorrect);
-            const correctOpt = q.options?.find((o) => o.isCorrect);
+            const correctIdx = (q.options || []).findIndex((o) => o.isCorrect);
+            const correctOpt = (q.options || []).find((o) => o.isCorrect);
             if (correctIdx !== undefined && correctIdx >= 0 && correctOpt) {
               const imgNotice = correctOpt.imageUrl ? ' [Ada Gambar]' : '';
               return `[${String.fromCharCode(65 + correctIdx)}] ${correctOpt.text}${imgNotice}`;
@@ -627,7 +630,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
     {
       header: 'Teks Pertanyaan & Materi',
       render: (q) => {
-        const hasOptionImages = q.options?.some(o => !!o.imageUrl);
+        const hasOptionImages = (q.options || []).some(o => !!o.imageUrl);
         return (
           <div className="flex flex-col gap-1.5">
             <div style={{ fontWeight: 600, fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 1.45 }}>
@@ -665,7 +668,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                   <ImageIcon size={11} /> Opsi Bergambar
                 </Badge>
               )}
-              {q.tags?.map((t, idx) => (
+              {(q.tags || []).map((t, idx) => (
                 <span key={idx} style={{ fontSize: '10px', color: 'var(--text-muted)', backgroundColor: 'var(--bg-subtle)', padding: '1px 6px', borderRadius: '4px' }}>
                   #{t}
                 </span>
@@ -680,12 +683,12 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
       width: '190px',
       render: (q) => {
         if (q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') {
-          const correctIdx = q.options?.findIndex((o) => o.isCorrect);
-          const correctOpt = q.options?.find((o) => o.isCorrect);
+          const correctIdx = (q.options || []).findIndex((o) => o.isCorrect);
+          const correctOpt = (q.options || []).find((o) => o.isCorrect);
           return (
             <div className="flex flex-col gap-0.5">
               <span className="text-emerald-700 font-bold text-xs flex items-center gap-1">
-                <CheckCircle2 size={12} /> Opsi [{String.fromCharCode(65 + (correctIdx ?? 0))}]
+                <CheckCircle2 size={12} /> Opsi [{String.fromCharCode(65 + (correctIdx >= 0 ? correctIdx : 0))}]
               </span>
               <div className="flex items-center gap-1.5">
                 {correctOpt?.imageUrl && (
@@ -860,7 +863,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                 Pilih Kategori Mata Kuliah
               </h2>
               <p className="text-xs text-slate-500 mt-0.5">
-                Klik kartu mata kuliah untuk membuka repositori butir soal spesifik
+                Klik kartu mata kuliah di bawah untuk mengelola butir soal secara spesifik
               </p>
             </div>
 
@@ -882,7 +885,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                 key={st.code}
                 onClick={() => setSelectedCourse(st.code)}
                 className="group relative bg-white rounded-2xl border border-slate-200 hover:border-emerald-500 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden p-5 flex flex-col justify-between"
-                style={{ minHeight: '190px' }}
+                style={{ minHeight: '200px' }}
               >
                 {/* Top Badge & Code */}
                 <div>
@@ -890,8 +893,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                     <span className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-bold font-mono border border-emerald-200">
                       {st.code}
                     </span>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 flex items-center gap-1">
-                      <FileQuestion size={12} className="text-emerald-600" /> {st.total} Butir Soal
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-100/80 text-emerald-900 flex items-center gap-1 font-mono">
+                      <FileQuestion size={12} className="text-emerald-700" /> {st.total} Butir Soal
                     </span>
                   </div>
 
@@ -903,6 +906,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                     <span>{st.prodi}</span>
                     <span>•</span>
                     <span>{st.credits} SKS</span>
+                    <span>•</span>
+                    <span>Sem. {st.semester}</span>
                   </div>
                 </div>
 
@@ -915,8 +920,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                     <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-200 text-[11px]">Esai: <strong>{st.esai}</strong></span>
                   </div>
 
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800">
-                    <span>Kelola Butir Soal</span>
+                  <div className="flex items-center justify-between text-xs font-bold text-emerald-700 group-hover:text-emerald-800 bg-emerald-50/60 p-2 rounded-lg border border-emerald-100">
+                    <span>Akses Bank Soal</span>
                     <span className="inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                       Buka Bank Soal <ChevronRight size={14} />
                     </span>
@@ -953,7 +958,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                 size="sm" 
                 icon={ArrowLeft} 
                 onClick={() => setSelectedCourse(null)}
-                className="bg-white border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold"
+                className="bg-white border-slate-300 text-slate-700 hover:bg-slate-100 font-semibold shadow-xs"
               >
                 Kembali ke Daftar Mata Kuliah
               </Button>
@@ -1021,7 +1026,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                   {selectedCourse}
                 </span>
                 <span className="text-xs text-emerald-200">
-                  {activeCourseInfo?.prodi} • {activeCourseInfo?.credits} SKS
+                  {activeCourseInfo?.prodi} • {activeCourseInfo?.credits} SKS • Semester {activeCourseInfo?.semester}
                 </span>
               </div>
               <h2 className="text-xl md:text-2xl font-bold text-white">
@@ -1045,6 +1050,10 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[65px]">
                 <div className="text-[10px] text-emerald-300 uppercase font-semibold">B/S</div>
                 <div className="text-lg font-bold text-white">{activeCourseStats?.bs || 0}</div>
+              </div>
+              <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[65px]">
+                <div className="text-[10px] text-emerald-300 uppercase font-semibold">Isian</div>
+                <div className="text-lg font-bold text-white">{activeCourseStats?.js || 0}</div>
               </div>
               <div className="bg-emerald-950/50 px-3 py-2 rounded-xl border border-emerald-500/20 text-center min-w-[65px]">
                 <div className="text-[10px] text-emerald-300 uppercase font-semibold">Esai</div>
@@ -1116,7 +1125,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
               ========================================================================= */}
           <div className="block md:hidden flex flex-col gap-3">
             {paginatedQuestions.map((q, idx) => {
-              const hasOptImages = q.options?.some(o => !!o.imageUrl);
+              const hasOptImages = (q.options || []).some(o => !!o.imageUrl);
               return (
                 <div 
                   key={q.id}
@@ -1195,7 +1204,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                     <span className="text-slate-500 font-medium">Kunci: </span>
                     {q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH' ? (
                       <strong className="text-emerald-700">
-                        [{String.fromCharCode(65 + (q.options?.findIndex(o => o.isCorrect) ?? 0))}] {q.options?.find(o => o.isCorrect)?.text || '-'}
+                        [{String.fromCharCode(65 + ((q.options || []).findIndex(o => o.isCorrect) >= 0 ? (q.options || []).findIndex(o => o.isCorrect) : 0))}] {(q.options || []).find(o => o.isCorrect)?.text || '-'}
                       </strong>
                     ) : q.type === 'JAWABAN_SINGKAT' ? (
                       <strong className="text-emerald-700 font-mono">{q.correctShortAnswer}</strong>
@@ -1247,6 +1256,11 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack }) => {
                 <FileQuestion size={36} className="mx-auto text-slate-300 mb-2" />
                 <p className="font-bold text-slate-700 text-sm">Tidak Ada Butir Soal</p>
                 <p className="text-xs text-slate-500 mt-1">Belum ada butir soal yang sesuai dengan filter pencarian.</p>
+                <div className="mt-3 flex justify-center gap-2">
+                  <Button variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}>
+                    Tambah Soal Sekarang
+                  </Button>
+                </div>
               </div>
             )}
           </div>

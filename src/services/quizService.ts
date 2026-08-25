@@ -208,109 +208,263 @@ export const INITIAL_BANK_QUESTIONS: BankQuestion[] = [
     createdAt: '2026-09-01T08:00:00Z'
   },
 
-  // PAI-102: Ilmu Pendidikan Islam
+  // PAI-204: Ulumul Qur'an & Tafsir Tematik (Tambahan Isian & Esai)
   {
-    id: 'bq-ipi-01',
+    id: 'bq-uq-03',
+    courseCode: 'PAI-204',
+    topic: 'Metode Penafsiran Al-Qur\'an',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Metode penafsiran Al-Qur\'an yang membahas ayat-ayat berdasarkan satu tema atau topik pembahasan tertentu dinamakan metode tafsir:',
+    correctShortAnswer: 'maaudhu\'i',
+    defaultPoints: 20,
+    explanation: 'Metode Tafsir Maudhu\'i (Tematik) mengumpulkan ayat-ayat dengan tema yang sama untuk ditarik kesimpulan komprehensif.',
+    tags: ['Tafsir', 'Maudhui', 'Metodologi'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-uq-04',
+    courseCode: 'PAI-204',
+    topic: 'I\'jaz Al-Qur\'an',
+    type: 'ESAI',
+    difficulty: 'SULIT',
+    questionText: 'Jelaskan aspek-aspek kemukjizatan Al-Qur\'an (I\'jaz al-Qur\'an) ditinjau dari sisi kebahasaan (lughawi), pemberitaan masa lalu dan masa depan (ghaibi), serta isyarat ilmiah (ilmi)!',
+    essayRubric: 'Kriteria: 1. I\'jaz Lughawi & Balaghah (35%), 2. I\'jaz Ghaibi & Nubuwah (30%), 3. I\'jaz Ilmi & Isyarat Kauniyah (35%).',
+    defaultPoints: 30,
+    explanation: 'Kemukjizatan Al-Qur\'an mencakup kesusastraan tertinggi, ramalan sejarah ghaib, serta isyarat sains yang selaras dengan akal sehat.',
+    tags: ['Ijaz Quran', 'Mukjizat', 'Balaghah'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // PAI-205: Ulumul Hadits & Kritik Sanad (Tambahan B/S & Isian)
+  {
+    id: 'bq-uh-03',
+    courseCode: 'PAI-205',
+    topic: 'Klasifikasi Hadits Berdasarkan Perawi',
+    type: 'BENAR_SALAH',
+    difficulty: 'MUDAH',
+    questionText: 'Hadits Hasan adalah hadits yang memenuhi seluruh syarat hadits shahih kecuali dalam hal kedhabithan (kekuatan ingatan/pencatatan) perawinya yang berada di bawah perawi hadits shahih.',
+    options: [
+      { id: 'uh-opt-3a', text: 'Benar', isCorrect: true },
+      { id: 'uh-opt-3b', text: 'Salah', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Benar. Perbedaan mendasar hadits shahih dan hasan terletak pada tingkatan dhabith rawi (khaffad-dhabth).',
+    tags: ['Hadits Hasan', 'Kaidah', 'Dhabith'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-uh-04',
+    courseCode: 'PAI-205',
+    topic: 'Istilah Ilmu Hadits',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Silsilah para perawi yang menghubungkan atau menyampaikan kita kepada matan (isi teks) hadits disebut:',
+    arabicText: 'سِلْسِلَةُ الرُّوَاةِ المproductُوْصِلَةُ إِلَى المَتْنِ',
+    correctShortAnswer: 'sanad',
+    defaultPoints: 20,
+    explanation: 'Sanad atau Thariq adalah mata rantai susunan perawi dari mukharrij hadits sampai ke Rasulullah SAW.',
+    tags: ['Sanad', 'Istilah', 'Ilmu Rijal'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // PAI-302: Pengembangan Kurikulum PAI (Tambahan B/S, Isian, Esai)
+  {
+    id: 'bq-kur-02',
+    courseCode: 'PAI-302',
+    topic: 'Taksonomi Bloom & Domain Pembelajaran',
+    type: 'BENAR_SALAH',
+    difficulty: 'MUDAH',
+    questionText: 'Tingkatan evaluasi (C5) dan kreasi (C6) dalam Taksonomi Bloom revisi Anderson-Krathwohl termasuk dalam kategori kemampuan berpikir tingkat tinggi (Higher Order Thinking Skills / HOTS).',
+    options: [
+      { id: 'kur-opt-2a', text: 'Benar', isCorrect: true },
+      { id: 'kur-opt-2b', text: 'Salah', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Tingkatan C4 (Analisis), C5 (Evaluasi), dan C6 (Kreasi) merupakan domain HOTS dalam kurikulum modern.',
+    tags: ['Bloom', 'HOTS', 'Evaluasi'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-kur-03',
+    courseCode: 'PAI-302',
+    topic: 'Model Pengembangan Kurikulum',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Model perancangan kurikulum yang dimulai dari penentuan hasil akhir asesmen capaian belajar sebelum merancang materi ajar (Backward Design) dikembangkan oleh Grant Wiggins dan Jay McTighe dalam konsep:',
+    correctShortAnswer: 'ubd',
+    defaultPoints: 20,
+    explanation: 'Understanding by Design (UbD) atau Backward Design adalah pendekatan desain kurikulum berorientasi capaian kompetensi mendalam.',
+    tags: ['UbD', 'Backward Design', 'Kurikulum'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-kur-04',
+    courseCode: 'PAI-302',
+    topic: 'Diferensiasi Pembelajaran PAI',
+    type: 'ESAI',
+    difficulty: 'SULIT',
+    questionText: 'Rancanglah strategi pembelajaran berdiferensiasi pada materi Fiqih Ibadah di tingkat Madrasah Aliyah yang mencakup diferensiasi konten, proses, dan produk!',
+    essayRubric: 'Kriteria: 1. Diferensiasi Konten (30%), 2. Diferensiasi Proses & Media (35%), 3. Diferensiasi Produk Asesmen (35%).',
+    defaultPoints: 40,
+    explanation: 'Pembelajaran berdiferensiasi mengakomodasi keragaman profil belajar, minat, dan kesiapan murid tanpa menurunkan standar capaian.',
+    tags: ['Diferensiasi', 'RPS', 'Inovasi'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // PAI-102: Ilmu Pendidikan Islam (Tambahan B/S, Isian, Esai)
+  {
+    id: 'bq-ipi-02',
     courseCode: 'PAI-102',
-    topic: 'Falsafah Pendidikan Islam',
-    type: 'PILIHAN_GANDA',
-    difficulty: 'SEDANG',
-    questionText: 'Istilah dalam khazanah pendidikan Islam yang berfokus pada penanaman adab, nilai-nilai etika, dan penyucian jiwa secara menyeluruh adalah:',
+    topic: 'Prinsip Pendidik Muslim',
+    type: 'BENAR_SALAH',
+    difficulty: 'MUDAH',
+    questionText: 'Dalam konsep pendidik muslim, seorang guru tidak hanya bertindak sebagai pengajar informasi (Mu\'allim) tetapi juga wajib menjadi figur teladan moralitas (Murabbi dan Mu\'addib).',
     options: [
-      { id: 'ipi-opt-1', text: 'Ta\'dib', isCorrect: true },
-      { id: 'ipi-opt-2', text: 'Ta\'lim', isCorrect: false },
-      { id: 'ipi-opt-3', text: 'Tarbiyah', isCorrect: false },
-      { id: 'ipi-opt-4', text: 'Tadrib', isCorrect: false },
-      { id: 'ipi-opt-5', text: 'Tadris', isCorrect: false },
+      { id: 'ipi-opt-2a', text: 'Benar', isCorrect: true },
+      { id: 'ipi-opt-2b', text: 'Salah', isCorrect: false },
     ],
     defaultPoints: 20,
-    explanation: 'Menurut Prof. Dr. Syed Muhammad Naquib Al-Attas, istilah Ta\'dib adalah terminologi yang paling komprehensif menggambarkan hakikat pendidikan Islam yang berporos pada adab.',
-    tags: ['Filsafat PAI', 'Tadib', 'Adab'],
+    explanation: 'Pendidik dalam Islam mengemban amanah integratif antara transfer ilmu dan pembentukan karakter akhlakul karimah.',
+    tags: ['Pendidik', 'Murabbi', 'Karakter'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-ipi-03',
+    courseCode: 'PAI-102',
+    topic: 'Lembaga Pendidikan Tradisional Islam',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Institusi pendidikan keagamaan tertua di Nusantara yang bercirikan pondokan, masjid, santri, kyai, dan kajian kitab kuning disebut:',
+    correctShortAnswer: 'pesantren',
+    defaultPoints: 20,
+    explanation: 'Pesantren merupakan episentrum pendidikan Islam pribumi di Nusantara dengan 5 elemen panca jiwa.',
+    tags: ['Pesantren', 'Institusi', 'Nusantara'],
     createdAt: '2026-09-01T08:00:00Z'
   },
 
-  // MPI-101: Manajemen Pendidikan Islam
+  // MPI-101: Manajemen Pendidikan Islam (Tambahan B/S, Isian)
   {
-    id: 'bq-mpi-01',
+    id: 'bq-mpi-02',
     courseCode: 'MPI-101',
-    topic: 'Fungsi Manajemen POAC',
-    type: 'PILIHAN_GANDA',
-    difficulty: 'MUDAH',
-    questionText: 'Dalam teori manajemen George R. Terry yang diintegrasikan ke dalam lembaga pendidikan Islam, tahapan penentuan tujuan dan perumusan strategi disebut:',
-    options: [
-      { id: 'mpi-opt-1', text: 'Planning (Perencanaan)', isCorrect: true },
-      { id: 'mpi-opt-2', text: 'Organizing (Pengorganisasian)', isCorrect: false },
-      { id: 'mpi-opt-3', text: 'Actuating (Penggerakan)', isCorrect: false },
-      { id: 'mpi-opt-4', text: 'Controlling (Pengawasan)', isCorrect: false },
-      { id: 'mpi-opt-5', text: 'Evaluating (Evaluasi)', isCorrect: false },
-    ],
-    defaultPoints: 20,
-    explanation: 'Planning adalah langkah awal fundamental dalam menetapkan visi, misi, sasaran, dan alokasi sumber daya madrasah/pesantren.',
-    tags: ['Manajemen', 'POAC', 'Planning'],
-    createdAt: '2026-09-01T08:00:00Z'
-  },
-
-  // EKS-201: Fiqih Muamalah & Ekonomi Syariah
-  {
-    id: 'bq-eks-01',
-    courseCode: 'EKS-201',
-    topic: 'Akad Tabarru\' & Tijarah',
-    type: 'PILIHAN_GANDA',
+    topic: 'Total Quality Management (TQM)',
+    type: 'BENAR_SALAH',
     difficulty: 'SEDANG',
-    questionText: 'Akad kerjasama usaha antara pemilik modal (shahibul mal) dan pengelola dana (mudharib) dengan nisbah bagi hasil yang disepakati sejak awal disebut:',
+    questionText: 'Penerapan Total Quality Management (TQM) di madrasah menekankan pada kepuasan pelanggan (stakeholder), kepemimpinan visioner, dan perbaikan mutu berkelanjutan (continuous improvement/kaizen).',
     options: [
-      { id: 'eks-opt-1', text: 'Akad Mudharabah', isCorrect: true },
-      { id: 'eks-opt-2', text: 'Akad Musyarakah Mutanaqisah', isCorrect: false },
-      { id: 'eks-opt-3', text: 'Akad Murabahah', isCorrect: false },
-      { id: 'eks-opt-4', text: 'Akad Ijarah Muntahiyah Bittamlik', isCorrect: false },
-      { id: 'eks-opt-5', text: 'Akad Salam', isCorrect: false },
+      { id: 'mpi-opt-2a', text: 'Benar', isCorrect: true },
+      { id: 'mpi-opt-2b', text: 'Salah', isCorrect: false },
     ],
     defaultPoints: 20,
-    explanation: 'Mudharabah adalah akad kemitraan di mana modal 100% dari shahibul mal dan keahlian/kerja dari mudharib.',
-    tags: ['Ekonomi Syariah', 'Mudharabah', 'Akad'],
+    explanation: 'TQM berfokus pada kualitas holistik seluruh input, proses, dan output lembaga pendidikan Islam.',
+    tags: ['TQM', 'Mutu', 'Kaizen'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-mpi-03',
+    courseCode: 'MPI-101',
+    topic: 'Kepemimpinan Spiritual',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Gaya kepemimpinan yang mengintegrasikan nilai-nilai profetik: Shiddiq, Amanah, Tabligh, dan Fathanah dalam memimpin lembaga pendidikan Islam disebut kepemimpinan:',
+    correctShortAnswer: 'profetik',
+    defaultPoints: 20,
+    explanation: 'Kepemimpinan Profetik mengadopsi keteladanan empat sifat utama para nabi dalam manajemen manajerial.',
+    tags: ['Kepemimpinan', 'Profetik', 'Karakter'],
     createdAt: '2026-09-01T08:00:00Z'
   },
 
-  // TBI-201: Bahasa Arab Komunikatif & Qira'ah
+  // EKS-201: Fiqih Muamalah & Ekonomi Syariah (Tambahan B/S, Isian, Esai)
   {
-    id: 'bq-tbi-01',
+    id: 'bq-eks-02',
+    courseCode: 'EKS-201',
+    topic: 'Larangan Transaksi Terlarang',
+    type: 'BENAR_SALAH',
+    difficulty: 'MUDAH',
+    questionText: 'Dalam fiqih muamalah, segala bentuk transaksi yang mengandung ketidakpastian (Gharar), perjudian (Maysir), dan bunga utang-piutang (Riba) berstatus haram dan bathil.',
+    options: [
+      { id: 'eks-opt-2a', text: 'Benar', isCorrect: true },
+      { id: 'eks-opt-2b', text: 'Salah', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Prinsip MAGHRIB (Maysir, Gharar, Haram, Riba, Ikrah, Bathil) adalah pilar keabsahan akad transaksi syariah.',
+    tags: ['Gharar', 'Riba', 'Muamalah'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-eks-03',
+    courseCode: 'EKS-201',
+    topic: 'Akad Jual Beli Amanah',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Akad jual beli barang dengan menegaskan harga perolehan (modal pokok) kepada pembeli dan pembeli membayarnya dengan tambahan keuntungan (margin) yang disepakati disebut:',
+    correctShortAnswer: 'murabahah',
+    defaultPoints: 20,
+    explanation: 'Murabahah merupakan akad pembiayaan jual beli berbasis keterbukaan margin keuntungan.',
+    tags: ['Murabahah', 'Jual Beli', 'Syariah'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // TBI-201: Bahasa Arab Komunikatif & Qira'ah (Tambahan B/S, Isian)
+  {
+    id: 'bq-tbi-02',
     courseCode: 'TBI-201',
-    topic: 'Kaidah Nahwu Dasar',
-    type: 'PILIHAN_GANDA',
+    topic: 'Struktur Jumlah Fi\'liyyah',
+    type: 'BENAR_SALAH',
     difficulty: 'MUDAH',
-    questionText: 'Isim marfu\' yang terletak di awal kalimat dalam susunan jumlah ismiyyah dinamakan:',
-    arabicText: 'الاسْمُ المَرْفُوعُ العَارِي عَنِ العَوَامِلِ اللَّفْظِيَّةِ',
+    questionText: 'Jumlah Fi\'liyyah adalah susunan kalimat dalam bahasa Arab yang diawali dengan kata kerja (Fi\'il) dan diikuti oleh pelaku (Fa\'il).',
     options: [
-      { id: 'tbi-opt-1', text: 'Mubtada\'', isCorrect: true },
-      { id: 'tbi-opt-2', text: 'Khabar', isCorrect: false },
-      { id: 'tbi-opt-3', text: 'Fa\'il', isCorrect: false },
-      { id: 'tbi-opt-4', text: 'Maf\'ul Bih', isCorrect: false },
-      { id: 'tbi-opt-5', text: 'Na\'at', isCorrect: false },
+      { id: 'tbi-opt-2a', text: 'Benar', isCorrect: true },
+      { id: 'tbi-opt-2b', text: 'Salah', isCorrect: false },
     ],
     defaultPoints: 20,
-    explanation: 'Mubtada\' adalah isim marfu\' yang terbebas dari amil lafdzi dan menjadi pokok pembicaraan dalam kalimat.',
-    tags: ['Bahasa Arab', 'Nahwu', 'Mubtada'],
+    explanation: 'Kalimat bahasa Arab terbagi dua: Jumlah Ismiyyah (diawali Isim) dan Jumlah Fi\'liyyah (diawali Fi\'il).',
+    tags: ['Jumlah Filiyyah', 'Qawaid', 'Bahasa Arab'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-tbi-03',
+    courseCode: 'TBI-201',
+    topic: 'I\'rab Jar & Huruf Jar',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Tanda i\'rab asli (pokok) untuk isim mufrad yang berkedudukan majrur (kemasukan huruf jar) adalah:',
+    arabicText: 'العَلَامَةُ الأَصْلِيَّةُ لِلجَرِّ فِي الاسْمِ المُفْرَدِ',
+    correctShortAnswer: 'kasrah',
+    defaultPoints: 20,
+    explanation: 'Kasrah adalah harakat pokok untuk menyatakan tanda i\'rab jar pada isim mufrad.',
+    tags: ['Irab', 'Kasrah', 'Jar'],
     createdAt: '2026-09-01T08:00:00Z'
   },
 
-  // TAR-204: Sejarah Peradaban Islam
+  // TAR-204: Sejarah Peradaban Islam (Tambahan B/S, Isian)
   {
-    id: 'bq-tar-01',
+    id: 'bq-tar-02',
     courseCode: 'TAR-204',
-    topic: 'Khulafaur Rasyidin',
-    type: 'PILIHAN_GANDA',
+    topic: 'Masa Keemasan Bani Abbasiyah',
+    type: 'BENAR_SALAH',
     difficulty: 'MUDAH',
-    questionText: 'Khalifah yang menginisiasi standarisasi penulisan mushaf Al-Qur\'an menjadi rasm resmi (Mushaf Utsmani) adalah:',
+    questionText: 'Baitul Hikmah yang menjadi pusat penerjemahan ilmu pengetahuan dunia ke dalam bahasa Arab didirikan pada masa kekhalifahan Harun Ar-Rasyid dan Al-Ma\'mun dari Dinasti Abbasiyah.',
     options: [
-      { id: 'tar-opt-1', text: 'Utsman bin Affan r.a.', isCorrect: true },
-      { id: 'tar-opt-2', text: 'Abu Bakar Ash-Shiddiq r.a.', isCorrect: false },
-      { id: 'tar-opt-3', text: 'Umar bin Khattab r.a.', isCorrect: false },
-      { id: 'tar-opt-4', text: 'Ali bin Abi Thalib r.a.', isCorrect: false },
-      { id: 'tar-opt-5', text: 'Muawiyah bin Abi Sufyan', isCorrect: false },
+      { id: 'tar-opt-2a', text: 'Benar', isCorrect: true },
+      { id: 'tar-opt-2b', text: 'Salah', isCorrect: false },
     ],
     defaultPoints: 20,
-    explanation: 'Kodifikasi resmi mushaf Al-Qur\'an dengan dialek Quraisy dilakukan pada era Khalifah Utsman bin Affan r.a. untuk menyatukan qiraat umat.',
-    tags: ['Sejarah Islam', 'Khulafaur Rasyidin', 'Kodifikasi'],
+    explanation: 'Baitul Hikmah di Baghdad menjadi mercusuar peradaban ilmu sains dan filsafat Islam pada abad ke-8 hingga ke-9 Masehi.',
+    tags: ['Baitul Hikmah', 'Abbasiyah', 'Peradaban'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-tar-03',
+    courseCode: 'TAR-204',
+    topic: 'Tokoh Kedokteran Islam',
+    type: 'JAWABAN_SINGKAT',
+    difficulty: 'SEDANG',
+    questionText: 'Cendekiawan muslim penulis mahakarya kedokteran dunia "Al-Qanun fi at-Tibb" (The Canon of Medicine) yang dikenal di Barat dengan nama Avicenna adalah:',
+    correctShortAnswer: 'ibnu sina',
+    defaultPoints: 20,
+    explanation: 'Ibnu Sina (Avicenna) adalah bapak kedokteran modern dan filsuf agung dunia Islam.',
+    tags: ['Ibnu Sina', 'Kedokteran', 'Tokoh'],
     createdAt: '2026-09-01T08:00:00Z'
   }
 ];
@@ -490,7 +644,32 @@ class QuizService {
         return list;
       }
       const raw = localStorage.getItem(BANK_QUESTIONS_KEY);
-      let list: BankQuestion[] = raw ? JSON.parse(raw) : INITIAL_BANK_QUESTIONS;
+      let list: BankQuestion[] = raw ? JSON.parse(raw) : [];
+
+      // Merge standard seeds so all curriculum courses are always populated
+      const existingIds = new Set(list.map((q) => q.id));
+      let hasChange = false;
+      INITIAL_BANK_QUESTIONS.forEach((seedQ) => {
+        if (!existingIds.has(seedQ.id)) {
+          list.push(seedQ);
+          hasChange = true;
+        }
+      });
+
+      // Sanitize fields to prevent any undefined crashes
+      list = list.map((q) => ({
+        ...q,
+        courseCode: q.courseCode || 'PAI-301',
+        topic: q.topic || 'Umum',
+        questionText: q.questionText || '',
+        tags: Array.isArray(q.tags) ? q.tags : [],
+        options: Array.isArray(q.options) ? q.options : [],
+      }));
+
+      if (hasChange || !raw) {
+        localStorage.setItem(BANK_QUESTIONS_KEY, JSON.stringify(list));
+      }
+
       if (courseCode) {
         list = list.filter((b) => b.courseCode === courseCode);
       }
