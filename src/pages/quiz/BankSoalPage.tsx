@@ -164,6 +164,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
   const globalMetrics = useMemo(() => ({
     totalCourses: Object.keys(courseStats).length,
     totalQuestions: questions.length,
+    objectiveCount: questions.filter(q => q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH').length,
+    subjectiveCount: questions.filter(q => q.type === 'JAWABAN_SINGKAT' || q.type === 'ESAI').length,
   }), [questions, courseStats]);
 
   const filteredCourses = useMemo(() => {
@@ -393,10 +395,10 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', margin: 0, lineHeight: 1.2 }}>
-                  📚 Bank Soal
+                  📚 Bank Soal & Materi Evaluasi
                 </h1>
                 <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px' }}>
-                  Pilih mata kuliah untuk melihat dan mengelola soal ujian
+                  Pusat repositori butir soal terstandarisasi, bank teks Arab, dan rubrik evaluasi
                 </p>
               </div>
 
@@ -412,32 +414,32 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                   style={{ background: 'linear-gradient(135deg, #059669, #047857)' }}
                   className="text-xs font-bold"
                 >
-                  Tambah Soal
+                  Tambah Soal Baru
                 </Button>
               </div>
             </div>
 
             {/* Stats Summary Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '14px 16px' }}>
-                <div style={{ fontSize: '11px', color: '#166534', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mata Kuliah</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#065f46', marginTop: '2px' }}>{globalMetrics.totalCourses}</div>
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '14px', padding: '16px' }}>
+                <div style={{ fontSize: '11px', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Mata Kuliah</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1e293b', marginTop: '2px' }}>{globalMetrics.totalCourses}</div>
+                <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>Tersedia di Kurikulum</div>
               </div>
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '14px 16px' }}>
-                <div style={{ fontSize: '11px', color: '#166534', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Soal</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#065f46', marginTop: '2px' }}>{globalMetrics.totalQuestions}</div>
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '14px', padding: '16px' }}>
+                <div style={{ fontSize: '11px', color: '#166534', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Butir Soal</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#15803d', marginTop: '2px' }}>{globalMetrics.totalQuestions}</div>
+                <div style={{ fontSize: '11px', color: '#166534', marginTop: '2px' }}>Terverifikasi di Bank</div>
               </div>
-              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '14px 16px' }}>
-                <div style={{ fontSize: '11px', color: '#1e40af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Objektif</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1d4ed8', marginTop: '2px' }}>
-                  {questions.filter(q => q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH').length}
-                </div>
+              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '14px', padding: '16px' }}>
+                <div style={{ fontSize: '11px', color: '#1e40af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Soal Objektif</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#1d4ed8', marginTop: '2px' }}>{globalMetrics.objectiveCount}</div>
+                <div style={{ fontSize: '11px', color: '#1e40af', marginTop: '2px' }}>PG & Benar/Salah</div>
               </div>
-              <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: '12px', padding: '14px 16px' }}>
-                <div style={{ fontSize: '11px', color: '#92400e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Subjektif</div>
-                <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#b45309', marginTop: '2px' }}>
-                  {questions.filter(q => q.type === 'JAWABAN_SINGKAT' || q.type === 'ESAI').length}
-                </div>
+              <div style={{ background: '#fefce8', border: '1px solid #fde68a', borderRadius: '14px', padding: '16px' }}>
+                <div style={{ fontSize: '11px', color: '#92400e', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Soal Subjektif</div>
+                <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#b45309', marginTop: '2px' }}>{globalMetrics.subjectiveCount}</div>
+                <div style={{ fontSize: '11px', color: '#92400e', marginTop: '2px' }}>Isian Singkat & Esai</div>
               </div>
             </div>
           </div>
@@ -446,7 +448,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
           <div style={{ position: 'relative' }}>
             <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
             <Input
-              placeholder="Cari mata kuliah... (contoh: Fiqih, PAI-301, Tafsir)"
+              placeholder="Cari mata kuliah... (contoh: Ushul Fiqih, PAI-301, Hadits, Tarbiyah)"
               value={courseSearchQuery}
               onChange={(e) => setCourseSearchQuery(e.target.value)}
               style={{ paddingLeft: '40px', fontSize: '0.85rem', borderRadius: '12px', height: '44px' }}
@@ -469,52 +471,62 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
-                  minHeight: '180px',
+                  minHeight: '200px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
                 }}
                 onMouseEnter={(e) => {
                   (e.currentTarget as HTMLElement).style.borderColor = '#059669';
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.12)';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(5, 150, 105, 0.12)';
                   (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                  (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.02)';
                   (e.currentTarget as HTMLElement).style.transform = 'none';
                 }}
               >
                 {/* Card Top */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '2rem', lineHeight: 1 }}>{st.icon}</span>
-                  <span style={{
-                    fontSize: '11px', fontWeight: 700, fontFamily: 'monospace',
-                    background: '#f0fdf4', color: '#065f46', padding: '3px 8px',
-                    borderRadius: '6px', border: '1px solid #bbf7d0'
-                  }}>
-                    {st.code}
-                  </span>
+                  <span style={{ fontSize: '2.25rem', lineHeight: 1 }}>{st.icon}</span>
+                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                    <span style={{
+                      fontSize: '11px', fontWeight: 700, fontFamily: 'monospace',
+                      background: '#f0fdf4', color: '#065f46', padding: '3px 8px',
+                      borderRadius: '6px', border: '1px solid #bbf7d0'
+                    }}>
+                      {st.code}
+                    </span>
+                    <span style={{
+                      fontSize: '11px', fontWeight: 600,
+                      background: '#f1f5f9', color: '#475569', padding: '3px 8px',
+                      borderRadius: '6px'
+                    }}>
+                      {st.credits} SKS
+                    </span>
+                  </div>
                 </div>
 
                 {/* Course Name */}
                 <div>
-                  <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b', margin: 0, lineHeight: 1.3 }}>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#1e293b', margin: 0, lineHeight: 1.3 }}>
                     {st.name}
                   </h3>
-                  <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
-                    {st.credits} SKS • Semester {st.semester}
+                  <p style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
+                    {st.prodi} • Semester {st.semester}
                   </p>
                 </div>
 
                 {/* Stats Row */}
                 <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
                   <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-                    {st.pg > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#f0fdf4', color: '#166534', padding: '2px 6px', borderRadius: '4px' }}>PG {st.pg}</span>}
-                    {st.bs > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#eff6ff', color: '#1e40af', padding: '2px 6px', borderRadius: '4px' }}>B/S {st.bs}</span>}
-                    {st.js > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#fefce8', color: '#92400e', padding: '2px 6px', borderRadius: '4px' }}>Isian {st.js}</span>}
-                    {st.esai > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#fef2f2', color: '#991b1b', padding: '2px 6px', borderRadius: '4px' }}>Esai {st.esai}</span>}
+                    {st.pg > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#f0fdf4', color: '#166534', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bbf7d0' }}>PG {st.pg}</span>}
+                    {st.bs > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#eff6ff', color: '#1e40af', padding: '2px 6px', borderRadius: '4px', border: '1px solid #bfdbfe' }}>B/S {st.bs}</span>}
+                    {st.js > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#fefce8', color: '#92400e', padding: '2px 6px', borderRadius: '4px', border: '1px solid #fde68a' }}>Isian {st.js}</span>}
+                    {st.esai > 0 && <span style={{ fontSize: '10px', fontWeight: 600, background: '#fef2f2', color: '#991b1b', padding: '2px 6px', borderRadius: '4px', border: '1px solid #fecaca' }}>Esai {st.esai}</span>}
                     {st.total === 0 && <span style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic' }}>Belum ada soal</span>}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: 700, color: '#059669' }}>
-                    <span>{st.total}</span>
+                    <span>{st.total} Soal</span>
                     <ChevronRight size={14} />
                   </div>
                 </div>
@@ -527,7 +539,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
               <Folder size={36} style={{ color: '#cbd5e1', margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#475569', margin: 0 }}>Tidak Ditemukan</h3>
               <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '6px' }}>
-                Kata kunci "{courseSearchQuery}" tidak cocok.
+                Mata kuliah dengan kata kunci "{courseSearchQuery}" tidak ditemukan.
               </p>
               <Button variant="secondary" size="sm" onClick={() => setCourseSearchQuery('')} style={{ marginTop: '12px' }}>
                 Reset Pencarian
@@ -557,7 +569,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#fff'; }}
               >
-                <ArrowLeft size={16} /> Kembali
+                <ArrowLeft size={16} /> Kembali ke Katalog
               </button>
               <div style={{ fontSize: '12px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <span>Bank Soal</span>
@@ -566,42 +578,43 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
               </div>
             </div>
 
-            {/* Course Info Banner */}
+            {/* Course Info Hero Banner */}
             <div style={{
               background: 'linear-gradient(135deg, #064e3b 0%, #059669 100%)',
-              borderRadius: '16px', padding: '20px 24px', color: '#fff',
-              display: 'flex', flexDirection: 'column', gap: '12px'
+              borderRadius: '20px', padding: '24px 28px', color: '#ffffff',
+              boxShadow: '0 10px 25px -5px rgba(5, 150, 105, 0.25)',
+              display: 'flex', flexDirection: 'column', gap: '14px'
             }}>
-              <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                <div style={{ flex: 1, minWidth: '240px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '1.5rem' }}>{activeCourseInfo?.icon}</span>
-                    <span style={{ fontSize: '11px', fontFamily: 'monospace', fontWeight: 700, background: 'rgba(255,255,255,0.15)', padding: '3px 8px', borderRadius: '6px' }}>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '1.75rem' }}>{activeCourseInfo?.icon}</span>
+                    <span style={{ fontSize: '12px', fontFamily: 'monospace', fontWeight: 800, background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '8px' }}>
                       {selectedCourse}
                     </span>
-                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.7)' }}>
-                      {activeCourseInfo?.credits} SKS • Sem. {activeCourseInfo?.semester}
+                    <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.85)' }}>
+                      {activeCourseInfo?.credits} SKS • Semester {activeCourseInfo?.semester} • {activeCourseInfo?.prodi}
                     </span>
                   </div>
-                  <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>{activeCourseInfo?.name}</h2>
+                  <h2 style={{ fontSize: '1.4rem', fontWeight: 800, margin: 0, color: '#ffffff' }}>{activeCourseInfo?.name}</h2>
                 </div>
 
                 {/* Quick Counters */}
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {[
-                    { label: 'Total', value: activeCourseStats?.total || 0 },
+                    { label: 'Total Soal', value: activeCourseStats?.total || 0 },
                     { label: 'PG', value: activeCourseStats?.pg || 0 },
                     { label: 'B/S', value: activeCourseStats?.bs || 0 },
                     { label: 'Isian', value: activeCourseStats?.js || 0 },
                     { label: 'Esai', value: activeCourseStats?.esai || 0 },
                   ].map(c => (
                     <div key={c.label} style={{
-                      background: 'rgba(255,255,255,0.12)', borderRadius: '10px',
-                      padding: '8px 12px', textAlign: 'center', minWidth: '55px',
-                      border: '1px solid rgba(255,255,255,0.1)'
+                      background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)', borderRadius: '12px',
+                      padding: '8px 14px', textAlign: 'center', minWidth: '60px',
+                      border: '1px solid rgba(255,255,255,0.2)'
                     }}>
-                      <div style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase' }}>{c.label}</div>
-                      <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#fff' }}>{c.value}</div>
+                      <div style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.75)', textTransform: 'uppercase' }}>{c.label}</div>
+                      <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginTop: '1px' }}>{c.value}</div>
                     </div>
                   ))}
                 </div>
@@ -609,17 +622,17 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             </div>
 
             {/* Action Buttons Row */}
-            <div className="flex gap-2 flex-wrap">
-              <Button variant="outline" size="sm" icon={Download} onClick={exportQuestionBankExcelTemplate} className="text-xs">Template</Button>
-              <Button variant="outline" size="sm" icon={Upload} onClick={() => setImportModal(true)} className="text-xs">Impor</Button>
-              <ExportDropdown config={bankQuestionExportConfig} buttonLabel="Ekspor" />
+            <div className="flex gap-2 flex-wrap items-center">
+              <Button variant="outline" size="sm" icon={Download} onClick={exportQuestionBankExcelTemplate} className="text-xs">Template Excel</Button>
+              <Button variant="outline" size="sm" icon={Upload} onClick={() => setImportModal(true)} className="text-xs">Impor Soal</Button>
+              <ExportDropdown config={bankQuestionExportConfig} buttonLabel="Ekspor Soal" />
               <div style={{ flex: 1 }} />
               <Button 
                 variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}
                 style={{ background: 'linear-gradient(135deg, #059669, #047857)' }}
                 className="text-xs font-bold"
               >
-                Tambah Soal
+                Tambah Soal Baru
               </Button>
             </div>
           </div>
@@ -627,12 +640,12 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
           {/* === FILTER BAR === */}
           <div style={{
             display: 'flex', flexWrap: 'wrap', gap: '10px', alignItems: 'center',
-            background: '#f8fafc', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0'
+            background: '#f8fafc', padding: '12px 16px', borderRadius: '14px', border: '1px solid #e2e8f0'
           }}>
             <div style={{ position: 'relative', flex: '1 1 250px' }}>
               <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }} />
               <Input
-                placeholder="Cari soal, topik, atau tag..."
+                placeholder="Cari teks soal, topik materi, atau kata kunci tag..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ paddingLeft: '36px', fontSize: '0.8rem', borderRadius: '10px' }}
@@ -644,19 +657,19 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
               onChange={(e) => setFilterType(e.target.value)}
               style={{ fontSize: '0.8rem', padding: '8px 12px', borderRadius: '10px', borderColor: '#e2e8f0', minWidth: '140px' }}
             >
-              <option value="SEMUA">Semua Tipe</option>
+              <option value="SEMUA">Semua Tipe Soal</option>
               <option value="PILIHAN_GANDA">Pilihan Ganda</option>
               <option value="BENAR_SALAH">Benar / Salah</option>
               <option value="JAWABAN_SINGKAT">Isian Singkat</option>
-              <option value="ESAI">Esai</option>
+              <option value="ESAI">Esai / Uraian</option>
             </select>
             <select
               className="form-select"
               value={filterDifficulty}
               onChange={(e) => setFilterDifficulty(e.target.value)}
-              style={{ fontSize: '0.8rem', padding: '8px 12px', borderRadius: '10px', borderColor: '#e2e8f0', minWidth: '120px' }}
+              style={{ fontSize: '0.8rem', padding: '8px 12px', borderRadius: '10px', borderColor: '#e2e8f0', minWidth: '130px' }}
             >
-              <option value="SEMUA">Semua Level</option>
+              <option value="SEMUA">Semua Tingkat</option>
               <option value="MUDAH">Mudah</option>
               <option value="SEDANG">Sedang</option>
               <option value="SULIT">Sulit</option>
@@ -666,22 +679,22 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 onClick={handleResetFilters}
                 style={{ fontSize: '12px', color: '#ef4444', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
               >
-                <X size={14} /> Reset
+                <X size={14} /> Reset Filter
               </button>
             )}
           </div>
 
-          {/* === QUESTIONS LIST (CARD-BASED, WORKS FOR ALL DEVICES) === */}
+          {/* === QUESTIONS LIST === */}
           {paginatedQuestions.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '48px 20px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
               <FileQuestion size={40} style={{ color: '#cbd5e1', margin: '0 auto 12px' }} />
-              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#475569', margin: 0 }}>Belum Ada Soal</h3>
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#475569', margin: 0 }}>Belum Ada Butir Soal</h3>
               <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '6px', maxWidth: '360px', margin: '6px auto 0' }}>
-                {hasActiveFilters ? 'Tidak ada soal yang sesuai filter. Coba ubah pencarian Anda.' : 'Mata kuliah ini belum memiliki soal. Mulai tambahkan soal pertama.'}
+                {hasActiveFilters ? 'Tidak ada soal yang sesuai dengan kriteria filter. Coba ubah kata kunci pencarian.' : 'Mata kuliah ini belum memiliki butir soal. Mulai tambahkan soal atau impor dari Excel.'}
               </p>
               <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: '8px' }}>
                 {hasActiveFilters && <Button variant="secondary" size="sm" onClick={handleResetFilters}>Reset Filter</Button>}
-                <Button variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}>Tambah Soal</Button>
+                <Button variant="primary" size="sm" icon={Plus} onClick={handleOpenCreate}>Tambah Soal Sekarang</Button>
               </div>
             </div>
           ) : (
@@ -698,18 +711,18 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                   <div
                     key={q.id}
                     style={{
-                      background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '14px',
-                      padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '10px',
-                      transition: 'border-color 0.15s'
+                      background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px',
+                      padding: '18px 22px', display: 'flex', flexDirection: 'column', gap: '12px',
+                      transition: 'all 0.15s ease', boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
                     }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#cbd5e1'; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#059669'; (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 12px rgba(5, 150, 105, 0.08)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.borderColor = '#e2e8f0'; (e.currentTarget as HTMLElement).style.boxShadow = '0 1px 3px rgba(0,0,0,0.02)'; }}
                   >
                     {/* Row 1: Number + Badges + Points */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                         <span style={{
-                          width: '28px', height: '28px', borderRadius: '8px',
+                          width: '30px', height: '30px', borderRadius: '10px',
                           background: '#f0fdf4', color: '#065f46', fontWeight: 800,
                           fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center',
                           border: '1px solid #bbf7d0', flexShrink: 0
@@ -717,31 +730,31 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                           {qNum}
                         </span>
                         <span style={{
-                          fontSize: '11px', fontWeight: 600, padding: '3px 8px',
+                          fontSize: '11px', fontWeight: 700, padding: '3px 8px',
                           borderRadius: '6px', background: '#f1f5f9', color: '#475569'
                         }}>
                           {typeLabel}
                         </span>
                         <span style={{
-                          fontSize: '11px', fontWeight: 600, padding: '3px 8px',
+                          fontSize: '11px', fontWeight: 700, padding: '3px 8px',
                           borderRadius: '6px', background: diffCfg.bg, color: diffCfg.color, border: `1px solid ${diffCfg.border}`
                         }}>
                           {diffCfg.label}
                         </span>
                         {q.imageUrl && (
                           <span style={{ fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                            <ImageIcon size={10} /> Gambar
+                            <ImageIcon size={11} /> Gambar
                           </span>
                         )}
                         {hasOptImages && (
                           <span style={{ fontSize: '10px', fontWeight: 600, padding: '2px 6px', borderRadius: '4px', background: '#eff6ff', color: '#1e40af', display: 'flex', alignItems: 'center', gap: '3px' }}>
-                            <ImageIcon size={10} /> Opsi Gambar
+                            <ImageIcon size={11} /> Opsi Gambar
                           </span>
                         )}
                       </div>
                       <span style={{
                         fontSize: '12px', fontWeight: 800, color: '#065f46',
-                        background: '#f0fdf4', padding: '4px 10px', borderRadius: '8px',
+                        background: '#f0fdf4', padding: '4px 12px', borderRadius: '8px',
                         border: '1px solid #bbf7d0'
                       }}>
                         {q.defaultPoints} Poin
@@ -749,7 +762,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                     </div>
 
                     {/* Row 2: Question Text */}
-                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1e293b', lineHeight: 1.5 }}>
+                    <div style={{ fontSize: '0.95rem', fontWeight: 600, color: '#1e293b', lineHeight: 1.6 }}>
                       {q.questionText}
                     </div>
 
@@ -757,9 +770,9 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                     {q.arabicText && (
                       <div style={{
                         fontFamily: "'Amiri', 'Traditional Arabic', serif",
-                        fontSize: '1.1rem', color: '#065f46', direction: 'rtl', textAlign: 'right',
-                        lineHeight: 1.7, background: '#f0fdf4', padding: '10px 14px',
-                        borderRadius: '10px', borderRight: '4px solid #059669'
+                        fontSize: '1.25rem', color: '#065f46', direction: 'rtl', textAlign: 'right',
+                        lineHeight: 1.9, background: '#f0fdf4', padding: '12px 16px',
+                        borderRadius: '12px', borderRight: '4px solid #059669', border: '1px solid #bbf7d0'
                       }}>
                         {q.arabicText}
                       </div>
@@ -767,16 +780,16 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
 
                     {/* Question image */}
                     {q.imageUrl && (
-                      <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'center', padding: '8px', maxHeight: '160px' }}>
-                        <img src={q.imageUrl} alt="Ilustrasi soal" style={{ maxHeight: '144px', objectFit: 'contain', borderRadius: '8px' }} />
+                      <div style={{ borderRadius: '10px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#f8fafc', display: 'flex', justifyContent: 'center', padding: '8px', maxHeight: '180px' }}>
+                        <img src={q.imageUrl} alt="Ilustrasi soal" style={{ maxHeight: '164px', objectFit: 'contain', borderRadius: '8px' }} />
                       </div>
                     )}
 
                     {/* Row 3: Topic + Answer Key */}
                     <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '11px', color: '#94a3b8' }}>
-                          Topik: <strong style={{ color: '#475569' }}>{q.topic}</strong>
+                        <span style={{ fontSize: '11px', color: '#64748b' }}>
+                          Topik: <strong style={{ color: '#334155' }}>{q.topic}</strong>
                         </span>
                         {(q.tags || []).slice(0, 3).map((t, ti) => (
                           <span key={ti} style={{ fontSize: '10px', color: '#64748b', background: '#f1f5f9', padding: '1px 6px', borderRadius: '4px' }}>#{t}</span>
@@ -787,11 +800,11 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                         borderRadius: '8px', background: '#f0fdf4', color: '#065f46', border: '1px solid #d1fae5'
                       }}>
                         {(q.type === 'PILIHAN_GANDA' || q.type === 'BENAR_SALAH') ? (
-                          <span>Kunci: <strong>[{String.fromCharCode(65 + (correctIdx >= 0 ? correctIdx : 0))}]</strong> {correctOpt?.text ? ` ${correctOpt.text.substring(0, 30)}${correctOpt.text.length > 30 ? '...' : ''}` : ''}</span>
+                          <span>Kunci: <strong>[{String.fromCharCode(65 + (correctIdx >= 0 ? correctIdx : 0))}]</strong> {correctOpt?.text ? ` ${correctOpt.text.substring(0, 32)}${correctOpt.text.length > 32 ? '...' : ''}` : ''}</span>
                         ) : q.type === 'JAWABAN_SINGKAT' ? (
                           <span>Kunci: <strong style={{ fontFamily: 'monospace' }}>{q.correctShortAnswer}</strong></span>
                         ) : (
-                          <span style={{ color: '#b45309', background: '#fef3c7', padding: '2px 6px', borderRadius: '4px', border: '1px solid #fde68a' }}>Rubrik Esai</span>
+                          <span style={{ color: '#b45309', background: '#fef3c7', padding: '2px 6px', borderRadius: '4px', border: '1px solid #fde68a' }}>Rubrik Penilaian Dosen</span>
                         )}
                       </div>
                     </div>
@@ -809,7 +822,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                         onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
                         onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '#fff'; }}
                       >
-                        <Eye size={14} /> Lihat
+                        <Eye size={14} /> Pratinjau
                       </button>
                       <button
                         onClick={() => handleOpenEdit(q)}
@@ -846,15 +859,16 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
 
           {/* Pagination */}
           {filteredQuestions.length > 0 && (
-            <div style={{ background: '#fff', padding: '12px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+            <div style={{ background: '#fff', padding: '12px 16px', borderRadius: '14px', border: '1px solid #e2e8f0' }}>
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 totalItems={filteredQuestions.length}
                 pageSize={pageSize}
+                pageSizeOptions={[5, 10, 20, 50]}
                 onPageChange={setCurrentPage}
                 onPageSizeChange={setPageSize}
-                itemLabel="soal"
+                itemLabel="butir soal"
               />
             </div>
           )}
@@ -863,10 +877,10 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
 
 
       {/* ================================================================
-          MODAL: PRATINJAU SOAL
+          MODAL: PRATINJAU SOAL INTERAKTIF
           ================================================================ */}
       {previewModal && previewingQuestion && (
-        <Modal isOpen={previewModal} onClose={() => setPreviewModal(false)} title="Pratinjau Soal" maxWidth="640px">
+        <Modal isOpen={previewModal} onClose={() => setPreviewModal(false)} title="👁️ Pratinjau Lembar Soal" maxWidth="660px">
           <div className="flex flex-col gap-4">
             {/* Header Info */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
@@ -874,11 +888,11 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 <span style={{ fontSize: '11px', fontWeight: 700, fontFamily: 'monospace', background: '#f0fdf4', color: '#065f46', padding: '3px 8px', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
                   {previewingQuestion.courseCode}
                 </span>
-                <span style={{ fontSize: '11px', fontWeight: 600, background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '6px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, background: '#f1f5f9', color: '#475569', padding: '3px 8px', borderRadius: '6px' }}>
                   {TIPE_LABEL[previewingQuestion.type] || previewingQuestion.type}
                 </span>
                 <span style={{
-                  fontSize: '11px', fontWeight: 600, padding: '3px 8px', borderRadius: '6px',
+                  fontSize: '11px', fontWeight: 700, padding: '3px 8px', borderRadius: '6px',
                   ...(DIFFICULTY_CONFIG[previewingQuestion.difficulty] ? {
                     background: DIFFICULTY_CONFIG[previewingQuestion.difficulty].bg,
                     color: DIFFICULTY_CONFIG[previewingQuestion.difficulty].color,
@@ -901,9 +915,9 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             {/* Arabic */}
             {previewingQuestion.arabicText && (
               <div style={{
-                fontFamily: "'Amiri', 'Traditional Arabic', serif", fontSize: '1.25rem',
-                color: '#065f46', direction: 'rtl', textAlign: 'right', lineHeight: 1.8,
-                background: '#f0fdf4', padding: '14px 18px', borderRadius: '12px', borderRight: '4px solid #059669'
+                fontFamily: "'Amiri', 'Traditional Arabic', serif", fontSize: '1.3rem',
+                color: '#065f46', direction: 'rtl', textAlign: 'right', lineHeight: 1.9,
+                background: '#f0fdf4', padding: '14px 18px', borderRadius: '12px', borderRight: '4px solid #059669', border: '1px solid #bbf7d0'
               }}>
                 {previewingQuestion.arabicText}
               </div>
@@ -927,7 +941,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                       padding: '12px 14px', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '8px',
                       border: `1.5px solid ${previewShowAnswer && opt.isCorrect ? '#059669' : '#e2e8f0'}`,
                       background: previewShowAnswer && opt.isCorrect ? '#f0fdf4' : '#fff',
-                      transition: 'all 0.2s'
+                      transition: 'all 0.15s'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -956,8 +970,8 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             {/* Short Answer */}
             {previewingQuestion.type === 'JAWABAN_SINGKAT' && (
               <div style={{ padding: '12px 16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <div style={{ fontSize: '11px', color: '#94a3b8', marginBottom: '6px' }}>Kunci Jawaban:</div>
-                <div style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace', color: '#065f46', background: '#fff', padding: '6px 10px', borderRadius: '6px', border: '1px solid #e2e8f0', width: 'fit-content' }}>
+                <div style={{ fontSize: '11px', color: '#64748b', marginBottom: '6px' }}>Kunci Jawaban:</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700, fontFamily: 'monospace', color: '#065f46', background: '#fff', padding: '6px 12px', borderRadius: '8px', border: '1px solid #bbf7d0', width: 'fit-content' }}>
                   {previewShowAnswer ? previewingQuestion.correctShortAnswer : '••••••••'}
                 </div>
               </div>
@@ -992,12 +1006,12 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 }}
               >
                 <Sparkles size={16} />
-                {previewShowAnswer ? 'Sembunyikan Jawaban' : 'Tampilkan Jawaban'}
+                {previewShowAnswer ? 'Sembunyikan Kunci' : 'Tampilkan Kunci & Pembahasan'}
               </button>
               <div className="flex gap-2">
                 <Button variant="secondary" size="sm" icon={Edit}
                   onClick={() => { setPreviewModal(false); handleOpenEdit(previewingQuestion); }}>
-                  Edit
+                  Edit Soal
                 </Button>
                 <Button variant="primary" size="sm" onClick={() => setPreviewModal(false)}
                   style={{ background: '#059669' }}>Tutup</Button>
@@ -1016,7 +1030,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
           <div className="flex flex-col gap-4">
             <div style={{ padding: '14px', background: '#fef2f2', borderRadius: '12px', border: '1px solid #fecaca', fontSize: '13px', color: '#991b1b', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
               <Trash2 size={20} style={{ color: '#dc2626', flexShrink: 0, marginTop: '1px' }} />
-              <div>Soal ini akan dihapus <strong>secara permanen</strong> dan tidak dapat dikembalikan.</div>
+              <div>Soal ini akan dihapus <strong>secara permanen</strong> dari Bank Soal.</div>
             </div>
             <div style={{ padding: '12px 14px', background: '#f8fafc', borderRadius: '10px', border: '1px solid #e2e8f0', fontSize: '13px' }}>
               <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, marginBottom: '4px' }}>{deletingQuestion.courseCode} • {TIPE_LABEL[deletingQuestion.type]}</div>
@@ -1039,7 +1053,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
           ================================================================ */}
       {editModal && (
         <Modal isOpen={editModal} onClose={() => setEditModal(false)}
-          title={editingQuestionId ? '✏️ Edit Soal' : '➕ Tambah Soal Baru'} maxWidth="700px">
+          title={editingQuestionId ? '✏️ Edit Butir Soal' : '➕ Tambah Soal ke Bank Soal'} maxWidth="720px">
           <form onSubmit={handleSaveQuestion} className="flex flex-col gap-4">
             {/* Row: Mata Kuliah + Topik */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1053,7 +1067,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Topik / Materi</label>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Topik / Materi Pokok</label>
                 <Input required placeholder="contoh: Kaidah Fiqhiyyah" value={topic} onChange={(e) => setTopic(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
             </div>
@@ -1080,7 +1094,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 </select>
               </div>
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Bobot Poin</label>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Bobot Poin Standar</label>
                 <Input type="number" min={1} max={100} required value={points} onChange={(e) => setPoints(Number(e.target.value) || 0)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
             </div>
@@ -1088,16 +1102,16 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             {/* Pertanyaan */}
             <div>
               <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Teks Pertanyaan</label>
-              <textarea className="form-textarea" rows={3} required placeholder="Tuliskan pertanyaan secara jelas..."
+              <textarea className="form-textarea" rows={3} required placeholder="Tuliskan butir soal secara lengkap dan terstruktur..."
                 value={questionText} onChange={(e) => setQuestionText(e.target.value)}
                 style={{ fontSize: '13px', borderRadius: '10px' }} />
             </div>
 
             {/* Teks Arab */}
             <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Teks Arab / Ayat / Hadits <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span></label>
-              <textarea className="form-textarea" rows={2} placeholder="أدخل النص العربي هنا..." dir="rtl"
-                style={{ fontFamily: "'Amiri', 'Traditional Arabic', serif", fontSize: '1rem', color: '#065f46', borderRadius: '10px' }}
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Teks Arab / Matan / Hadits / Ayat <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span></label>
+              <textarea className="form-textarea" rows={2} placeholder="اكتب النص العربي أو متن الحديث / القاعدة هنا..." dir="rtl"
+                style={{ fontFamily: "'Amiri', 'Traditional Arabic', serif", fontSize: '1.15rem', color: '#065f46', borderRadius: '10px' }}
                 value={arabicText} onChange={(e) => setArabicText(e.target.value)} />
             </div>
 
@@ -1105,7 +1119,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             <div style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
-                  <ImageIcon size={14} style={{ color: '#059669' }} /> Gambar Soal <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span>
+                  <ImageIcon size={14} style={{ color: '#059669' }} /> Gambar Pendukung Soal <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span>
                 </label>
                 {imageUrl && (
                   <button type="button" onClick={() => setImageUrl('')} style={{ fontSize: '11px', color: '#dc2626', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1127,11 +1141,11 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
               ) : (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', border: '1px solid #e2e8f0', background: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: 600, color: '#475569' }}>
-                    <Upload size={14} style={{ color: '#059669' }} /> Unggah Gambar
+                    <Upload size={14} style={{ color: '#059669' }} /> Unggah Berkas
                     <input type="file" accept="image/*" className="hidden" onChange={handleQuestionImageUpload} />
                   </label>
                   <span style={{ fontSize: '11px', color: '#94a3b8' }}>atau</span>
-                  <Input placeholder="Tempel URL gambar..." value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={{ fontSize: '12px', flex: 1, borderRadius: '8px', minWidth: '180px' }} />
+                  <Input placeholder="Tempel URL tautan gambar..." value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} style={{ fontSize: '12px', flex: 1, borderRadius: '8px', minWidth: '180px' }} />
                 </div>
               )}
             </div>
@@ -1142,7 +1156,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
                   <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', margin: 0 }}>Opsi Jawaban (A–E)</label>
                   <span style={{ fontSize: '10px', color: '#059669', fontWeight: 600, background: '#f0fdf4', padding: '2px 8px', borderRadius: '6px', border: '1px solid #bbf7d0' }}>
-                    Klik radio = kunci benar
+                    Pilih radio untuk kunci jawaban benar
                   </span>
                 </div>
                 {[
@@ -1173,7 +1187,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                         border: `1px solid ${item.img ? '#bbf7d0' : '#e2e8f0'}`,
                         background: item.img ? '#f0fdf4' : '#fff', color: item.img ? '#065f46' : '#64748b'
                       }}>
-                        <ImageIcon size={13} /> <span className="hidden sm:inline">{item.img ? '✓' : '+Gbr'}</span>
+                        <ImageIcon size={13} /> <span className="hidden sm:inline">{item.img ? '✓ Gambar' : '+ Gambar'}</span>
                         <input type="file" accept="image/*" className="hidden" onChange={(e) => handleOptionImageUpload(e, item.setImg, item.label)} />
                       </label>
                     </div>
@@ -1181,7 +1195,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginLeft: '52px', padding: '6px 8px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <img src={item.img} alt={`Opsi ${item.label}`} style={{ width: '48px', height: '48px', objectFit: 'contain', borderRadius: '6px', border: '1px solid #e2e8f0', background: '#fff' }} />
-                          <span style={{ fontSize: '11px', color: '#64748b' }}>Gambar opsi {item.label}</span>
+                          <span style={{ fontSize: '11px', color: '#64748b' }}>Gambar ilustrasi opsi {item.label} aktif</span>
                         </div>
                         <button type="button" onClick={() => item.setImg('')}
                           style={{ fontSize: '11px', color: '#dc2626', fontWeight: 600, background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '3px' }}>
@@ -1197,7 +1211,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             {/* Benar / Salah */}
             {qType === 'BENAR_SALAH' && (
               <div style={{ padding: '14px', borderRadius: '12px', border: '1px solid #e2e8f0', background: '#f8fafc' }}>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '10px' }}>Kunci Jawaban</label>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '10px' }}>Kunci Jawaban yang Benar</label>
                 <div style={{ display: 'flex', gap: '16px' }}>
                   {['Benar', 'Salah'].map((opt, li) => (
                     <label key={opt} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
@@ -1213,7 +1227,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             {/* Jawaban Singkat */}
             {qType === 'JAWABAN_SINGKAT' && (
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Kunci Jawaban</label>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Kunci Jawaban Singkat</label>
                 <Input required placeholder="Kata kunci jawaban yang tepat" value={shortAnswer} onChange={(e) => setShortAnswer(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
             )}
@@ -1221,7 +1235,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             {/* Esai */}
             {qType === 'ESAI' && (
               <div>
-                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Rubrik Penilaian</label>
+                <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Panduan Rubrik Penilaian Dosen</label>
                 <textarea className="form-textarea" rows={2} placeholder="Kriteria penilaian esai..."
                   value={essayRubric} onChange={(e) => setEssayRubric(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
               </div>
@@ -1229,22 +1243,22 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
 
             {/* Pembahasan */}
             <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Pembahasan <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span></label>
-              <textarea className="form-textarea" rows={2} placeholder="Penjelasan, dalil, atau rujukan..."
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Pembahasan & Rujukan <span style={{ fontWeight: 400, color: '#94a3b8' }}>(opsional)</span></label>
+              <textarea className="form-textarea" rows={2} placeholder="Penjelasan, dalil rujukan, atau catatan materi..."
                 value={explanation} onChange={(e) => setExplanation(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
             </div>
 
             {/* Tags */}
             <div>
-              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Tag <span style={{ fontWeight: 400, color: '#94a3b8' }}>(pisahkan koma)</span></label>
-              <Input placeholder="contoh: Fiqih, Ushul, Kaidah" value={tags} onChange={(e) => setTags(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
+              <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Tag / Kata Kunci <span style={{ fontWeight: 400, color: '#94a3b8' }}>(pisahkan koma)</span></label>
+              <Input placeholder="contoh: Fiqih, Ushul, Kaidah, Semester 3" value={tags} onChange={(e) => setTags(e.target.value)} style={{ fontSize: '13px', borderRadius: '10px' }} />
             </div>
 
             {/* Actions */}
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '14px', marginTop: '4px' }}>
               <Button variant="secondary" type="button" onClick={() => setEditModal(false)}>Batal</Button>
               <Button variant="primary" type="submit" style={{ background: 'linear-gradient(135deg, #059669, #047857)', fontWeight: 700 }}>
-                {editingQuestionId ? 'Simpan Perubahan' : 'Simpan Soal'}
+                {editingQuestionId ? 'Simpan Perubahan' : 'Simpan ke Bank Soal'}
               </Button>
             </div>
           </form>
@@ -1267,3 +1281,4 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
     </div>
   );
 };
+
