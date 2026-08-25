@@ -8,13 +8,11 @@ import {
   Download, 
   Edit, 
   Trash2, 
-  Folder, 
   Eye, 
   CheckCircle2, 
   FileQuestion, 
   Image as ImageIcon, 
-  ChevronRight, 
-  Sparkles
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
@@ -31,16 +29,16 @@ export interface BankSoalPageProps {
   onBack?: () => void;
 }
 
-export const COURSES_INFO: Record<string, { name: string; prodi: string; credits: number; semester: number; icon: string }> = {
-  'PAI-301': { name: 'Ushul Fiqih & Qawaid Fiqhiyyah', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3, icon: '⚖️' },
-  'PAI-204': { name: 'Ulumul Qur\'an & Tafsir Tematik', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 2, icon: '📖' },
-  'PAI-205': { name: 'Ulumul Hadits & Kritik Sanad', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2, icon: '📜' },
-  'PAI-302': { name: 'Pengembangan Kurikulum PAI', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3, icon: '🎓' },
-  'PAI-102': { name: 'Ilmu Pendidikan Islam', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 1, icon: '🕌' },
-  'TAR-204': { name: 'Sejarah Peradaban Islam', prodi: 'Fakultas Tarbiyah', credits: 2, semester: 2, icon: '🏛️' },
-  'TBI-201': { name: 'Bahasa Arab Komunikatif & Qira\'ah', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2, icon: '🗣️' },
-  'MPI-101': { name: 'Manajemen Pendidikan Islam', prodi: 'Manajemen Pendidikan Islam', credits: 3, semester: 1, icon: '📋' },
-  'EKS-201': { name: 'Fiqih Muamalah & Ekonomi Syariah', prodi: 'Ekonomi Syariah', credits: 3, semester: 2, icon: '💰' },
+export const COURSES_INFO: Record<string, { name: string; prodi: string; credits: number; semester: number }> = {
+  'PAI-301': { name: 'Ushul Fiqih & Qawaid Fiqhiyyah', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3 },
+  'PAI-204': { name: 'Ulumul Qur\'an & Tafsir Tematik', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 2 },
+  'PAI-205': { name: 'Ulumul Hadits & Kritik Sanad', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2 },
+  'PAI-302': { name: 'Pengembangan Kurikulum PAI', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 3 },
+  'PAI-102': { name: 'Ilmu Pendidikan Islam', prodi: 'Pendidikan Agama Islam', credits: 3, semester: 1 },
+  'TAR-204': { name: 'Sejarah Peradaban Islam', prodi: 'Fakultas Tarbiyah', credits: 2, semester: 2 },
+  'TBI-201': { name: 'Bahasa Arab Komunikatif & Qira\'ah', prodi: 'Pendidikan Agama Islam', credits: 2, semester: 2 },
+  'MPI-101': { name: 'Manajemen Pendidikan Islam', prodi: 'Manajemen Pendidikan Islam', credits: 3, semester: 1 },
+  'EKS-201': { name: 'Fiqih Muamalah & Ekonomi Syariah', prodi: 'Ekonomi Syariah', credits: 3, semester: 2 },
 };
 
 // Helper: Tipe label yang mudah dibaca user
@@ -145,13 +143,13 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
 
   // Stats per course
   const courseStats = useMemo(() => {
-    const stats: Record<string, { code: string; name: string; prodi: string; credits: number; semester: number; icon: string; total: number; pg: number; bs: number; js: number; esai: number }> = {};
+    const stats: Record<string, { code: string; name: string; prodi: string; credits: number; semester: number; total: number; pg: number; bs: number; js: number; esai: number }> = {};
     Object.entries(COURSES_INFO).forEach(([code, info]) => {
-      stats[code] = { code, name: info.name, prodi: info.prodi, credits: info.credits, semester: info.semester, icon: info.icon, total: 0, pg: 0, bs: 0, js: 0, esai: 0 };
+      stats[code] = { code, name: info.name, prodi: info.prodi, credits: info.credits, semester: info.semester, total: 0, pg: 0, bs: 0, js: 0, esai: 0 };
     });
     questions.forEach((q) => {
       const code = q.courseCode || 'LAINNYA';
-      if (!stats[code]) stats[code] = { code, name: 'Lainnya', prodi: '-', credits: 2, semester: 1, icon: '📝', total: 0, pg: 0, bs: 0, js: 0, esai: 0 };
+      if (!stats[code]) stats[code] = { code, name: 'Lainnya', prodi: '-', credits: 2, semester: 1, total: 0, pg: 0, bs: 0, js: 0, esai: 0 };
       stats[code].total += 1;
       if (q.type === 'PILIHAN_GANDA') stats[code].pg += 1;
       if (q.type === 'BENAR_SALAH') stats[code].bs += 1;
@@ -337,7 +335,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
     return filteredQuestions.slice(start, start + pageSize);
   }, [filteredQuestions, currentPage, pageSize]);
 
-  const activeCourseInfo = selectedCourse ? (COURSES_INFO[selectedCourse] || { name: 'Mata Kuliah Pilihan', prodi: '-', credits: 3, semester: 1, icon: '📝' }) : null;
+  const activeCourseInfo = selectedCourse ? (COURSES_INFO[selectedCourse] || { name: 'Mata Kuliah Pilihan', prodi: '-', credits: 3, semester: 1 }) : null;
   const activeCourseStats = selectedCourse ? courseStats[selectedCourse] : null;
 
   // Export config
@@ -395,7 +393,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1e293b', margin: 0, lineHeight: 1.2 }}>
-                  📚 Bank Soal & Materi Evaluasi
+                  Bank Soal & Materi Evaluasi
                 </h1>
                 <p style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '4px' }}>
                   Pusat repositori butir soal terstandarisasi, bank teks Arab, dan rubrik evaluasi
@@ -471,7 +469,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '12px',
-                  minHeight: '200px',
+                  minHeight: '180px',
                   boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
                 }}
                 onMouseEnter={(e) => {
@@ -486,24 +484,21 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 }}
               >
                 {/* Card Top */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <span style={{ fontSize: '2.25rem', lineHeight: 1 }}>{st.icon}</span>
-                  <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                    <span style={{
-                      fontSize: '11px', fontWeight: 700, fontFamily: 'monospace',
-                      background: '#f0fdf4', color: '#065f46', padding: '3px 8px',
-                      borderRadius: '6px', border: '1px solid #bbf7d0'
-                    }}>
-                      {st.code}
-                    </span>
-                    <span style={{
-                      fontSize: '11px', fontWeight: 600,
-                      background: '#f1f5f9', color: '#475569', padding: '3px 8px',
-                      borderRadius: '6px'
-                    }}>
-                      {st.credits} SKS
-                    </span>
-                  </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{
+                    fontSize: '12px', fontWeight: 800, fontFamily: 'monospace',
+                    background: '#f0fdf4', color: '#065f46', padding: '4px 10px',
+                    borderRadius: '8px', border: '1px solid #bbf7d0'
+                  }}>
+                    {st.code}
+                  </span>
+                  <span style={{
+                    fontSize: '11px', fontWeight: 600,
+                    background: '#f1f5f9', color: '#475569', padding: '3px 8px',
+                    borderRadius: '6px'
+                  }}>
+                    {st.credits} SKS
+                  </span>
                 </div>
 
                 {/* Course Name */}
@@ -536,7 +531,6 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
 
           {filteredCourses.length === 0 && (
             <div style={{ textAlign: 'center', padding: '48px 20px', background: '#fff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-              <Folder size={36} style={{ color: '#cbd5e1', margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#475569', margin: 0 }}>Tidak Ditemukan</h3>
               <p style={{ fontSize: '0.8rem', color: '#94a3b8', marginTop: '6px' }}>
                 Mata kuliah dengan kata kunci "{courseSearchQuery}" tidak ditemukan.
@@ -588,7 +582,6 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div style={{ flex: 1 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '1.75rem' }}>{activeCourseInfo?.icon}</span>
                     <span style={{ fontSize: '12px', fontFamily: 'monospace', fontWeight: 800, background: 'rgba(255,255,255,0.2)', padding: '4px 10px', borderRadius: '8px' }}>
                       {selectedCourse}
                     </span>
@@ -990,7 +983,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
             {/* Explanation */}
             {previewShowAnswer && previewingQuestion.explanation && (
               <div style={{ padding: '12px 16px', background: '#f0fdf4', borderRadius: '12px', border: '1px solid #bbf7d0' }}>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#166534', marginBottom: '6px' }}>💡 Pembahasan:</div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: '#166534', marginBottom: '6px' }}>Pembahasan:</div>
                 <p style={{ fontSize: '0.85rem', color: '#065f46', lineHeight: 1.6, margin: 0 }}>{previewingQuestion.explanation}</p>
               </div>
             )}
@@ -1005,7 +998,6 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                   background: 'none', border: 'none', cursor: 'pointer'
                 }}
               >
-                <Sparkles size={16} />
                 {previewShowAnswer ? 'Sembunyikan Kunci' : 'Tampilkan Kunci & Pembahasan'}
               </button>
               <div className="flex gap-2">
@@ -1053,7 +1045,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
           ================================================================ */}
       {editModal && (
         <Modal isOpen={editModal} onClose={() => setEditModal(false)}
-          title={editingQuestionId ? '✏️ Edit Butir Soal' : '➕ Tambah Soal ke Bank Soal'} maxWidth="720px">
+          title={editingQuestionId ? 'Edit Butir Soal' : 'Tambah Soal ke Bank Soal'} maxWidth="720px">
           <form onSubmit={handleSaveQuestion} className="flex flex-col gap-4">
             {/* Row: Mata Kuliah + Topik */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1062,7 +1054,7 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 <select className="form-select" value={courseCode} onChange={(e) => setCourseCode(e.target.value)} required
                   style={{ fontSize: '13px', borderRadius: '10px' }}>
                   {Object.entries(COURSES_INFO).map(([code, info]) => (
-                    <option key={code} value={code}>{info.icon} {code} — {info.name}</option>
+                    <option key={code} value={code}>{code} — {info.name}</option>
                   ))}
                 </select>
               </div>
@@ -1088,9 +1080,9 @@ export const BankSoalPage: React.FC<BankSoalPageProps> = ({ onBack: _onBack }) =
                 <label style={{ fontSize: '12px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '6px' }}>Tingkat Kesulitan</label>
                 <select className="form-select" value={difficulty} onChange={(e) => setDifficulty(e.target.value as QuestionDifficulty)}
                   style={{ fontSize: '13px', borderRadius: '10px' }}>
-                  <option value="MUDAH">🟢 Mudah</option>
-                  <option value="SEDANG">🟡 Sedang</option>
-                  <option value="SULIT">🔴 Sulit</option>
+                  <option value="MUDAH">Mudah</option>
+                  <option value="SEDANG">Sedang</option>
+                  <option value="SULIT">Sulit</option>
                 </select>
               </div>
               <div>
