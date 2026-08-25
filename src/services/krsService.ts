@@ -342,39 +342,7 @@ export const INITIAL_KRS_HISTORY: KrsHistoryItem[] = [
   }
 ];
 
-export const INITIAL_CONSULTATION_MESSAGES: Record<string, KrsConsultationMessage[]> = {
-  'usr-mhs-01': [
-    {
-      id: 'msg-01',
-      senderId: 'usr-mhs-01',
-      senderName: 'Ahmad Fauzi Rahman',
-      senderRole: 'MAHASISWA',
-      message: 'Assalamu’alaikum Warahmatullahi Wabarakatuh. Mohon izin Bapak Dr. H. M. Ridwan, M.Ag selaku Dosen Pembimbing Akademik, saya telah mengisi rencana studi semester 5 dengan total 21 SKS (7 Mata Kuliah wajib prodi & institusi). Mohon arahan dan persetujuannya. Terima kasih.',
-      timestamp: '2026-08-20T09:15:00+07:00',
-      isRead: true
-    },
-    {
-      id: 'msg-02',
-      senderId: 'usr-dsn-01',
-      senderName: 'Dr. H. M. Ridwan, M.Ag',
-      senderRole: 'DOSEN_PA',
-      message: 'Wa’alaikumsalam Warahmatullahi Wabarakatuh. Rencana studi Semester 5 Anda telah saya periksa. Seluruh mata kuliah telah memenuhi prasyarat kurikulum PAI dan distribusi jadwal tidak ada yang bentrok. KRS resmi telah siap disetujui.',
-      timestamp: '2026-08-21T10:30:00+07:00',
-      isRead: true
-    }
-  ],
-  'usr-mhs-04': [
-    {
-      id: 'msg-04-1',
-      senderId: 'usr-dsn-01',
-      senderName: 'Dr. H. M. Ridwan, M.Ag',
-      senderRole: 'DOSEN_PA',
-      message: 'Assalamu’alaikum Fatimah. KRS Anda perlu disesuaikan. Berdasarkan IPS Semester lalu (2.80), batas beban SKS maksimal Anda adalah 21 SKS. Harap batalkan 1 mata kuliah pilihan agar sesuai ketentuan akademik.',
-      timestamp: '2026-08-20T14:00:00+07:00',
-      isRead: false
-    }
-  ]
-};
+export const INITIAL_CONSULTATION_MESSAGES: Record<string, KrsConsultationMessage[]> = {};
 
 // Data Inisial Mahasiswa Bimbingan
 export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
@@ -392,17 +360,17 @@ export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
     academicYear: '2026/2027',
     previousSemesterGpa: 3.85,
     cumulativeGpa: 3.78,
-    maxCreditQuota: 24, // IPS 3.85 -> kuota max 24 SKS
-    totalCreditsTaken: 21,
+    maxCreditQuota: 24,
+    totalCreditsTaken: 0,
     totalCumulativeCreditsEarned: 85,
-    krsStatus: 'MENUNGGU_PERSETUJUAN',
-    submissionDate: '2026-08-20T09:15:00+07:00',
+    krsStatus: 'DRAF',
+    submissionDate: undefined,
     approvedDate: undefined,
     academicAdvisorId: 'usr-dsn-01',
     academicAdvisorName: 'Dr. H. M. Ridwan, M.Ag',
     academicAdvisorNidn: '2112087501',
     academicAdvisorNotes: '',
-    courses: MASTER_COURSE_CATALOG.slice(0, 7) // 7 MK = 21 SKS
+    courses: []
   },
   'usr-mhs-02': {
     id: 'krs-20261-21010055',
@@ -419,16 +387,16 @@ export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
     previousSemesterGpa: 3.92,
     cumulativeGpa: 3.88,
     maxCreditQuota: 24,
-    totalCreditsTaken: 24,
+    totalCreditsTaken: 0,
     totalCumulativeCreditsEarned: 88,
-    krsStatus: 'DISETUJUI',
-    submissionDate: '2026-08-19T11:00:00+07:00',
-    approvedDate: '2026-08-20T08:30:00+07:00',
+    krsStatus: 'DRAF',
+    submissionDate: undefined,
+    approvedDate: undefined,
     academicAdvisorId: 'usr-dsn-01',
     academicAdvisorName: 'Dr. H. M. Ridwan, M.Ag',
     academicAdvisorNidn: '2112087501',
-    academicAdvisorNotes: 'KRS disetujui penuh dengan 24 SKS. Pertahankan prestasi akademik.',
-    courses: [...MASTER_COURSE_CATALOG.slice(0, 7), MASTER_COURSE_CATALOG[7]] // 21 + 3 = 24 SKS
+    academicAdvisorNotes: '',
+    courses: []
   },
   'usr-mhs-03': {
     id: 'krs-20261-22010019',
@@ -445,7 +413,7 @@ export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
     previousSemesterGpa: 3.45,
     cumulativeGpa: 3.50,
     maxCreditQuota: 24,
-    totalCreditsTaken: 18,
+    totalCreditsTaken: 0,
     totalCumulativeCreditsEarned: 42,
     krsStatus: 'DRAF',
     submissionDate: undefined,
@@ -454,7 +422,7 @@ export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
     academicAdvisorName: 'Dr. H. M. Ridwan, M.Ag',
     academicAdvisorNidn: '2112087501',
     academicAdvisorNotes: '',
-    courses: MASTER_COURSE_CATALOG.slice(0, 6) // 18 SKS
+    courses: []
   },
   'usr-mhs-04': {
     id: 'krs-20261-22010034',
@@ -471,16 +439,16 @@ export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
     previousSemesterGpa: 2.80,
     cumulativeGpa: 2.95,
     maxCreditQuota: 21,
-    totalCreditsTaken: 23,
+    totalCreditsTaken: 0,
     totalCumulativeCreditsEarned: 40,
-    krsStatus: 'DITOLAK_REVISI',
-    submissionDate: '2026-08-19T15:20:00+07:00',
+    krsStatus: 'DRAF',
+    submissionDate: undefined,
     approvedDate: undefined,
     academicAdvisorId: 'usr-dsn-01',
     academicAdvisorName: 'Dr. H. M. Ridwan, M.Ag',
     academicAdvisorNidn: '2112087501',
-    academicAdvisorNotes: 'Beban SKS melebihi batas kuota IPS 2.80 (Maks 21 SKS). Harap batalkan 1 mata kuliah pilihan.',
-    courses: [...MASTER_COURSE_CATALOG.slice(0, 7), MASTER_COURSE_CATALOG[8]] // 21 + 2 = 23 SKS (Melebihi kuota 21)
+    academicAdvisorNotes: '',
+    courses: []
   },
   'usr-mhs-05': {
     id: 'krs-20261-23010011',
@@ -497,16 +465,16 @@ export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
     previousSemesterGpa: 0,
     cumulativeGpa: 0,
     maxCreditQuota: 20,
-    totalCreditsTaken: 20,
+    totalCreditsTaken: 0,
     totalCumulativeCreditsEarned: 0,
-    krsStatus: 'DISETUJUI',
-    submissionDate: '2026-08-18T10:00:00+07:00',
-    approvedDate: '2026-08-18T14:30:00+07:00',
+    krsStatus: 'DRAF',
+    submissionDate: undefined,
+    approvedDate: undefined,
     academicAdvisorId: 'usr-dsn-01',
     academicAdvisorName: 'Dr. H. M. Ridwan, M.Ag',
     academicAdvisorNidn: '2112087501',
-    academicAdvisorNotes: 'Paket Semester 1 disetujui otomatis sesuai kurikulum.',
-    courses: MASTER_COURSE_CATALOG.slice(0, 6)
+    academicAdvisorNotes: '',
+    courses: []
   },
   'usr-mhs-06': {
     id: 'krs-20261-21010089',
@@ -523,16 +491,16 @@ export const INITIAL_STUDENTS_KRS: Record<string, StudentKrsData> = {
     previousSemesterGpa: 3.65,
     cumulativeGpa: 3.60,
     maxCreditQuota: 24,
-    totalCreditsTaken: 21,
+    totalCreditsTaken: 0,
     totalCumulativeCreditsEarned: 84,
-    krsStatus: 'MENUNGGU_PERSETUJUAN',
-    submissionDate: '2026-08-20T14:30:00+07:00',
+    krsStatus: 'DRAF',
+    submissionDate: undefined,
     approvedDate: undefined,
     academicAdvisorId: 'usr-dsn-01',
     academicAdvisorName: 'Dr. H. M. Ridwan, M.Ag',
     academicAdvisorNidn: '2112087501',
     academicAdvisorNotes: '',
-    courses: MASTER_COURSE_CATALOG.slice(0, 7)
+    courses: []
   }
 };
 

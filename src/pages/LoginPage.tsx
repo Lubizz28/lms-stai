@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogIn, AlertCircle, Shield, Key, UserCheck, ArrowRight, Info } from 'lucide-react';
+import { LogIn, AlertCircle, Key, UserCheck, Info } from 'lucide-react';
 import { Card, CardBody } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -8,9 +8,9 @@ import { useAuth } from '../context/AuthContext';
 import { REGISTERED_USERS } from '../services/authService';
 
 export const LoginPage: React.FC = () => {
-  const { login, switchRole } = useAuth();
+  const { login } = useAuth();
   const [identifier, setIdentifier] = useState('');
-  const [kataSandi, setKataSandi] = useState('salam123');
+  const [kataSandi, setKataSandi] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeTab, setActiveTab] = useState<'form' | 'accounts'>('form');
@@ -54,7 +54,7 @@ export const LoginPage: React.FC = () => {
         background: 'linear-gradient(135deg, #f0fdf4 0%, #f8fafc 100%)' 
       }}
     >
-      <div style={{ width: '100%', maxWidth: '520px' }}>
+      <div style={{ width: '100%', maxWidth: '500px' }}>
         {/* Brand Header */}
         <div style={{ textAlign: 'center', marginBottom: 'var(--space-5)' }}>
           <div 
@@ -117,7 +117,7 @@ export const LoginPage: React.FC = () => {
                 : 'text-muted hover:text-primary'
             }`}
           >
-            <UserCheck size={14} /> Daftar Akun 7 Role ({REGISTERED_USERS.length})
+            <UserCheck size={14} /> Panduan Akun Akses
           </button>
         </div>
 
@@ -131,7 +131,7 @@ export const LoginPage: React.FC = () => {
                     Masuk ke Sistem
                   </h2>
                   <Badge variant="primary" style={{ fontSize: '10px' }}>
-                    Tahun Akademik 2026/2027 Ganjil
+                    Tahun Akademik 2026/2027
                   </Badge>
                 </div>
 
@@ -164,7 +164,7 @@ export const LoginPage: React.FC = () => {
                 <Input
                   label="Kata Sandi"
                   type="password"
-                  placeholder="Masukkan kata sandi (Default: salam123)"
+                  placeholder="Masukkan kata sandi akun Anda"
                   value={kataSandi}
                   onChange={(e) => setKataSandi(e.target.value)}
                   autoComplete="current-password"
@@ -173,14 +173,14 @@ export const LoginPage: React.FC = () => {
 
                 <div className="flex items-center justify-between" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-muted)' }}>
                   <span className="flex items-center gap-1">
-                    <Key size={12} /> Default Sandi: <strong>salam123</strong>
+                    <Key size={12} /> Sandi default demo: <strong>salam123</strong>
                   </span>
                   <button 
                     type="button" 
                     onClick={() => setActiveTab('accounts')}
                     className="text-primary-700 hover:underline"
                   >
-                    Lihat Akun Role
+                    Lihat Info Akun
                   </button>
                 </div>
 
@@ -191,41 +191,18 @@ export const LoginPage: React.FC = () => {
                   icon={LogIn}
                   isLoading={isSubmitting}
                   className="w-full"
-                  style={{ marginTop: 'var(--space-1)' }}
+                  style={{ marginTop: 'var(--space-2)' }}
                 >
                   Masuk ke SALAM
                 </Button>
-
-                {/* Quick Persona Demo Selector */}
-                <div style={{ marginTop: 'var(--space-4)', paddingTop: 'var(--space-4)', borderTop: '1px solid var(--border-subtle)' }}>
-                  <div className="flex items-center gap-1 text-muted" style={{ fontSize: 'var(--text-xs)', marginBottom: 'var(--space-2)' }}>
-                    <Shield size={13} />
-                    <span style={{ fontWeight: 'bold' }}>Masuk Cepat 1-Klik (Evaluasi Role):</span>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-2">
-                    {REGISTERED_USERS.slice(0, 6).map((u) => (
-                      <button
-                        key={u.id}
-                        type="button"
-                        onClick={() => switchRole(u.role)}
-                        className="flex flex-col text-left p-2 rounded border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50 transition-colors"
-                        style={{ fontSize: '11px' }}
-                      >
-                        <span className="font-semibold text-slate-800 truncate">{u.roleLabel}</span>
-                        <span className="text-slate-500 truncate">{u.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
               </form>
             ) : (
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between">
                   <h2 style={{ fontSize: 'var(--text-base)', margin: 0, fontWeight: 'bold' }}>
-                    Daftar Akun Pengguna Aktif
+                    Daftar Akun Pengguna Terdaftar
                   </h2>
-                  <span className="text-xs text-muted">Kata Sandi: <strong>salam123</strong></span>
+                  <span className="text-xs text-muted">Sandi Demo: <strong>salam123</strong></span>
                 </div>
 
                 <div 
@@ -233,7 +210,7 @@ export const LoginPage: React.FC = () => {
                   style={{ backgroundColor: 'var(--color-primary-50)', border: '1px solid var(--color-primary-200)', fontSize: '11px', color: 'var(--color-primary-900)' }}
                 >
                   <Info size={14} className="flex-shrink-0" />
-                  <span>Klik tombol <strong>"Gunakan Akun"</strong> untuk auto-fill form atau <strong>"Masuk Langsung"</strong> untuk membuka dashboard role tersebut.</span>
+                  <span>Klik <strong>"Pilih Akun"</strong> untuk menyalin NIM/NIDN ke formulir login resmi.</span>
                 </div>
 
                 <div className="flex flex-col gap-2 max-h-[380px] overflow-y-auto pr-1">
@@ -258,20 +235,10 @@ export const LoginPage: React.FC = () => {
                           variant="secondary"
                           size="sm"
                           onClick={() => handleSelectAccount(u)}
-                          className="flex-1"
+                          className="w-full"
                           style={{ fontSize: '11px', padding: '4px 8px' }}
                         >
-                          Gunakan Akun
-                        </Button>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          icon={ArrowRight}
-                          onClick={() => switchRole(u.role)}
-                          className="flex-1"
-                          style={{ fontSize: '11px', padding: '4px 8px' }}
-                        >
-                          Masuk Langsung
+                          Pilih Akun Ini
                         </Button>
                       </div>
                     </div>

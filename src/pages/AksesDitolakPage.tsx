@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Home, UserCheck } from 'lucide-react';
+import { ShieldAlert, Home } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Card, CardBody } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -15,7 +15,7 @@ export const AksesDitolakPage: React.FC<AksesDitolakPageProps> = ({
   requiredPermission,
   onNavigateHome
 }) => {
-  const { user, switchRole } = useAuth();
+  const { user } = useAuth();
 
   return (
     <div style={{ maxWidth: '640px', margin: 'var(--space-8) auto' }}>
@@ -56,21 +56,12 @@ export const AksesDitolakPage: React.FC<AksesDitolakPageProps> = ({
 
           <div className="flex gap-3 flex-wrap justify-center" style={{ marginTop: 'var(--space-2)' }}>
             <Button 
-              variant="outline" 
+              variant="primary" 
               icon={Home} 
               onClick={onNavigateHome || (() => window.location.href = '/')}
             >
               Kembali ke {KAMUS_UI.BERANDA}
             </Button>
-            {user?.role !== 'administrator_sistem' && (
-              <Button 
-                variant="primary" 
-                icon={UserCheck} 
-                onClick={() => switchRole('administrator_sistem')}
-              >
-                Beralih ke Administrator Sistem
-              </Button>
-            )}
           </div>
         </CardBody>
       </Card>

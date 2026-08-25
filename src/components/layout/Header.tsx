@@ -1,9 +1,6 @@
 import React from 'react';
 import { Menu, LogOut, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { UserRole } from '../../types/roles';
-import { ROLE_LABELS } from '../../constants/permissions';
-import { REGISTERED_USERS } from '../../services/authService';
 import { NotificationDropdown } from './NotificationDropdown';
 
 export interface HeaderProps {
@@ -24,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
   isFocusMode = false,
   onToggleFocusMode
 }) => {
-  const { user, switchRole, logout } = useAuth();
+  const { user, logout } = useAuth();
 
   if (!user) return null;
 
@@ -55,7 +52,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
         
-        {/* Role Switcher Selector for RBAC evaluation */}
+        {/* User Role Badge */}
         <div className="flex items-center gap-1 sm:gap-2 min-w-0">
           <span 
             className="hidden sm:inline-block"
@@ -63,33 +60,22 @@ export const Header: React.FC<HeaderProps> = ({
           >
             Peran:
           </span>
-          <select 
-            value={user.role} 
-            onChange={(e) => switchRole(e.target.value as UserRole)}
-            className="form-select"
-            aria-label="Pilih Peran Pengguna"
+          <span 
             style={{ 
-              padding: '4px 8px', 
+              padding: '4px 12px', 
               fontSize: 'var(--text-xs)', 
-              fontWeight: 'var(--font-weight-semibold)',
-              width: 'auto',
-              maxWidth: 'min(160px, 40vw)',
+              fontWeight: 700,
               borderRadius: 'var(--radius-full)',
               backgroundColor: 'var(--color-primary-50)',
               color: 'var(--color-primary-900)',
-              borderColor: 'var(--color-primary-200)',
-              cursor: 'pointer',
+              border: '1px solid var(--color-primary-200)',
+              whiteSpace: 'nowrap',
               textOverflow: 'ellipsis',
-              overflow: 'hidden',
-              whiteSpace: 'nowrap'
+              overflow: 'hidden'
             }}
           >
-            {REGISTERED_USERS.map((u) => (
-              <option key={u.id} value={u.role}>
-                {ROLE_LABELS[u.role]}: {u.name}
-              </option>
-            ))}
-          </select>
+            {user.roleLabel}
+          </span>
         </div>
       </div>
 
