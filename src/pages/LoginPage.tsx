@@ -121,12 +121,12 @@ export const LoginPage: React.FC = () => {
         backgroundImage: 'radial-gradient(ellipse at 50% 0%, #ecfdf5 0%, #f8fafc 70%, #f1f5f9 100%)'
       }}
     >
-      {/* Main Container Card */}
+      {/* Outer Shell Card - Proportional & Compact */}
       <div 
         style={{
           width: '100%',
-          maxWidth: '780px',
-          borderRadius: '20px',
+          maxWidth: '760px',
+          borderRadius: '16px',
           backgroundColor: '#ffffff',
           boxShadow: '0 20px 40px -15px rgba(6, 78, 59, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.06)',
           overflow: 'hidden',
@@ -134,10 +134,10 @@ export const LoginPage: React.FC = () => {
           flexDirection: 'column'
         }}
       >
-        <div style={{ display: 'flex', width: '100%', minHeight: '480px' }}>
+        <div style={{ display: 'flex', width: '100%' }}>
           
           {/* ========================================================================= */}
-          {/* LEFT HERO PANEL (Visible on Tablet/Desktop >= 768px) */}
+          {/* LEFT HERO PANEL (Desktop >= 768px) */}
           {/* ========================================================================= */}
           <div 
             className="hidden md:flex"
@@ -171,9 +171,9 @@ export const LoginPage: React.FC = () => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
                 <div 
                   style={{
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
+                    width: '42px',
+                    height: '42px',
+                    borderRadius: '10px',
                     backgroundColor: '#ffffff',
                     padding: '5px',
                     display: 'flex',
@@ -191,7 +191,7 @@ export const LoginPage: React.FC = () => {
                 </div>
                 <div>
                   <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.8px', textTransform: 'uppercase', color: '#a7f3d0' }}>
-                    PORTAL AKADEMIK
+                    PORTAL AKADEMIK RESMI
                   </span>
                   <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', lineHeight: 1.1, margin: 0 }}>
                     SALAM LMS
@@ -203,7 +203,7 @@ export const LoginPage: React.FC = () => {
                 STAI AL-ITTIHAD CIANJUR
               </h2>
               <p style={{ fontSize: '11px', color: '#d1fae5', lineHeight: 1.45, margin: '0 0 16px 0' }}>
-                Layanan akademik terpadu, perkuliahan interaktif, evaluasi CBT, dan transkrip digital.
+                Layanan akademik digital, perkuliahan interaktif, evaluasi CBT, dan transkrip digital terintegrasi.
               </p>
 
               {/* Value Highlights */}
@@ -281,17 +281,17 @@ export const LoginPage: React.FC = () => {
               <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
                 <Sparkles size={11} color="#6ee7b7" /> TA 2026/2027 Ganjil
               </span>
-              <span>BAN-PT</span>
+              <span>Terakreditasi BAN-PT</span>
             </div>
           </div>
 
           {/* ========================================================================= */}
-          {/* RIGHT FORM PANEL (Responsive & Mobile-First) */}
+          {/* RIGHT FORM PANEL (Desktop & Mobile Unified) */}
           {/* ========================================================================= */}
           <div 
             style={{
               flex: '1 1 auto',
-              padding: '24px 20px sm:28px 24px',
+              padding: '24px 22px sm:28px 26px',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'space-between',
@@ -299,7 +299,7 @@ export const LoginPage: React.FC = () => {
             }}
           >
             <div>
-              {/* Mobile Compact Header (Hidden on Desktop) */}
+              {/* Mobile Compact Header (Hidden on Desktop >= 768px) */}
               <div className="flex md:hidden flex-col items-center text-center mb-4">
                 <div 
                   style={{
@@ -330,7 +330,7 @@ export const LoginPage: React.FC = () => {
                 </p>
               </div>
 
-              {/* Segmented Tab Switcher */}
+              {/* Segmented Tab Switcher with Clear Visual Emphasis & Border-Bottom */}
               <div 
                 style={{
                   display: 'flex',
@@ -346,56 +346,62 @@ export const LoginPage: React.FC = () => {
                   onClick={() => setActiveTab('form')}
                   style={{
                     flex: 1,
-                    padding: '7px 10px',
-                    fontSize: '11.5px',
-                    fontWeight: 700,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: activeTab === 'form' ? 700 : 500,
                     borderRadius: '7px',
                     backgroundColor: activeTab === 'form' ? '#ffffff' : 'transparent',
                     color: activeTab === 'form' ? '#065f46' : '#64748b',
+                    borderBottom: activeTab === 'form' ? '2px solid #059669' : '2px solid transparent',
                     boxShadow: activeTab === 'form' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '5px',
                     transition: 'all 0.15s ease',
-                    minHeight: '34px'
+                    minHeight: '36px'
                   }}
                 >
-                  <LogIn size={13} /> Masuk Akun
+                  <LogIn size={14} /> Masuk Akun
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('accounts')}
                   style={{
                     flex: 1,
-                    padding: '7px 10px',
-                    fontSize: '11.5px',
-                    fontWeight: 700,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: activeTab === 'accounts' ? 700 : 500,
                     borderRadius: '7px',
                     backgroundColor: activeTab === 'accounts' ? '#ffffff' : 'transparent',
                     color: activeTab === 'accounts' ? '#065f46' : '#64748b',
+                    borderBottom: activeTab === 'accounts' ? '2px solid #059669' : '2px solid transparent',
                     boxShadow: activeTab === 'accounts' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: '5px',
                     transition: 'all 0.15s ease',
-                    minHeight: '34px'
+                    minHeight: '36px'
                   }}
                 >
-                  <UserCheck size={13} /> Panduan Akun ({REGISTERED_USERS.length})
+                  <UserCheck size={14} /> Panduan Akun ({REGISTERED_USERS.length})
                 </button>
               </div>
 
               {/* TAB 1: FORMULIR MASUK */}
               {activeTab === 'form' ? (
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
                   
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '6px', borderBottom: '1px solid #f1f5f9' }}>
+                  {/* Form Heading & Badge */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '8px', borderBottom: '1px solid #f1f5f9', marginBottom: '14px' }}>
                     <div>
-                      <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                      <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
                         Masuk ke Akun Anda
                       </h3>
+                      <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>
+                        Masukkan identitas akademik resmi
+                      </p>
                     </div>
                     <Badge variant="success" style={{ fontSize: '9.5px', padding: '2px 7px' }}>
                       2026/2027 Ganjil
@@ -409,27 +415,28 @@ export const LoginPage: React.FC = () => {
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: '6px',
-                        padding: '8px 10px',
+                        padding: '9px 12px',
                         borderRadius: '8px',
                         backgroundColor: '#fef2f2',
                         border: '1px solid #fecaca',
                         color: '#991b1b',
                         fontSize: '11px',
-                        fontWeight: 500
+                        fontWeight: 500,
+                        marginBottom: '14px'
                       }}
                     >
-                      <AlertCircle size={14} color="#dc2626" style={{ flexShrink: 0, marginTop: '2px' }} />
+                      <AlertCircle size={15} color="#dc2626" style={{ flexShrink: 0, marginTop: '1px' }} />
                       <span>{errorMessage}</span>
                     </div>
                   )}
 
-                  {/* Input Identifier */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                    <label style={{ fontSize: '11px', fontWeight: 700, color: '#334155' }}>
+                  {/* Input Identifier (Uniform 42px Height) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '14px' }}>
+                    <label style={{ fontSize: '11.5px', fontWeight: 600, color: '#334155' }}>
                       NIM / NIDN / NIP / Email
                     </label>
                     <div style={{ position: 'relative' }}>
-                      <div style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
+                      <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
                         <User size={15} />
                       </div>
                       <input
@@ -441,20 +448,21 @@ export const LoginPage: React.FC = () => {
                         required
                         style={{
                           width: '100%',
-                          padding: '9px 12px 9px 34px',
-                          fontSize: '12.5px',
+                          height: '42px',
+                          padding: '0 14px 0 38px',
+                          fontSize: '13px',
                           fontWeight: 500,
                           borderRadius: '8px',
                           border: '1px solid #cbd5e1',
                           backgroundColor: '#ffffff',
                           color: '#0f172a',
                           outline: 'none',
-                          height: '38px',
+                          boxSizing: 'border-box',
                           transition: 'border-color 0.2s, box-shadow 0.2s'
                         }}
                         onFocus={(e) => {
                           e.target.style.borderColor = '#059669';
-                          e.target.style.boxShadow = '0 0 0 2px rgba(5, 150, 105, 0.12)';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.12)';
                         }}
                         onBlur={(e) => {
                           e.target.style.borderColor = '#cbd5e1';
@@ -464,10 +472,10 @@ export const LoginPage: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Input Kata Sandi */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  {/* Input Kata Sandi (Uniform 42px Height & Centered Eye Icon) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '14px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#334155' }}>
+                      <label style={{ fontSize: '11.5px', fontWeight: 600, color: '#334155' }}>
                         Kata Sandi
                       </label>
                       <button
@@ -479,7 +487,7 @@ export const LoginPage: React.FC = () => {
                       </button>
                     </div>
                     <div style={{ position: 'relative' }}>
-                      <div style={{ position: 'absolute', left: '11px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
+                      <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
                         <Lock size={15} />
                       </div>
                       <input
@@ -491,20 +499,21 @@ export const LoginPage: React.FC = () => {
                         required
                         style={{
                           width: '100%',
-                          padding: '9px 36px 9px 34px',
-                          fontSize: '12.5px',
+                          height: '42px',
+                          padding: '0 40px 0 38px',
+                          fontSize: '13px',
                           fontWeight: 500,
                           borderRadius: '8px',
                           border: '1px solid #cbd5e1',
                           backgroundColor: '#ffffff',
                           color: '#0f172a',
                           outline: 'none',
-                          height: '38px',
+                          boxSizing: 'border-box',
                           transition: 'border-color 0.2s, box-shadow 0.2s'
                         }}
                         onFocus={(e) => {
                           e.target.style.borderColor = '#059669';
-                          e.target.style.boxShadow = '0 0 0 2px rgba(5, 150, 105, 0.12)';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.12)';
                         }}
                         onBlur={(e) => {
                           e.target.style.borderColor = '#cbd5e1';
@@ -516,24 +525,26 @@ export const LoginPage: React.FC = () => {
                         onClick={() => setShowPassword(!showPassword)}
                         style={{
                           position: 'absolute',
-                          right: '8px',
+                          right: '10px',
                           top: '50%',
                           transform: 'translateY(-50%)',
                           color: '#94a3b8',
-                          padding: '4px',
+                          padding: '6px',
                           display: 'flex',
-                          alignItems: 'center'
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '4px'
                         }}
                         title={showPassword ? 'Sembunyikan' : 'Tampilkan'}
                         tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                   </div>
 
                   {/* Checkbox Ingat Saya */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: '#475569' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: '#475569', marginBottom: '14px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
                       <input
                         type="checkbox"
@@ -545,33 +556,35 @@ export const LoginPage: React.FC = () => {
                     </label>
                   </div>
 
-                  {/* Compact CAPTCHA */}
-                  <CaptchaSecurity
-                    onVerify={(isValid) => {
-                      setIsCaptchaVerified(isValid);
-                      if (isValid) setCaptchaError(null);
-                    }}
-                    isVerified={isCaptchaVerified}
-                    error={captchaError}
-                  />
+                  {/* CAPTCHA Security Section */}
+                  <div style={{ marginBottom: '16px' }}>
+                    <CaptchaSecurity
+                      onVerify={(isValid) => {
+                        setIsCaptchaVerified(isValid);
+                        if (isValid) setCaptchaError(null);
+                      }}
+                      isVerified={isCaptchaVerified}
+                      error={captchaError}
+                    />
+                  </div>
 
-                  {/* Tombol Submit */}
+                  {/* Tombol Utama (Solid Emerald Green & Generous Padding) */}
                   <Button
                     type="submit"
                     variant="primary"
-                    size="md"
+                    size="lg"
                     icon={LogIn}
                     isLoading={isSubmitting}
                     style={{
                       width: '100%',
-                      padding: '11px',
-                      borderRadius: '10px',
-                      fontSize: '13px',
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      fontSize: '13.5px',
                       fontWeight: 700,
-                      backgroundColor: isCaptchaVerified ? '#059669' : undefined,
-                      boxShadow: '0 2px 8px rgba(5, 150, 105, 0.2)',
-                      marginTop: '2px',
-                      minHeight: '42px'
+                      backgroundColor: isCaptchaVerified ? '#059669' : '#047857',
+                      color: '#ffffff',
+                      boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+                      minHeight: '44px'
                     }}
                   >
                     {isSubmitting ? 'Memverifikasi...' : 'Masuk ke Portal'}
@@ -581,9 +594,14 @@ export const LoginPage: React.FC = () => {
                 /* TAB 2: PANDUAN AKUN AKSES */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h3 style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
-                      Daftar Akun Pengguna
-                    </h3>
+                    <div>
+                      <h3 style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                        Daftar Akun Pengguna
+                      </h3>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
+                        Pilih peran untuk simulasi
+                      </span>
+                    </div>
                     <span style={{ fontSize: '10px', backgroundColor: '#ecfdf5', color: '#065f46', padding: '2px 7px', borderRadius: '5px', fontWeight: 700, border: '1px solid #a7f3d0' }}>
                       Sandi: salam123
                     </span>
@@ -591,7 +609,7 @@ export const LoginPage: React.FC = () => {
 
                   {/* Search Bar */}
                   <div style={{ position: 'relative' }}>
-                    <Search size={13} color="#94a3b8" style={{ position: 'absolute', left: '9px', top: '50%', transform: 'translateY(-50%)' }} />
+                    <Search size={13} color="#94a3b8" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
                     <input
                       type="text"
                       placeholder="Cari nama, NIM, atau peran..."
@@ -599,11 +617,13 @@ export const LoginPage: React.FC = () => {
                       onChange={(e) => setSearchAccount(e.target.value)}
                       style={{
                         width: '100%',
-                        padding: '6px 10px 6px 28px',
-                        fontSize: '11px',
-                        borderRadius: '6px',
+                        height: '36px',
+                        padding: '0 10px 0 30px',
+                        fontSize: '11.5px',
+                        borderRadius: '8px',
                         border: '1px solid #cbd5e1',
-                        outline: 'none'
+                        outline: 'none',
+                        boxSizing: 'border-box'
                       }}
                     />
                   </div>
@@ -622,7 +642,7 @@ export const LoginPage: React.FC = () => {
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'space-between',
-                            padding: '7px 9px',
+                            padding: '8px 10px',
                             borderRadius: '8px',
                             backgroundColor: '#f8fafc',
                             border: '1px solid #e2e8f0'
@@ -630,7 +650,7 @@ export const LoginPage: React.FC = () => {
                         >
                           <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {u.name}
                               </span>
                               <Badge variant={u.role === 'mahasiswa' ? 'primary' : u.role === 'dosen' ? 'success' : 'warning'} style={{ fontSize: '9px', padding: '1px 5px' }}>
@@ -646,7 +666,7 @@ export const LoginPage: React.FC = () => {
                             variant="secondary"
                             size="sm"
                             onClick={() => handleSelectAccount(u)}
-                            style={{ fontSize: '10px', padding: '4px 8px', flexShrink: 0 }}
+                            style={{ fontSize: '10.5px', padding: '5px 10px', flexShrink: 0, borderRadius: '6px' }}
                           >
                             Pilih <ArrowRight size={10} style={{ marginLeft: '2px' }} />
                           </Button>
@@ -661,14 +681,14 @@ export const LoginPage: React.FC = () => {
             {/* Footer */}
             <div 
               style={{
-                paddingTop: '12px',
+                paddingTop: '14px',
                 borderTop: '1px solid #f1f5f9',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                fontSize: '10.5px',
+                fontSize: '11px',
                 color: '#64748b',
-                marginTop: '12px'
+                marginTop: '14px'
               }}
             >
               <span>© 2026 STAI AL-ITTIHAD</span>
