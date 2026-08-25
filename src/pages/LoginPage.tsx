@@ -15,7 +15,8 @@ import {
   Search, 
   Phone, 
   Mail, 
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -73,7 +74,6 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    // Save or clear remembered identifier
     try {
       if (rememberMe) {
         localStorage.setItem(REMEMBER_KEY, identifier.trim());
@@ -89,7 +89,6 @@ export const LoginPage: React.FC = () => {
       await login(identifier, kataSandi);
     } catch (err: any) {
       setErrorMessage(err.message || 'Gagal masuk. Periksa kembali data kredensial Anda.');
-      // Auto-reset CAPTCHA on login failure to prevent brute force
       setIsCaptchaVerified(false);
     } finally {
       setIsSubmitting(false);
@@ -112,394 +111,653 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-3 sm:p-6 md:p-8"
-      style={{ 
-        background: 'radial-gradient(ellipse at 50% 0%, #ecfdf5 0%, #f8fafc 65%, #e2e8f0 100%)' 
+      style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '16px',
+        backgroundColor: '#f1f5f9',
+        backgroundImage: 'radial-gradient(at 0% 0%, #ecfdf5 0px, transparent 50%), radial-gradient(at 100% 100%, #f0fdf4 0px, transparent 50%)'
       }}
     >
-      {/* Main Container Card */}
+      {/* Outer Shell Card */}
       <div 
-        className="w-full max-w-5xl rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 bg-white grid grid-cols-1 lg:grid-cols-12"
+        style={{
+          width: '100%',
+          maxWidth: '960px',
+          borderRadius: '24px',
+          backgroundColor: '#ffffff',
+          boxShadow: '0 20px 40px -15px rgba(6, 78, 59, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.05)',
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column'
+        }}
       >
-        {/* ========================================================================= */}
-        {/* LEFT COLUMN: BRAND & INSTITUTIONAL HERO (DESKTOP & TABLET) */}
-        {/* ========================================================================= */}
-        <div 
-          className="lg:col-span-5 p-6 sm:p-8 lg:p-10 flex flex-col justify-between relative overflow-hidden text-white"
-          style={{
-            background: 'linear-gradient(145deg, #064e3b 0%, #065f46 45%, #047857 100%)'
-          }}
-        >
-          {/* Decorative Subtle Geometry & Glow */}
+        {/* Responsive Dual Pane: Left Hero (Desktop only) + Right Form */}
+        <div style={{ display: 'flex', width: '100%', minHeight: '560px' }}>
+          
+          {/* ========================================================================= */}
+          {/* LEFT HERO PANEL (Visible on Desktop >= 900px) */}
+          {/* ========================================================================= */}
           <div 
-            className="absolute -right-16 -top-16 w-56 h-56 rounded-full opacity-20 pointer-events-none"
-            style={{ background: 'radial-gradient(circle, #34d399 0%, transparent 70%)' }}
-          />
-          <div 
-            className="absolute -left-20 -bottom-20 w-64 h-64 rounded-full opacity-15 pointer-events-none"
-            style={{ background: 'radial-gradient(circle, #6ee7b7 0%, transparent 70%)' }}
-          />
-
-          {/* Top Section: Logo & Titles */}
-          <div className="relative z-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-14 h-14 rounded-2xl bg-white p-2 flex items-center justify-center shadow-lg border border-emerald-300 flex-shrink-0">
-                <img 
-                  src="/logo.png" 
-                  alt="Logo STAI AL-ITTIHAD" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-200 block">
-                  LMS & SIAKAD TERPADU
-                </span>
-                <h1 className="text-2xl font-extrabold text-white tracking-tight leading-none">
-                  SALAM PORTAL
-                </h1>
-              </div>
-            </div>
-
-            <h2 className="text-lg font-bold text-white mb-2 leading-snug">
-              Sistem Aplikasi Layanan Akademik & Mahasiswa
-            </h2>
-            <p className="text-xs text-emerald-100/90 leading-relaxed mb-6 font-normal">
-              Pusat pembelajaran digital, evaluasi CBT, manajemen KRS-KHS, dan perkuliahan interaktif STAI Al-Ittihad Cianjur.
-            </p>
-
-            {/* Feature Highlights */}
-            <div className="flex flex-col gap-2.5 my-4">
-              <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/10">
-                <GraduationCap size={16} className="text-emerald-300 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-xs font-semibold text-white">Ekosistem Akademik Lengkap</div>
-                  <div className="text-[11px] text-emerald-100">KRS, KHS, E-Modul, CBT, Tugas, dan Forum Diskusi.</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/10">
-                <ShieldCheck size={16} className="text-emerald-300 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-xs font-semibold text-white">Aman & Terstandarisasi</div>
-                  <div className="text-[11px] text-emerald-100">Otentikasi berlapis, CAPTCHA anti-bot, dan audit log.</div>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-2.5 p-2.5 rounded-xl bg-white/10 backdrop-blur-xs border border-white/10">
-                <BookOpen size={16} className="text-emerald-300 flex-shrink-0 mt-0.5" />
-                <div>
-                  <div className="text-xs font-semibold text-white">Integrasi Turats & Kurikulum OBE</div>
-                  <div className="text-[11px] text-emerald-100">Dukungan teks Arab berharakat & kurikulum berbasis capaian.</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Section: Accreditation & Academic Year */}
-          <div className="relative z-10 pt-4 border-t border-emerald-600/60 mt-4 flex items-center justify-between text-[11px] text-emerald-200">
-            <span className="flex items-center gap-1 font-medium">
-              <Sparkles size={13} className="text-emerald-300" /> TA 2026/2027 Ganjil
-            </span>
-            <span className="opacity-90">Terakreditasi BAN-PT</span>
-          </div>
-        </div>
-
-        {/* ========================================================================= */}
-        {/* RIGHT COLUMN: LOGIN FORM & TABBED CONTAINER */}
-        {/* ========================================================================= */}
-        <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between bg-white">
-          <div>
-            {/* Navigation Tabs Segmented Control */}
+            className="hidden lg:flex"
+            style={{
+              flex: '0 0 42%',
+              background: 'linear-gradient(155deg, #064e3b 0%, #065f46 50%, #047857 100%)',
+              padding: '40px 32px',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              position: 'relative',
+              overflow: 'hidden',
+              color: '#ffffff'
+            }}
+          >
+            {/* Background Glow Accents */}
             <div 
-              className="flex rounded-xl p-1 bg-slate-100 border border-slate-200 mb-6"
-            >
-              <button
-                type="button"
-                onClick={() => setActiveTab('form')}
-                className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'form' 
-                    ? 'bg-white shadow-xs text-emerald-800' 
-                    : 'text-slate-600 hover:text-emerald-700'
-                }`}
-              >
-                <LogIn size={15} /> Formulir Masuk Akun
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab('accounts')}
-                className={`flex-1 py-2.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${
-                  activeTab === 'accounts' 
-                    ? 'bg-white shadow-xs text-emerald-800' 
-                    : 'text-slate-600 hover:text-emerald-700'
-                }`}
-              >
-                <UserCheck size={15} /> Panduan Akun Akses ({REGISTERED_USERS.length})
-              </button>
-            </div>
+              style={{
+                position: 'absolute',
+                right: '-40px',
+                top: '-40px',
+                width: '180px',
+                height: '180px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(52, 211, 153, 0.25) 0%, transparent 70%)',
+                pointerEvents: 'none'
+              }}
+            />
+            <div 
+              style={{
+                position: 'absolute',
+                left: '-40px',
+                bottom: '-40px',
+                width: '200px',
+                height: '200px',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(110, 231, 183, 0.2) 0%, transparent 70%)',
+                pointerEvents: 'none'
+              }}
+            />
 
-            {/* TAB 1: FORMULIR MASUK AKUN */}
-            {activeTab === 'form' ? (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                  <div>
-                    <h3 className="text-lg font-extrabold text-slate-900 m-0">
-                      Masuk ke Akun Anda
-                    </h3>
-                    <p className="text-xs text-slate-500 m-0">
-                      Silakan masukkan kredensial resmi institusi
-                    </p>
-                  </div>
-                  <Badge variant="success" style={{ fontSize: '10px', padding: '3px 8px' }}>
-                    Sesi Aktif Aman
-                  </Badge>
-                </div>
-
-                {/* Error Banner */}
-                {errorMessage && (
-                  <div 
-                    className="flex items-start gap-2.5 p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs animate-shake"
-                  >
-                    <AlertCircle size={16} className="flex-shrink-0 text-rose-600 mt-0.5" />
-                    <span className="font-medium">{errorMessage}</span>
-                  </div>
-                )}
-
-                {/* Input Identifier */}
-                <div className="flex flex-col gap-1">
-                  <label className="text-xs font-bold text-slate-700">
-                    NIM / NIDN / NIP / Username / Email
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                      <User size={16} />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Contoh: 21010042 atau 2112087501"
-                      value={identifier}
-                      onChange={(e) => setIdentifier(e.target.value)}
-                      autoComplete="username"
-                      required
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Input Password */}
-                <div className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center">
-                    <label className="text-xs font-bold text-slate-700">
-                      Kata Sandi
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setIsHelpModalOpen(true)}
-                      className="text-[11px] font-medium text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1"
-                    >
-                      <HelpCircle size={12} /> Lupa Sandi?
-                    </button>
-                  </div>
-                  <div className="relative">
-                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                      <Lock size={16} />
-                    </div>
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Masukkan kata sandi akun Anda"
-                      value={kataSandi}
-                      onChange={(e) => setKataSandi(e.target.value)}
-                      autoComplete="current-password"
-                      required
-                      className="w-full pl-10 pr-11 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-                      title={showPassword ? 'Sembunyikan Kata Sandi' : 'Tampilkan Kata Sandi'}
-                      tabIndex={-1}
-                    >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Remember Me Option */}
-                <div className="flex items-center justify-between text-xs pt-0.5">
-                  <label className="flex items-center gap-2 cursor-pointer select-none text-slate-600 font-medium">
-                    <input
-                      type="checkbox"
-                      checked={rememberMe}
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      className="rounded text-emerald-600 focus:ring-emerald-500 w-4 h-4"
-                    />
-                    <span>Ingat identitas saya di peramban ini</span>
-                  </label>
-                </div>
-
-                {/* Modern Interactive CAPTCHA Component */}
-                <CaptchaSecurity
-                  onVerify={(isValid) => {
-                    setIsCaptchaVerified(isValid);
-                    if (isValid) setCaptchaError(null);
-                  }}
-                  isVerified={isCaptchaVerified}
-                  error={captchaError}
-                />
-
-                {/* Submit Action Button */}
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="lg"
-                  icon={LogIn}
-                  isLoading={isSubmitting}
-                  className="w-full shadow-md hover:shadow-lg transition-all font-bold"
+            {/* Top Brand */}
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
+                <div 
                   style={{
-                    backgroundColor: isCaptchaVerified ? '#059669' : undefined,
-                    padding: '13px',
-                    borderRadius: 'var(--radius-xl)'
+                    width: '52px',
+                    height: '52px',
+                    borderRadius: '14px',
+                    backgroundColor: '#ffffff',
+                    padding: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    flexShrink: 0
                   }}
                 >
-                  {isSubmitting ? 'Memverifikasi...' : 'Masuk ke Portal SALAM'}
-                </Button>
-              </form>
-            ) : (
-              /* TAB 2: PANDUAN AKUN AKSES & ROLE DIRECTORY */
-              <div className="flex flex-col gap-3">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900 m-0">
-                      Daftar Akun Pengguna Terdaftar
-                    </h3>
-                    <p className="text-[11px] text-slate-500 m-0">
-                      Gunakan akun demo berikut untuk eksplorasi sistem
-                    </p>
-                  </div>
-                  <span className="text-xs bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-md font-mono border border-emerald-200">
-                    Sandi: <strong>salam123</strong>
-                  </span>
-                </div>
-
-                {/* Account Search Input */}
-                <div className="relative">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Cari nama, NIM, atau peran akun..."
-                    value={searchAccount}
-                    onChange={(e) => setSearchAccount(e.target.value)}
-                    className="w-full pl-9 pr-3 py-1.5 rounded-lg border border-slate-200 text-xs focus:outline-none focus:border-emerald-600"
+                  <img 
+                    src="/logo.png" 
+                    alt="Logo STAI AL-ITTIHAD" 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                   />
                 </div>
+                <div>
+                  <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '1px', textTransform: 'uppercase', color: '#a7f3d0' }}>
+                    PORTAL AKADEMIK RESMI
+                  </span>
+                  <h1 style={{ fontSize: '22px', fontWeight: 800, color: '#ffffff', lineHeight: 1.1, margin: 0 }}>
+                    SALAM LMS
+                  </h1>
+                </div>
+              </div>
 
-                <div className="flex flex-col gap-2 max-h-[350px] overflow-y-auto pr-1">
-                  {filteredAccounts.length === 0 ? (
-                    <div className="text-center py-6 text-xs text-slate-400">
-                      Tidak ada akun yang sesuai dengan kata kunci pencarian.
+              <h2 style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff', lineHeight: 1.4, margin: '0 0 8px 0' }}>
+                Sistem Aplikasi Layanan Akademik & Mahasiswa
+              </h2>
+              <p style={{ fontSize: '12px', color: '#d1fae5', lineHeight: 1.5, margin: '0 0 20px 0' }}>
+                STAI Al-Ittihad Cianjur menghadirkan ekosistem pembelajaran digital komprehensif, terintegrasi SIAKAD & Kemendikbudristek.
+              </p>
+
+              {/* Feature Cards */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)'
+                  }}
+                >
+                  <GraduationCap size={16} color="#6ee7b7" style={{ flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff' }}>Akademik & Perwalian KRS</div>
+                    <div style={{ fontSize: '10px', color: '#a7f3d0' }}>Bimbingan PA & cetak KHS digital instan.</div>
+                  </div>
+                </div>
+
+                <div 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)'
+                  }}
+                >
+                  <ShieldCheck size={16} color="#6ee7b7" style={{ flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff' }}>Ujian CBT & Bank Soal</div>
+                    <div style={{ fontSize: '10px', color: '#a7f3d0' }}>Evaluasi terstandarisasi dengan keamanan anti-curang.</div>
+                  </div>
+                </div>
+
+                <div 
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    borderRadius: '12px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)'
+                  }}
+                >
+                  <BookOpen size={16} color="#6ee7b7" style={{ flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#ffffff' }}>E-Modul & Turats Interaktif</div>
+                    <div style={{ fontSize: '10px', color: '#a7f3d0' }}>Materi kuliah berharakat & audio visual.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Footer on Left */}
+            <div 
+              style={{
+                position: 'relative',
+                zIndex: 2,
+                paddingTop: '16px',
+                borderTop: '1px solid rgba(255, 255, 255, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '10px',
+                color: '#a7f3d0'
+              }}
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                <Sparkles size={12} color="#6ee7b7" /> TA 2026/2027 Ganjil
+              </span>
+              <span>Terakreditasi BAN-PT</span>
+            </div>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* RIGHT FORM PANEL (Desktop & Mobile Friendly) */}
+          {/* ========================================================================= */}
+          <div 
+            style={{
+              flex: '1 1 auto',
+              padding: '32px 28px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              backgroundColor: '#ffffff'
+            }}
+          >
+            <div>
+              {/* Mobile Header (Shown only on small screens < 1024px) */}
+              <div className="flex lg:hidden flex-col items-center text-center mb-5">
+                <div 
+                  style={{
+                    width: '54px',
+                    height: '54px',
+                    borderRadius: '14px',
+                    backgroundColor: '#ffffff',
+                    padding: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 10px rgba(0,0,0,0.08)',
+                    border: '1px solid #e2e8f0',
+                    marginBottom: '8px'
+                  }}
+                >
+                  <img 
+                    src="/logo.png" 
+                    alt="Logo STAI AL-ITTIHAD" 
+                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  />
+                </div>
+                <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#065f46', margin: '0 0 2px 0' }}>
+                  SALAM LMS
+                </h1>
+                <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>
+                  STAI AL-ITTIHAD CIANJUR
+                </p>
+              </div>
+
+              {/* Segmented Control Switcher */}
+              <div 
+                style={{
+                  display: 'flex',
+                  backgroundColor: '#f1f5f9',
+                  padding: '4px',
+                  borderRadius: '12px',
+                  marginBottom: '20px',
+                  border: '1px solid #e2e8f0'
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('form')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    backgroundColor: activeTab === 'form' ? '#ffffff' : 'transparent',
+                    color: activeTab === 'form' ? '#065f46' : '#64748b',
+                    boxShadow: activeTab === 'form' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <LogIn size={14} /> Masuk Akun
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('accounts')}
+                  style={{
+                    flex: 1,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    backgroundColor: activeTab === 'accounts' ? '#ffffff' : 'transparent',
+                    color: activeTab === 'accounts' ? '#065f46' : '#64748b',
+                    boxShadow: activeTab === 'accounts' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  <UserCheck size={14} /> Panduan Akun ({REGISTERED_USERS.length})
+                </button>
+              </div>
+
+              {/* TAB 1: FORMULIR MASUK */}
+              {activeTab === 'form' ? (
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', paddingBottom: '8px', borderBottom: '1px solid #f1f5f9' }}>
+                    <div>
+                      <h3 style={{ fontSize: '15px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                        Autentikasi Pengguna
+                      </h3>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
+                        Masukkan identitas akademik terdaftar
+                      </span>
                     </div>
-                  ) : (
-                    filteredAccounts.map((u) => (
-                      <div
-                        key={u.id}
-                        className="flex flex-col gap-2 p-3 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-emerald-50/30 hover:border-emerald-300 transition-all"
-                      >
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <div className="font-bold text-slate-900 text-xs">{u.name}</div>
-                            <div className="text-slate-600 text-[11px] font-mono">
-                              Username: <strong className="text-emerald-700">{u.username}</strong>
-                            </div>
-                            <div className="text-slate-500 text-[11px]">{u.studyProgram}</div>
-                          </div>
-                          <Badge variant={u.role === 'mahasiswa' ? 'primary' : u.role === 'dosen' ? 'success' : 'warning'}>
-                            {u.roleLabel}
-                          </Badge>
-                        </div>
+                    <Badge variant="success" style={{ fontSize: '10px', padding: '2px 8px' }}>
+                      2026/2027 Ganjil
+                    </Badge>
+                  </div>
 
-                        <div className="flex items-center gap-2 pt-1 border-t border-slate-200/70">
+                  {/* Error Notification */}
+                  {errorMessage && (
+                    <div 
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '8px',
+                        padding: '10px 12px',
+                        borderRadius: '10px',
+                        backgroundColor: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        color: '#991b1b',
+                        fontSize: '11px',
+                        fontWeight: 500
+                      }}
+                    >
+                      <AlertCircle size={15} color="#dc2626" style={{ flexShrink: 0, marginTop: '2px' }} />
+                      <span>{errorMessage}</span>
+                    </div>
+                  )}
+
+                  {/* Input Identifier */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 700, color: '#334155' }}>
+                      NIM / NIDN / NIP / Email
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
+                        <User size={15} />
+                      </div>
+                      <input
+                        type="text"
+                        placeholder="Contoh: 21010042 atau 2112087501"
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
+                        autoComplete="username"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '10px 12px 10px 36px',
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          borderRadius: '10px',
+                          border: '1px solid #cbd5e1',
+                          backgroundColor: '#ffffff',
+                          color: '#0f172a',
+                          outline: 'none',
+                          transition: 'border-color 0.2s, box-shadow 0.2s'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#059669';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.12)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = '#cbd5e1';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Input Kata Sandi */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <label style={{ fontSize: '11px', fontWeight: 700, color: '#334155' }}>
+                        Kata Sandi
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setIsHelpModalOpen(true)}
+                        style={{ fontSize: '11px', fontWeight: 600, color: '#047857', display: 'flex', alignItems: 'center', gap: '3px' }}
+                      >
+                        <HelpCircle size={11} /> Lupa Sandi?
+                      </button>
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                      <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
+                        <Lock size={15} />
+                      </div>
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Masukkan kata sandi Anda"
+                        value={kataSandi}
+                        onChange={(e) => setKataSandi(e.target.value)}
+                        autoComplete="current-password"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '10px 38px 10px 36px',
+                          fontSize: '13px',
+                          fontWeight: 500,
+                          borderRadius: '10px',
+                          border: '1px solid #cbd5e1',
+                          backgroundColor: '#ffffff',
+                          color: '#0f172a',
+                          outline: 'none',
+                          transition: 'border-color 0.2s, box-shadow 0.2s'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#059669';
+                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.12)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = '#cbd5e1';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: 'absolute',
+                          right: '10px',
+                          top: '50%',
+                          transform: 'translateY(-50%)',
+                          color: '#94a3b8',
+                          padding: '4px',
+                          display: 'flex',
+                          alignItems: 'center'
+                        }}
+                        title={showPassword ? 'Sembunyikan' : 'Tampilkan'}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Checkbox Ingat Saya */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: '#475569' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        style={{ accentColor: '#059669', width: '14px', height: '14px', borderRadius: '4px' }}
+                      />
+                      <span>Ingat identitas saya</span>
+                    </label>
+                  </div>
+
+                  {/* CAPTCHA Security Box */}
+                  <CaptchaSecurity
+                    onVerify={(isValid) => {
+                      setIsCaptchaVerified(isValid);
+                      if (isValid) setCaptchaError(null);
+                    }}
+                    isVerified={isCaptchaVerified}
+                    error={captchaError}
+                  />
+
+                  {/* Tombol Submit */}
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    size="lg"
+                    icon={LogIn}
+                    isLoading={isSubmitting}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      borderRadius: '12px',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      backgroundColor: isCaptchaVerified ? '#059669' : undefined,
+                      boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
+                      marginTop: '4px'
+                    }}
+                  >
+                    {isSubmitting ? 'Memverifikasi...' : 'Masuk ke Portal SALAM'}
+                  </Button>
+                </form>
+              ) : (
+                /* TAB 2: PANDUAN AKUN AKSES & SIMULASI */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <h3 style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+                        Direktori Akun Pengguna
+                      </h3>
+                      <span style={{ fontSize: '11px', color: '#64748b' }}>
+                        Pilih salah satu peran untuk simulasi
+                      </span>
+                    </div>
+                    <span style={{ fontSize: '10px', backgroundColor: '#ecfdf5', color: '#065f46', padding: '3px 8px', borderRadius: '6px', fontWeight: 700, border: '1px solid #a7f3d0' }}>
+                      Sandi: salam123
+                    </span>
+                  </div>
+
+                  {/* Search Bar */}
+                  <div style={{ position: 'relative' }}>
+                    <Search size={13} color="#94a3b8" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                    <input
+                      type="text"
+                      placeholder="Cari nama, NIM, prodi, atau peran..."
+                      value={searchAccount}
+                      onChange={(e) => setSearchAccount(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '7px 10px 7px 30px',
+                        fontSize: '11px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        outline: 'none'
+                      }}
+                    />
+                  </div>
+
+                  {/* List Container */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '310px', overflowY: 'auto', paddingRight: '2px' }}>
+                    {filteredAccounts.length === 0 ? (
+                      <div style={{ textAlign: 'center', padding: '24px 0', fontSize: '11px', color: '#94a3b8' }}>
+                        Tidak ditemukan akun yang cocok.
+                      </div>
+                    ) : (
+                      filteredAccounts.map((u) => (
+                        <div
+                          key={u.id}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            padding: '8px 10px',
+                            borderRadius: '10px',
+                            backgroundColor: '#f8fafc',
+                            border: '1px solid #e2e8f0',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ fontSize: '11px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {u.name}
+                              </span>
+                              <Badge variant={u.role === 'mahasiswa' ? 'primary' : u.role === 'dosen' ? 'success' : 'warning'} style={{ fontSize: '9px', padding: '1px 5px' }}>
+                                {u.roleLabel}
+                              </Badge>
+                            </div>
+                            <div style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>
+                              Username: <strong style={{ color: '#059669' }}>{u.username}</strong>
+                            </div>
+                          </div>
+
                           <Button
                             variant="secondary"
                             size="sm"
                             onClick={() => handleSelectAccount(u)}
-                            className="w-full"
-                            style={{ fontSize: '11px', padding: '5px 8px' }}
+                            style={{ fontSize: '10px', padding: '4px 8px', flexShrink: 0 }}
                           >
-                            Pilih Akun Ini
+                            Pilih <ArrowRight size={10} style={{ marginLeft: '2px' }} />
                           </Button>
                         </div>
-                      </div>
-                    ))
-                  )}
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* Footer Notice */}
-          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 gap-2 mt-4">
-            <span>© 2026 STAI AL-ITTIHAD CIANJUR</span>
-            <button
-              type="button"
-              onClick={() => setIsHelpModalOpen(true)}
-              className="text-emerald-700 hover:underline font-medium flex items-center gap-1"
+            {/* Footer on Form Side */}
+            <div 
+              style={{
+                paddingTop: '16px',
+                borderTop: '1px solid #f1f5f9',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                fontSize: '11px',
+                color: '#64748b',
+                marginTop: '16px'
+              }}
             >
-              <HelpCircle size={13} /> Pusat Bantuan & Kontak BAAK
-            </button>
+              <span>© 2026 STAI AL-ITTIHAD</span>
+              <button
+                type="button"
+                onClick={() => setIsHelpModalOpen(true)}
+                style={{ color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+              >
+                <HelpCircle size={12} /> Bantuan BAAK
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* ========================================================================= */}
-      {/* MODAL: PUSAT BANTUAN & LUPA KATA SANDI */}
+      {/* MODAL BANTUAN & RESET KATA SANDI */}
       {/* ========================================================================= */}
       <Modal
         isOpen={isHelpModalOpen}
         onClose={() => setIsHelpModalOpen(false)}
         title="Pusat Bantuan & Pemulihan Akun"
-        maxWidth="500px"
+        maxWidth="480px"
         footer={
           <Button variant="primary" onClick={() => setIsHelpModalOpen(false)}>
-            Tutup Bantuan
+            Tutup
           </Button>
         }
       >
-        <div className="flex flex-col gap-4 text-xs text-slate-600">
-          <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 flex items-start gap-2.5">
-            <Info size={16} className="text-emerald-600 flex-shrink-0 mt-0.5" />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12px', color: '#334155' }}>
+          <div 
+            style={{
+              padding: '10px 12px',
+              borderRadius: '10px',
+              backgroundColor: '#ecfdf5',
+              border: '1px solid #a7f3d0',
+              color: '#065f46',
+              display: 'flex',
+              gap: '8px'
+            }}
+          >
+            <Info size={16} color="#059669" style={{ flexShrink: 0, marginTop: '2px' }} />
             <div>
-              <div className="font-bold mb-1">Lupa Kata Sandi Akun Akademik?</div>
-              <div>
-                Untuk menjaga keamanan data akademik mahasiswa dan dosen, reset kata sandi resmi dilakukan melalui verifikasi Biro Administrasi Akademik & Kemahasiswaan (BAAK).
+              <div style={{ fontWeight: 700, marginBottom: '2px' }}>Lupa Kata Sandi Akun?</div>
+              <div style={{ fontSize: '11px', lineHeight: 1.4 }}>
+                Sesuai protokol keamanan kampus, pemulihan kata sandi dilakukan secara terverifikasi melalui Bagian Akademik (BAAK) atau Tim IT (PTIPD).
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="font-bold text-slate-800">Layanan Bantuan Resmi:</div>
-            
-            <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200">
-              <Phone size={18} className="text-emerald-600" />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div style={{ fontWeight: 700, color: '#0f172a' }}>Kontak Resmi Kampus:</div>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+              <Phone size={16} color="#059669" />
               <div>
-                <div className="font-semibold text-slate-800">Helpdesk WhatsApp BAAK</div>
-                <div className="text-slate-500">+62 812-3456-7890 (Senin - Jumat: 08.00 - 16.00 WIB)</div>
+                <div style={{ fontWeight: 600, color: '#0f172a' }}>Layanan WhatsApp BAAK</div>
+                <div style={{ color: '#64748b', fontSize: '11px' }}>+62 812-3456-7890 (Jam Kerja: 08.00 - 16.00 WIB)</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-3 p-3 rounded-lg border border-slate-200">
-              <Mail size={18} className="text-emerald-600" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
+              <Mail size={16} color="#059669" />
               <div>
-                <div className="font-semibold text-slate-800">Email Pusat IT (PTIPD)</div>
-                <div className="text-slate-500">it-center@staialittihad.ac.id</div>
+                <div style={{ fontWeight: 600, color: '#0f172a' }}>Email Tim IT & Pangkalan Data</div>
+                <div style={{ color: '#64748b', fontSize: '11px' }}>ptipd@staialittihad.ac.id</div>
               </div>
             </div>
           </div>
 
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-            <div className="font-bold text-slate-800 mb-1">Akun Pengujian / Demo:</div>
-            <div className="text-slate-500">
-              Gunakan kata sandi default <strong>salam123</strong> untuk seluruh pengguna terdaftar pada tab "Panduan Akun Akses".
-            </div>
+          <div style={{ padding: '8px 10px', borderRadius: '8px', backgroundColor: '#f1f5f9', fontSize: '11px', color: '#64748b' }}>
+            <strong>Catatan Evaluasi / Demo:</strong> Seluruh pengguna yang terdaftar pada tab "Panduan Akun" dapat masuk menggunakan kata sandi <strong>salam123</strong>.
           </div>
         </div>
       </Modal>
@@ -508,5 +766,3 @@ export const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
-
-

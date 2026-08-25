@@ -43,11 +43,10 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Dimensions
     const width = canvas.width;
     const height = canvas.height;
 
-    // Background gradient with emerald / Islamic academic subtle tint
+    // Background gradient with emerald subtle tint
     const bgGradient = ctx.createLinearGradient(0, 0, width, height);
     bgGradient.addColorStop(0, '#f0fdf4');
     bgGradient.addColorStop(1, '#ecfdf5');
@@ -55,9 +54,9 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     ctx.fillRect(0, 0, width, height);
 
     // Draw background noise lines
-    for (let i = 0; i < 4; i++) {
-      ctx.strokeStyle = `rgba(16, 185, 129, ${0.2 + Math.random() * 0.25})`;
-      ctx.lineWidth = 1 + Math.random() * 2;
+    for (let i = 0; i < 3; i++) {
+      ctx.strokeStyle = `rgba(16, 185, 129, ${0.2 + Math.random() * 0.2})`;
+      ctx.lineWidth = 1 + Math.random() * 1.5;
       ctx.beginPath();
       ctx.moveTo(Math.random() * width, Math.random() * height);
       ctx.bezierCurveTo(
@@ -69,34 +68,33 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     }
 
     // Draw background noise dots
-    for (let i = 0; i < 35; i++) {
-      ctx.fillStyle = `rgba(5, 150, 105, ${0.2 + Math.random() * 0.3})`;
+    for (let i = 0; i < 25; i++) {
+      ctx.fillStyle = `rgba(5, 150, 105, ${0.2 + Math.random() * 0.25})`;
       ctx.beginPath();
-      ctx.arc(Math.random() * width, Math.random() * height, 1 + Math.random() * 1.5, 0, Math.PI * 2);
+      ctx.arc(Math.random() * width, Math.random() * height, 1 + Math.random() * 1.2, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Draw Characters with angle, color and position variations
+    // Draw Characters
     const colors = ['#065f46', '#047857', '#059669', '#0f766e', '#115e59'];
     const charSpacing = width / (code.length + 1);
 
     for (let i = 0; i < code.length; i++) {
       ctx.save();
       const char = code[i];
-      const x = (i + 0.7) * charSpacing;
-      const y = height / 2 + (Math.random() * 8 - 4);
-      const angle = (Math.random() - 0.5) * 0.45; // -13 to +13 deg
+      const x = (i + 0.75) * charSpacing;
+      const y = height / 2 + (Math.random() * 6 - 3);
+      const angle = (Math.random() - 0.5) * 0.4;
 
       ctx.translate(x, y);
       ctx.rotate(angle);
 
-      ctx.font = `bold ${Math.floor(22 + Math.random() * 4)}px 'Courier New', monospace, sans-serif`;
+      ctx.font = `bold 20px 'Courier New', monospace, sans-serif`;
       ctx.fillStyle = colors[i % colors.length];
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
       
-      // Shadow for depth
-      ctx.shadowColor = 'rgba(0,0,0,0.12)';
+      ctx.shadowColor = 'rgba(0,0,0,0.1)';
       ctx.shadowOffsetX = 1;
       ctx.shadowOffsetY = 1;
       ctx.shadowBlur = 1;
@@ -105,12 +103,12 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
       ctx.restore();
     }
 
-    // Foreground strike-through line
-    ctx.strokeStyle = 'rgba(4, 120, 87, 0.45)';
-    ctx.lineWidth = 1.5;
+    // Strike-through line
+    ctx.strokeStyle = 'rgba(4, 120, 87, 0.4)';
+    ctx.lineWidth = 1.2;
     ctx.beginPath();
-    ctx.moveTo(10, height / 2 + (Math.random() * 10 - 5));
-    ctx.lineTo(width - 10, height / 2 + (Math.random() * 10 - 5));
+    ctx.moveTo(8, height / 2 + (Math.random() * 8 - 4));
+    ctx.lineTo(width - 8, height / 2 + (Math.random() * 8 - 4));
     ctx.stroke();
   }, []);
 
@@ -124,15 +122,15 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     setTimeout(() => {
       drawCaptcha(newCode);
       setIsRotating(false);
-    }, 150);
+    }, 120);
   }, [drawCaptcha, generateRandomCode, onVerify]);
 
-  // Audio Playback (Accessibility TTS)
+  // Audio Playback
   const handleAudioSpeak = () => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const charsSpoken = captchaText.split('').join(' . ');
-    const utterance = new SpeechSynthesisUtterance(`Kode verifikasi keamanan: ${charsSpoken}`);
+    const utterance = new SpeechSynthesisUtterance(`Kode verifikasi: ${charsSpoken}`);
     utterance.lang = 'id-ID';
     utterance.rate = 0.85;
     window.speechSynthesis.speak(utterance);
@@ -143,7 +141,6 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     if (mode === 'canvas') {
       const code = generateRandomCode();
       setCaptchaText(code);
-      // Small timeout to allow canvas element to mount
       const timer = setTimeout(() => {
         drawCaptcha(code);
       }, 50);
@@ -166,7 +163,7 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     }
   };
 
-  // Slider Mouse/Touch Handlers
+  // Slider Handlers
   const handleDragStart = (clientX: number) => {
     if (isSliderSuccess) return;
     setIsDragging(true);
@@ -175,12 +172,11 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
 
   const handleDragMove = useCallback((clientX: number) => {
     if (!isDragging || !sliderTrackRef.current || isSliderSuccess) return;
-    const trackWidth = sliderTrackRef.current.clientWidth - 46; // button width 46
+    const trackWidth = sliderTrackRef.current.clientWidth - 44;
     const newPos = Math.max(0, Math.min(clientX - startXRef.current, trackWidth));
     setSliderPosition(newPos);
 
-    // Complete threshold 92%
-    if (newPos >= trackWidth * 0.92) {
+    if (newPos >= trackWidth * 0.9) {
       setSliderPosition(trackWidth);
       setIsDragging(false);
       setIsSliderSuccess(true);
@@ -192,13 +188,11 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     if (!isDragging) return;
     setIsDragging(false);
     if (!isSliderSuccess) {
-      // Snap back if incomplete
       setSliderPosition(0);
       onVerify(false);
     }
   }, [isDragging, isSliderSuccess, onVerify]);
 
-  // Global listeners for mouse move / mouse up during slider drag
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => handleDragMove(e.clientX);
     const onMouseUp = () => handleDragEnd();
@@ -221,7 +215,6 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     };
   }, [isDragging, handleDragMove, handleDragEnd]);
 
-  // Reset slider when mode changes
   const toggleMode = (newMode: CaptchaMode) => {
     setMode(newMode);
     setUserInput('');
@@ -232,105 +225,141 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
 
   return (
     <div 
-      className="flex flex-col gap-2 p-3 rounded-xl border transition-all"
       style={{
+        padding: '10px 12px',
+        borderRadius: '12px',
         backgroundColor: isVerified ? '#f0fdf4' : '#f8fafc',
-        borderColor: isVerified ? '#86efac' : error ? '#fca5a5' : '#e2e8f0',
-        boxShadow: isVerified ? '0 0 0 1px #86efac' : 'none'
+        border: `1px solid ${isVerified ? '#86efac' : error ? '#fca5a5' : '#e2e8f0'}`,
+        transition: 'all 0.2s ease',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '8px'
       }}
     >
       {/* Header bar: Title & Mode Switcher */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <ShieldCheck size={16} className={isVerified ? 'text-emerald-600' : 'text-slate-500'} />
-          <span style={{ fontSize: '12px', fontWeight: 600, color: isVerified ? '#065f46' : '#334155' }}>
-            Verifikasi Keamanan (CAPTCHA)
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <ShieldCheck size={15} color={isVerified ? '#059669' : '#64748b'} />
+          <span style={{ fontSize: '11px', fontWeight: 700, color: isVerified ? '#065f46' : '#334155' }}>
+            Verifikasi Keamanan
           </span>
         </div>
 
         {/* Switch Mode Tabs */}
-        <div className="flex items-center gap-1 bg-slate-200/70 p-0.5 rounded-lg text-[10px]">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', backgroundColor: '#e2e8f0', padding: '2px', borderRadius: '6px' }}>
           <button
             type="button"
             onClick={() => toggleMode('canvas')}
-            className={`px-2 py-0.5 rounded-md font-medium transition-all flex items-center gap-1 ${
-              mode === 'canvas' ? 'bg-white shadow-xs text-emerald-800' : 'text-slate-600 hover:text-slate-900'
-            }`}
-            title="Ketik Kode Gambar"
+            style={{
+              padding: '2px 8px',
+              fontSize: '10px',
+              fontWeight: 600,
+              borderRadius: '4px',
+              backgroundColor: mode === 'canvas' ? '#ffffff' : 'transparent',
+              color: mode === 'canvas' ? '#065f46' : '#64748b',
+              boxShadow: mode === 'canvas' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px'
+            }}
           >
-            <Hash size={11} /> Kode
+            <Hash size={10} /> Kode
           </button>
           <button
             type="button"
             onClick={() => toggleMode('slider')}
-            className={`px-2 py-0.5 rounded-md font-medium transition-all flex items-center gap-1 ${
-              mode === 'slider' ? 'bg-white shadow-xs text-emerald-800' : 'text-slate-600 hover:text-slate-900'
-            }`}
-            title="Geser Tombol Verifikasi"
+            style={{
+              padding: '2px 8px',
+              fontSize: '10px',
+              fontWeight: 600,
+              borderRadius: '4px',
+              backgroundColor: mode === 'slider' ? '#ffffff' : 'transparent',
+              color: mode === 'slider' ? '#065f46' : '#64748b',
+              boxShadow: mode === 'slider' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '3px'
+            }}
           >
-            <Sliders size={11} /> Geser
+            <Sliders size={10} /> Geser
           </button>
         </div>
       </div>
 
       {/* MODE 1: CANVAS ALPHANUMERIC CAPTCHA */}
       {mode === 'canvas' && (
-        <div className="flex flex-col sm:flex-row items-center gap-2.5">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Canvas Box */}
-          <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-slate-200 shadow-xs flex-shrink-0">
+          <div 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '4px', 
+              backgroundColor: '#ffffff', 
+              padding: '3px 4px', 
+              borderRadius: '8px', 
+              border: '1px solid #cbd5e1',
+              flexShrink: 0
+            }}
+          >
             <canvas
               ref={canvasRef}
-              width={140}
-              height={40}
-              className="rounded select-none cursor-pointer"
+              width={125}
+              height={36}
               onClick={handleRefresh}
-              title="Klik gambar untuk menyegarkan kode"
-              style={{ display: 'block', letterSpacing: '4px' }}
+              title="Klik untuk ganti kode"
+              style={{ display: 'block', borderRadius: '4px', cursor: 'pointer' }}
             />
 
-            <div className="flex flex-col gap-0.5 border-l border-slate-200 pl-1">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', borderLeft: '1px solid #e2e8f0', paddingLeft: '4px' }}>
               <button
                 type="button"
                 onClick={handleRefresh}
-                className="p-1 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
-                title="Segarkan Kode CAPTCHA"
-                aria-label="Segarkan Kode CAPTCHA"
+                title="Segarkan Kode"
+                style={{ padding: '3px', color: '#64748b', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <RefreshCw size={13} className={isRotating ? 'animate-spin text-emerald-600' : ''} />
+                <RefreshCw size={12} className={isRotating ? 'animate-spin' : ''} color={isRotating ? '#059669' : '#64748b'} />
               </button>
               <button
                 type="button"
                 onClick={handleAudioSpeak}
-                className="p-1 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-colors"
-                title="Dengarkan Audio Kode"
-                aria-label="Dengarkan Audio Kode"
+                title="Dengarkan Audio"
+                style={{ padding: '3px', color: '#64748b', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
               >
-                <Volume2 size={13} />
+                <Volume2 size={12} />
               </button>
             </div>
           </div>
 
           {/* Input field */}
-          <div className="flex-1 w-full relative">
+          <div style={{ flex: 1, position: 'relative' }}>
             <input
               type="text"
               value={userInput}
               onChange={handleInputChange}
-              placeholder="Ketik 5 huruf di samping"
+              placeholder="5 Karakter"
               maxLength={5}
               autoComplete="off"
               spellCheck="false"
-              className="w-full text-center sm:text-left font-mono font-bold tracking-widest text-sm px-3 py-2 rounded-lg border transition-all uppercase placeholder:normal-case placeholder:font-normal placeholder:tracking-normal placeholder:text-slate-400 focus:outline-none"
               style={{
+                width: '100%',
+                padding: '8px 10px',
+                textAlign: 'center',
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                fontSize: '14px',
+                letterSpacing: '2px',
+                textTransform: 'uppercase',
+                borderRadius: '8px',
+                border: `1px solid ${isVerified ? '#10b981' : userInput.length === 5 ? '#ef4444' : '#cbd5e1'}`,
                 backgroundColor: isVerified ? '#f0fdf4' : '#ffffff',
-                borderColor: isVerified ? '#10b981' : userInput.length === 5 ? '#ef4444' : '#cbd5e1',
-                color: isVerified ? '#065f46' : userInput.length === 5 ? '#b91c1c' : '#0f172a',
-                boxShadow: isVerified ? '0 0 0 2px rgba(16,185,129,0.15)' : 'none'
+                color: isVerified ? '#065f46' : '#0f172a',
+                outline: 'none'
               }}
             />
             {isVerified && (
-              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-emerald-600 flex items-center gap-1">
-                <CheckCircle2 size={16} />
+              <div style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', color: '#059669', display: 'flex' }}>
+                <CheckCircle2 size={15} />
               </div>
             )}
           </div>
@@ -341,31 +370,48 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
       {mode === 'slider' && (
         <div
           ref={sliderTrackRef}
-          className="relative h-11 rounded-xl flex items-center select-none overflow-hidden transition-all"
           style={{
-            backgroundColor: isSliderSuccess ? '#10b981' : '#f1f5f9',
-            border: isSliderSuccess ? '1px solid #059669' : '1px solid #cbd5e1'
+            position: 'relative',
+            height: '40px',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            userSelect: 'none',
+            overflow: 'hidden',
+            backgroundColor: isSliderSuccess ? '#10b981' : '#e2e8f0',
+            border: `1px solid ${isSliderSuccess ? '#059669' : '#cbd5e1'}`
           }}
         >
-          {/* Slider Progress Fill */}
+          {/* Progress Fill */}
           <div
-            className="absolute left-0 top-0 bottom-0 transition-all"
             style={{
-              width: `${sliderPosition + 46}px`,
-              backgroundColor: isSliderSuccess ? '#10b981' : 'rgba(16, 185, 129, 0.18)'
+              position: 'absolute',
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: `${sliderPosition + 44}px`,
+              backgroundColor: isSliderSuccess ? '#10b981' : 'rgba(16, 185, 129, 0.2)'
             }}
           />
 
-          {/* Guide label */}
-          <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold pointer-events-none transition-opacity"
+          {/* Guide Label */}
+          <div 
             style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '11px',
+              fontWeight: 600,
+              pointerEvents: 'none',
               color: isSliderSuccess ? '#ffffff' : '#64748b',
-              opacity: isDragging ? 0.4 : 1
+              opacity: isDragging ? 0.3 : 1
             }}
           >
             {isSliderSuccess ? (
-              <span className="flex items-center gap-1.5 text-white drop-shadow-xs">
-                <CheckCircle2 size={16} /> Terverifikasi Aman
+              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <CheckCircle2 size={14} /> Terverifikasi Aman
               </span>
             ) : (
               'Geser tombol ke kanan »'
@@ -378,34 +424,43 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
             onTouchStart={(e) => {
               if (e.touches.length > 0) handleDragStart(e.touches[0].clientX);
             }}
-            className="absolute top-1 bottom-1 w-10 rounded-lg flex items-center justify-center cursor-grab active:cursor-grabbing shadow-md transition-shadow"
             style={{
+              position: 'absolute',
+              top: '3px',
+              bottom: '3px',
+              width: '38px',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: isSliderSuccess ? 'default' : 'grab',
               left: `${sliderPosition + 3}px`,
               backgroundColor: isSliderSuccess ? '#ffffff' : '#059669',
               color: isSliderSuccess ? '#059669' : '#ffffff',
-              transition: isDragging ? 'none' : 'left 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+              boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+              transition: isDragging ? 'none' : 'left 0.2s ease'
             }}
           >
             {isSliderSuccess ? (
-              <CheckCircle2 size={18} className="text-emerald-600" />
+              <CheckCircle2 size={16} />
             ) : (
-              <ShieldCheck size={18} />
+              <ShieldCheck size={16} />
             )}
           </div>
         </div>
       )}
 
-      {/* Verification status label or Error */}
-      <div className="flex items-center justify-between text-[11px]">
+      {/* Status or Error Message */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
         {error ? (
-          <span className="text-rose-600 font-medium">{error}</span>
+          <span style={{ color: '#dc2626', fontWeight: 600 }}>{error}</span>
         ) : isVerified ? (
-          <span className="text-emerald-700 font-medium flex items-center gap-1">
-            <CheckCircle2 size={12} /> Verifikasi pengguna terkonfirmasi
+          <span style={{ color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <CheckCircle2 size={11} /> Berhasil diverifikasi
           </span>
         ) : (
-          <span className="text-slate-500">
-            {mode === 'canvas' ? 'Masukkan kode di atas untuk membuktikan Anda bukan robot.' : 'Geser penggeser hingga ujung kanan untuk verifikasi.'}
+          <span style={{ color: '#64748b' }}>
+            {mode === 'canvas' ? 'Masukkan 5 kode huruf/angka di atas' : 'Tarik tuas hingga ujung kanan'}
           </span>
         )}
       </div>
