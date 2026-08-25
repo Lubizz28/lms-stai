@@ -19,7 +19,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 import { Modal } from '../components/ui/Modal';
 import { useAuth } from '../context/AuthContext';
 import { REGISTERED_USERS } from '../services/authService';
@@ -110,176 +109,79 @@ export const LoginPage: React.FC = () => {
   );
 
   return (
-    <div 
-      style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '16px',
-        backgroundColor: '#f8fafc',
-        backgroundImage: 'radial-gradient(ellipse at 50% 0%, #ecfdf5 0%, #f8fafc 70%, #f1f5f9 100%)'
-      }}
-    >
-      {/* Outer Shell Card - Proportional & Compact */}
-      <div 
-        style={{
-          width: '100%',
-          maxWidth: '760px',
-          borderRadius: '16px',
-          backgroundColor: '#ffffff',
-          boxShadow: '0 20px 40px -15px rgba(6, 78, 59, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.06)',
-          overflow: 'hidden',
-          display: 'flex',
-          flexDirection: 'column'
-        }}
-      >
-        <div style={{ display: 'flex', width: '100%' }}>
+    <div className="min-h-screen flex items-center justify-center p-4 bg-slate-50 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-50 via-slate-50 to-slate-100">
+      
+      {/* Outer Shell Card - Pixel Perfect & Modern */}
+      <div className="w-full max-w-[780px] bg-white rounded-2xl shadow-xl shadow-emerald-950/5 border border-slate-200/80 overflow-hidden flex flex-col">
+        <div className="flex w-full min-h-[490px]">
           
           {/* ========================================================================= */}
           {/* LEFT HERO PANEL (Desktop >= 768px) */}
           {/* ========================================================================= */}
-          <div 
-            className="hidden md:flex"
-            style={{
-              flex: '0 0 38%',
-              background: 'linear-gradient(155deg, #064e3b 0%, #065f46 55%, #047857 100%)',
-              padding: '28px 22px',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              position: 'relative',
-              overflow: 'hidden',
-              color: '#ffffff'
-            }}
-          >
-            {/* Ambient Lighting */}
-            <div 
-              style={{
-                position: 'absolute',
-                right: '-30px',
-                top: '-30px',
-                width: '140px',
-                height: '140px',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(52, 211, 153, 0.25) 0%, transparent 70%)',
-                pointerEvents: 'none'
-              }}
-            />
+          <div className="hidden md:flex flex-col justify-between relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-700 text-white p-7 w-[38%] shrink-0">
+            {/* Ambient Background Accents */}
+            <div className="absolute -right-8 -top-8 w-36 h-36 rounded-full bg-emerald-400/20 blur-2xl pointer-events-none" />
+            <div className="absolute -left-8 -bottom-8 w-36 h-36 rounded-full bg-emerald-300/15 blur-2xl pointer-events-none" />
 
-            <div style={{ position: 'relative', zIndex: 2 }}>
+            <div className="relative z-10">
               {/* Brand Top Header */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '18px' }}>
-                <div 
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '10px',
-                    backgroundColor: '#ffffff',
-                    padding: '5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
-                    flexShrink: 0
-                  }}
-                >
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-11 h-11 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-md shrink-0">
                   <img 
                     src="/logo.png" 
                     alt="Logo STAI AL-ITTIHAD" 
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div>
-                  <span style={{ fontSize: '9px', fontWeight: 800, letterSpacing: '0.8px', textTransform: 'uppercase', color: '#a7f3d0' }}>
+                  <span className="text-[9px] font-extrabold tracking-wider uppercase text-emerald-300 block">
                     PORTAL AKADEMIK RESMI
                   </span>
-                  <h1 style={{ fontSize: '18px', fontWeight: 800, color: '#ffffff', lineHeight: 1.1, margin: 0 }}>
+                  <h1 className="text-lg font-extrabold text-white leading-tight">
                     SALAM LMS
                   </h1>
                 </div>
               </div>
 
-              <h2 style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', lineHeight: 1.35, margin: '0 0 6px 0' }}>
+              <h2 className="text-sm font-bold text-white leading-snug mb-1.5">
                 STAI AL-ITTIHAD CIANJUR
               </h2>
-              <p style={{ fontSize: '11px', color: '#d1fae5', lineHeight: 1.45, margin: '0 0 16px 0' }}>
-                Layanan akademik digital, perkuliahan interaktif, evaluasi CBT, dan transkrip digital terintegrasi.
+              <p className="text-xs text-emerald-100/90 leading-relaxed mb-5">
+                Layanan akademik digital, perkuliahan interaktif, evaluasi CBT, dan transkrip mahasiswa terintegrasi.
               </p>
 
               {/* Value Highlights */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div 
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 10px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)'
-                  }}
-                >
-                  <GraduationCap size={15} color="#6ee7b7" style={{ flexShrink: 0 }} />
+              <div className="flex flex-col gap-2.5">
+                <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white/10 border border-white/10 backdrop-blur-sm">
+                  <GraduationCap size={15} className="text-emerald-300 shrink-0" />
                   <div>
-                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#ffffff' }}>Akademik & KRS</div>
-                    <div style={{ fontSize: '9.5px', color: '#a7f3d0' }}>Perwalian PA & KHS online.</div>
+                    <div className="text-xs font-bold text-white">Akademik & KRS</div>
+                    <div className="text-[10px] text-emerald-200">Perwalian PA & KHS online.</div>
                   </div>
                 </div>
 
-                <div 
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 10px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)'
-                  }}
-                >
-                  <ShieldCheck size={15} color="#6ee7b7" style={{ flexShrink: 0 }} />
+                <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white/10 border border-white/10 backdrop-blur-sm">
+                  <ShieldCheck size={15} className="text-emerald-300 shrink-0" />
                   <div>
-                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#ffffff' }}>CBT & Bank Soal</div>
-                    <div style={{ fontSize: '9.5px', color: '#a7f3d0' }}>Ujian daring terproteksi.</div>
+                    <div className="text-xs font-bold text-white">CBT & Bank Soal</div>
+                    <div className="text-[10px] text-emerald-200">Ujian daring terproteksi.</div>
                   </div>
                 </div>
 
-                <div 
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 10px',
-                    borderRadius: '8px',
-                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                    border: '1px solid rgba(255, 255, 255, 0.12)'
-                  }}
-                >
-                  <BookOpen size={15} color="#6ee7b7" style={{ flexShrink: 0 }} />
+                <div className="flex items-center gap-2.5 p-2 rounded-lg bg-white/10 border border-white/10 backdrop-blur-sm">
+                  <BookOpen size={15} className="text-emerald-300 shrink-0" />
                   <div>
-                    <div style={{ fontSize: '10.5px', fontWeight: 700, color: '#ffffff' }}>E-Modul & Turats</div>
-                    <div style={{ fontSize: '9.5px', color: '#a7f3d0' }}>Materi kuliah interaktif.</div>
+                    <div className="text-xs font-bold text-white">E-Modul & Turats</div>
+                    <div className="text-[10px] text-emerald-200">Materi kuliah interaktif.</div>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Bottom Footer Info */}
-            <div 
-              style={{
-                position: 'relative',
-                zIndex: 2,
-                paddingTop: '12px',
-                borderTop: '1px solid rgba(255, 255, 255, 0.15)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: '10px',
-                color: '#a7f3d0'
-              }}
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-                <Sparkles size={11} color="#6ee7b7" /> TA 2026/2027 Ganjil
+            <div className="relative z-10 pt-3 border-t border-white/15 flex items-center justify-between text-[10px] text-emerald-200">
+              <span className="flex items-center gap-1 font-medium">
+                <Sparkles size={11} className="text-emerald-300" /> TA 2026/2027 Ganjil
               </span>
               <span>Terakreditasi BAN-PT</span>
             </div>
@@ -288,102 +190,46 @@ export const LoginPage: React.FC = () => {
           {/* ========================================================================= */}
           {/* RIGHT FORM PANEL (Desktop & Mobile Unified) */}
           {/* ========================================================================= */}
-          <div 
-            style={{
-              flex: '1 1 auto',
-              padding: '24px 22px sm:28px 26px',
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'space-between',
-              backgroundColor: '#ffffff'
-            }}
-          >
+          <div className="flex-1 bg-white p-6 sm:p-7 flex flex-col justify-between">
             <div>
               {/* Mobile Compact Header (Hidden on Desktop >= 768px) */}
               <div className="flex md:hidden flex-col items-center text-center mb-4">
-                <div 
-                  style={{
-                    width: '46px',
-                    height: '46px',
-                    borderRadius: '12px',
-                    backgroundColor: '#ffffff',
-                    padding: '5px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                    border: '1px solid #e2e8f0',
-                    marginBottom: '6px'
-                  }}
-                >
+                <div className="w-12 h-12 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-sm border border-slate-200 mb-1.5">
                   <img 
                     src="/logo.png" 
                     alt="Logo STAI AL-ITTIHAD" 
-                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                    className="w-full h-full object-contain"
                   />
                 </div>
-                <h1 style={{ fontSize: '16px', fontWeight: 800, color: '#065f46', margin: 0 }}>
+                <h1 className="text-base font-bold text-emerald-900">
                   SALAM LMS
                 </h1>
-                <p style={{ fontSize: '10.5px', color: '#64748b', margin: 0 }}>
+                <p className="text-[11px] text-gray-500">
                   STAI AL-ITTIHAD CIANJUR
                 </p>
               </div>
 
-              {/* Segmented Tab Switcher with Clear Visual Emphasis & Border-Bottom */}
-              <div 
-                style={{
-                  display: 'flex',
-                  backgroundColor: '#f1f5f9',
-                  padding: '3px',
-                  borderRadius: '10px',
-                  marginBottom: '16px',
-                  border: '1px solid #e2e8f0'
-                }}
-              >
+              {/* 1. Navigasi Tab (Modern Segmented Control Style) */}
+              <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200/80 mb-5">
                 <button
                   type="button"
                   onClick={() => setActiveTab('form')}
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                    fontWeight: activeTab === 'form' ? 700 : 500,
-                    borderRadius: '7px',
-                    backgroundColor: activeTab === 'form' ? '#ffffff' : 'transparent',
-                    color: activeTab === 'form' ? '#065f46' : '#64748b',
-                    borderBottom: activeTab === 'form' ? '2px solid #059669' : '2px solid transparent',
-                    boxShadow: activeTab === 'form' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '5px',
-                    transition: 'all 0.15s ease',
-                    minHeight: '36px'
-                  }}
+                  className={`flex-1 py-2 px-3 text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                    activeTab === 'form'
+                      ? 'bg-white text-emerald-700 font-semibold shadow-sm'
+                      : 'text-slate-500 font-medium hover:text-slate-700 bg-transparent'
+                  }`}
                 >
                   <LogIn size={14} /> Masuk Akun
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveTab('accounts')}
-                  style={{
-                    flex: 1,
-                    padding: '8px 12px',
-                    fontSize: '12px',
-                    fontWeight: activeTab === 'accounts' ? 700 : 500,
-                    borderRadius: '7px',
-                    backgroundColor: activeTab === 'accounts' ? '#ffffff' : 'transparent',
-                    color: activeTab === 'accounts' ? '#065f46' : '#64748b',
-                    borderBottom: activeTab === 'accounts' ? '2px solid #059669' : '2px solid transparent',
-                    boxShadow: activeTab === 'accounts' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '5px',
-                    transition: 'all 0.15s ease',
-                    minHeight: '36px'
-                  }}
+                  className={`flex-1 py-2 px-3 text-xs rounded-lg flex items-center justify-center gap-1.5 transition-all ${
+                    activeTab === 'accounts'
+                      ? 'bg-white text-emerald-700 font-semibold shadow-sm'
+                      : 'text-slate-500 font-medium hover:text-slate-700 bg-transparent'
+                  }`}
                 >
                   <UserCheck size={14} /> Panduan Akun ({REGISTERED_USERS.length})
                 </button>
@@ -391,52 +237,38 @@ export const LoginPage: React.FC = () => {
 
               {/* TAB 1: FORMULIR MASUK */}
               {activeTab === 'form' ? (
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3.5">
                   
-                  {/* Form Heading & Badge */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '8px', borderBottom: '1px solid #f1f5f9', marginBottom: '14px' }}>
+                  {/* 2. Hierarki Tipografi & Header Form */}
+                  <div className="flex justify-between items-center pb-2.5 border-b border-slate-100">
                     <div>
-                      <h3 style={{ fontSize: '15px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                      <h3 className="text-lg sm:text-xl font-bold text-gray-800 leading-tight">
                         Masuk ke Akun Anda
                       </h3>
-                      <p style={{ fontSize: '11px', color: '#64748b', margin: 0 }}>
+                      <p className="text-xs text-gray-500 mt-0.5">
                         Masukkan identitas akademik resmi
                       </p>
                     </div>
-                    <Badge variant="success" style={{ fontSize: '9.5px', padding: '2px 7px' }}>
+                    <span className="px-2.5 py-1 text-[11px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/70 rounded-full shrink-0">
                       2026/2027 Ganjil
-                    </Badge>
+                    </span>
                   </div>
 
                   {/* Error Notification */}
                   {errorMessage && (
-                    <div 
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '6px',
-                        padding: '9px 12px',
-                        borderRadius: '8px',
-                        backgroundColor: '#fef2f2',
-                        border: '1px solid #fecaca',
-                        color: '#991b1b',
-                        fontSize: '11px',
-                        fontWeight: 500,
-                        marginBottom: '14px'
-                      }}
-                    >
-                      <AlertCircle size={15} color="#dc2626" style={{ flexShrink: 0, marginTop: '1px' }} />
+                    <div className="flex items-start gap-2 p-2.5 rounded-lg bg-red-50 border border-red-200 text-red-800 text-xs font-medium">
+                      <AlertCircle size={15} className="text-red-600 shrink-0 mt-0.5" />
                       <span>{errorMessage}</span>
                     </div>
                   )}
 
-                  {/* Input Identifier (Uniform 42px Height) */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '14px' }}>
-                    <label style={{ fontSize: '11.5px', fontWeight: 600, color: '#334155' }}>
+                  {/* 3. Input Identifier (NIM/Email) */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
                       NIM / NIDN / NIP / Email
                     </label>
-                    <div style={{ position: 'relative' }}>
-                      <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none flex items-center">
                         <User size={15} />
                       </div>
                       <input
@@ -446,48 +278,27 @@ export const LoginPage: React.FC = () => {
                         onChange={(e) => setIdentifier(e.target.value)}
                         autoComplete="username"
                         required
-                        style={{
-                          width: '100%',
-                          height: '42px',
-                          padding: '0 14px 0 38px',
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          borderRadius: '8px',
-                          border: '1px solid #cbd5e1',
-                          backgroundColor: '#ffffff',
-                          color: '#0f172a',
-                          outline: 'none',
-                          boxSizing: 'border-box',
-                          transition: 'border-color 0.2s, box-shadow 0.2s'
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = '#059669';
-                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.12)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = '#cbd5e1';
-                          e.target.style.boxShadow = 'none';
-                        }}
+                        className="w-full h-10 pl-9 pr-3 text-xs text-gray-800 placeholder:text-gray-400 bg-white border border-gray-300 rounded-lg outline-none transition-all focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-left"
                       />
                     </div>
                   </div>
 
-                  {/* Input Kata Sandi (Uniform 42px Height & Centered Eye Icon) */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '14px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label style={{ fontSize: '11.5px', fontWeight: 600, color: '#334155' }}>
+                  {/* 3. Input Kata Sandi & Lupa Sandi Link */}
+                  <div>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="text-xs font-medium text-gray-700">
                         Kata Sandi
                       </label>
                       <button
                         type="button"
                         onClick={() => setIsHelpModalOpen(true)}
-                        style={{ fontSize: '11px', fontWeight: 600, color: '#047857', display: 'flex', alignItems: 'center', gap: '3px' }}
+                        className="text-xs font-medium text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition-colors"
                       >
                         <HelpCircle size={11} /> Lupa Sandi?
                       </button>
                     </div>
-                    <div style={{ position: 'relative' }}>
-                      <div style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', display: 'flex', pointerEvents: 'none' }}>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none flex items-center">
                         <Lock size={15} />
                       </div>
                       <input
@@ -497,67 +308,22 @@ export const LoginPage: React.FC = () => {
                         onChange={(e) => setKataSandi(e.target.value)}
                         autoComplete="current-password"
                         required
-                        style={{
-                          width: '100%',
-                          height: '42px',
-                          padding: '0 40px 0 38px',
-                          fontSize: '13px',
-                          fontWeight: 500,
-                          borderRadius: '8px',
-                          border: '1px solid #cbd5e1',
-                          backgroundColor: '#ffffff',
-                          color: '#0f172a',
-                          outline: 'none',
-                          boxSizing: 'border-box',
-                          transition: 'border-color 0.2s, box-shadow 0.2s'
-                        }}
-                        onFocus={(e) => {
-                          e.target.style.borderColor = '#059669';
-                          e.target.style.boxShadow = '0 0 0 3px rgba(5, 150, 105, 0.12)';
-                        }}
-                        onBlur={(e) => {
-                          e.target.style.borderColor = '#cbd5e1';
-                          e.target.style.boxShadow = 'none';
-                        }}
+                        className="w-full h-10 pl-9 pr-10 text-xs text-gray-800 placeholder:text-gray-400 bg-white border border-gray-300 rounded-lg outline-none transition-all focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-left"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        style={{
-                          position: 'absolute',
-                          right: '10px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          color: '#94a3b8',
-                          padding: '6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '4px'
-                        }}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded transition-colors"
                         title={showPassword ? 'Sembunyikan' : 'Tampilkan'}
                         tabIndex={-1}
                       >
-                        {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                        {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                       </button>
                     </div>
                   </div>
 
-                  {/* Checkbox Ingat Saya */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', color: '#475569', marginBottom: '14px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        style={{ accentColor: '#059669', width: '14px', height: '14px', borderRadius: '4px' }}
-                      />
-                      <span>Ingat identitas saya</span>
-                    </label>
-                  </div>
-
-                  {/* CAPTCHA Security Section */}
-                  <div style={{ marginBottom: '16px' }}>
+                  {/* 4. Area CAPTCHA (Verifikasi Keamanan) */}
+                  <div>
                     <CaptchaSecurity
                       onVerify={(isValid) => {
                         setIsCaptchaVerified(isValid);
@@ -568,97 +334,93 @@ export const LoginPage: React.FC = () => {
                     />
                   </div>
 
-                  {/* Tombol Utama (Solid Emerald Green & Generous Padding) */}
-                  <Button
+                  {/* 5. Checkbox Ingat Saya */}
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-2 text-xs text-gray-600 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="w-3.5 h-3.5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500/30 accent-emerald-600 cursor-pointer"
+                      />
+                      <span>Ingat identitas saya</span>
+                    </label>
+                  </div>
+
+                  {/* 5. Tombol Utama (Masuk ke Portal) */}
+                  <button
                     type="submit"
-                    variant="primary"
-                    size="lg"
-                    icon={LogIn}
-                    isLoading={isSubmitting}
-                    style={{
-                      width: '100%',
-                      padding: '12px 16px',
-                      borderRadius: '8px',
-                      fontSize: '13.5px',
-                      fontWeight: 700,
-                      backgroundColor: isCaptchaVerified ? '#059669' : '#047857',
-                      color: '#ffffff',
-                      boxShadow: '0 4px 12px rgba(5, 150, 105, 0.25)',
-                      minHeight: '44px'
-                    }}
+                    disabled={isSubmitting}
+                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-semibold text-xs rounded-lg shadow-sm hover:shadow transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed"
                   >
-                    {isSubmitting ? 'Memverifikasi...' : 'Masuk ke Portal'}
-                  </Button>
+                    {isSubmitting ? (
+                      <span>Memverifikasi...</span>
+                    ) : (
+                      <>
+                        <LogIn size={15} />
+                        <span>Masuk ke Portal</span>
+                      </>
+                    )}
+                  </button>
                 </form>
               ) : (
                 /* TAB 2: PANDUAN AKUN AKSES */
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="flex flex-col gap-3">
+                  <div className="flex justify-between items-center">
                     <div>
-                      <h3 style={{ fontSize: '13.5px', fontWeight: 700, color: '#0f172a', margin: 0 }}>
+                      <h3 className="text-sm font-bold text-gray-800">
                         Daftar Akun Pengguna
                       </h3>
-                      <span style={{ fontSize: '11px', color: '#64748b' }}>
-                        Pilih peran untuk simulasi
+                      <span className="text-[11px] text-gray-500">
+                        Pilih peran untuk simulasi akses
                       </span>
                     </div>
-                    <span style={{ fontSize: '10px', backgroundColor: '#ecfdf5', color: '#065f46', padding: '2px 7px', borderRadius: '5px', fontWeight: 700, border: '1px solid #a7f3d0' }}>
+                    <span className="text-[10px] bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded font-semibold">
                       Sandi: salam123
                     </span>
                   </div>
 
                   {/* Search Bar */}
-                  <div style={{ position: 'relative' }}>
-                    <Search size={13} color="#94a3b8" style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <div className="relative">
+                    <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Cari nama, NIM, atau peran..."
                       value={searchAccount}
                       onChange={(e) => setSearchAccount(e.target.value)}
-                      style={{
-                        width: '100%',
-                        height: '36px',
-                        padding: '0 10px 0 30px',
-                        fontSize: '11.5px',
-                        borderRadius: '8px',
-                        border: '1px solid #cbd5e1',
-                        outline: 'none',
-                        boxSizing: 'border-box'
-                      }}
+                      className="w-full h-9 pl-8 pr-3 text-xs bg-white border border-gray-300 rounded-lg outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 text-left placeholder:text-gray-400"
                     />
                   </div>
 
                   {/* List Container */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', maxHeight: '270px', overflowY: 'auto', paddingRight: '2px' }}>
+                  <div className="flex flex-col gap-1.5 max-h-[260px] overflow-y-auto pr-1">
                     {filteredAccounts.length === 0 ? (
-                      <div style={{ textAlign: 'center', padding: '20px 0', fontSize: '11px', color: '#94a3b8' }}>
+                      <div className="text-center py-5 text-xs text-gray-400">
                         Tidak ditemukan akun yang cocok.
                       </div>
                     ) : (
                       filteredAccounts.map((u) => (
                         <div
                           key={u.id}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'space-between',
-                            padding: '8px 10px',
-                            borderRadius: '8px',
-                            backgroundColor: '#f8fafc',
-                            border: '1px solid #e2e8f0'
-                          }}
+                          className="flex items-center justify-between p-2 rounded-lg bg-slate-50 border border-slate-200/80 hover:bg-slate-100/80 transition-colors"
                         >
-                          <div style={{ minWidth: 0, flex: 1, paddingRight: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                              <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#0f172a', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          <div className="min-w-0 flex-1 pr-2">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-xs font-semibold text-gray-800 truncate">
                                 {u.name}
                               </span>
-                              <Badge variant={u.role === 'mahasiswa' ? 'primary' : u.role === 'dosen' ? 'success' : 'warning'} style={{ fontSize: '9px', padding: '1px 5px' }}>
+                              <span className={`text-[9px] font-semibold px-1.5 py-0.5 rounded ${
+                                u.role === 'mahasiswa' 
+                                  ? 'bg-blue-50 text-blue-700 border border-blue-200' 
+                                  : u.role === 'dosen' 
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
+                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}>
                                 {u.roleLabel}
-                              </Badge>
+                              </span>
                             </div>
-                            <div style={{ fontSize: '10px', color: '#64748b', fontFamily: 'monospace' }}>
-                              Username: <strong style={{ color: '#059669' }}>{u.username}</strong>
+                            <div className="text-[10px] text-gray-500 font-mono">
+                              Username: <strong className="text-emerald-700">{u.username}</strong>
                             </div>
                           </div>
 
@@ -666,9 +428,9 @@ export const LoginPage: React.FC = () => {
                             variant="secondary"
                             size="sm"
                             onClick={() => handleSelectAccount(u)}
-                            style={{ fontSize: '10.5px', padding: '5px 10px', flexShrink: 0, borderRadius: '6px' }}
+                            className="text-[10px] py-1 px-2.5 rounded-md shrink-0"
                           >
-                            Pilih <ArrowRight size={10} style={{ marginLeft: '2px' }} />
+                            Pilih <ArrowRight size={10} className="ml-0.5" />
                           </Button>
                         </div>
                       ))
@@ -679,23 +441,12 @@ export const LoginPage: React.FC = () => {
             </div>
 
             {/* Footer */}
-            <div 
-              style={{
-                paddingTop: '14px',
-                borderTop: '1px solid #f1f5f9',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                fontSize: '11px',
-                color: '#64748b',
-                marginTop: '14px'
-              }}
-            >
+            <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between text-[11px] text-gray-500 mt-3.5">
               <span>© 2026 STAI AL-ITTIHAD</span>
               <button
                 type="button"
                 onClick={() => setIsHelpModalOpen(true)}
-                style={{ color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '3px' }}
+                className="text-emerald-700 font-semibold hover:text-emerald-800 flex items-center gap-1 transition-colors"
               >
                 <HelpCircle size={12} /> Bantuan
               </button>
@@ -718,48 +469,38 @@ export const LoginPage: React.FC = () => {
           </Button>
         }
       >
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '11px', color: '#334155' }}>
-          <div 
-            style={{
-              padding: '8px 10px',
-              borderRadius: '8px',
-              backgroundColor: '#ecfdf5',
-              border: '1px solid #a7f3d0',
-              color: '#065f46',
-              display: 'flex',
-              gap: '6px'
-            }}
-          >
-            <Info size={15} color="#059669" style={{ flexShrink: 0, marginTop: '1px' }} />
+        <div className="flex flex-col gap-2.5 text-xs text-gray-700">
+          <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 flex gap-2">
+            <Info size={16} className="text-emerald-600 shrink-0 mt-0.5" />
             <div>
-              <div style={{ fontWeight: 700, marginBottom: '1px' }}>Lupa Kata Sandi Akun?</div>
-              <div style={{ fontSize: '10.5px', lineHeight: 1.35 }}>
+              <div className="font-bold mb-0.5">Lupa Kata Sandi Akun?</div>
+              <div className="text-[11px] leading-relaxed text-emerald-800">
                 Pemulihan kata sandi resmi dilakukan melalui verifikasi Bagian Akademik (BAAK) atau Tim IT PTIPD.
               </div>
             </div>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-            <div style={{ fontWeight: 700, color: '#0f172a' }}>Kontak Resmi:</div>
+          <div className="flex flex-col gap-1.5">
+            <div className="font-semibold text-gray-900">Kontak Resmi:</div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
-              <Phone size={14} color="#059669" />
+            <div className="flex items-center gap-2.5 p-2 rounded-lg border border-gray-200 bg-slate-50">
+              <Phone size={15} className="text-emerald-600 shrink-0" />
               <div>
-                <div style={{ fontWeight: 600, color: '#0f172a' }}>WhatsApp BAAK STAI</div>
-                <div style={{ color: '#64748b', fontSize: '10px' }}>+62 812-3456-7890 (08.00 - 16.00 WIB)</div>
+                <div className="font-medium text-gray-900">WhatsApp BAAK STAI</div>
+                <div className="text-gray-500 text-[10px]">+62 812-3456-7890 (08.00 - 16.00 WIB)</div>
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px', borderRadius: '6px', border: '1px solid #e2e8f0', backgroundColor: '#f8fafc' }}>
-              <Mail size={14} color="#059669" />
+            <div className="flex items-center gap-2.5 p-2 rounded-lg border border-gray-200 bg-slate-50">
+              <Mail size={15} className="text-emerald-600 shrink-0" />
               <div>
-                <div style={{ fontWeight: 600, color: '#0f172a' }}>Email Tim IT (PTIPD)</div>
-                <div style={{ color: '#64748b', fontSize: '10px' }}>ptipd@staialittihad.ac.id</div>
+                <div className="font-medium text-gray-900">Email Tim IT (PTIPD)</div>
+                <div className="text-gray-500 text-[10px]">ptipd@staialittihad.ac.id</div>
               </div>
             </div>
           </div>
 
-          <div style={{ padding: '6px 8px', borderRadius: '6px', backgroundColor: '#f1f5f9', fontSize: '10px', color: '#64748b' }}>
+          <div className="p-2 rounded-lg bg-slate-100 text-[10px] text-gray-600">
             <strong>Demo / Evaluasi:</strong> Gunakan sandi default <strong>salam123</strong> untuk akun pada tab "Panduan Akun".
           </div>
         </div>

@@ -50,7 +50,7 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, width, height);
 
-    // Noise lines
+    // Subtle noise lines
     for (let i = 0; i < 2; i++) {
       ctx.strokeStyle = `rgba(16, 185, 129, ${0.25 + Math.random() * 0.2})`;
       ctx.lineWidth = 1 + Math.random();
@@ -65,14 +65,14 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
     }
 
     // Noise dots
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 18; i++) {
       ctx.fillStyle = `rgba(5, 150, 105, ${0.2 + Math.random() * 0.25})`;
       ctx.beginPath();
       ctx.arc(Math.random() * width, Math.random() * height, 1 + Math.random(), 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Characters
+    // Distorted Characters
     const colors = ['#065f46', '#047857', '#059669', '#0f766e', '#115e59'];
     const charSpacing = width / (code.length + 0.8);
 
@@ -211,142 +211,96 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
   };
 
   return (
-    <div 
-      style={{
-        padding: '10px 12px',
-        borderRadius: '8px',
-        backgroundColor: isVerified ? '#f0fdf4' : '#f8fafc',
-        border: `1px solid ${isVerified ? '#86efac' : error ? '#fca5a5' : '#e2e8f0'}`,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px'
-      }}
-    >
-      {/* Top Header Row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-          <ShieldCheck size={15} color={isVerified ? '#059669' : '#64748b'} />
-          <span style={{ fontSize: '11px', fontWeight: 600, color: isVerified ? '#065f46' : '#334155' }}>
-            Verifikasi Keamanan (Captcha)
-          </span>
-        </div>
+    <div className="flex flex-col gap-1.5 w-full">
+      {/* Top Header Row (Seamless inside form, no heavy card border) */}
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-medium text-gray-700 flex items-center gap-1.5">
+          <ShieldCheck size={14} className={isVerified ? "text-emerald-600" : "text-gray-400"} />
+          <span>Verifikasi Keamanan</span>
+        </label>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '2px', backgroundColor: '#e2e8f0', padding: '2px', borderRadius: '6px' }}>
+        {/* Small Mode Pill */}
+        <div className="flex items-center gap-0.5 bg-slate-100 p-0.5 rounded-md border border-slate-200/70">
           <button
             type="button"
             onClick={() => toggleMode('canvas')}
-            style={{
-              padding: '2px 8px',
-              fontSize: '10px',
-              fontWeight: 600,
-              borderRadius: '4px',
-              backgroundColor: mode === 'canvas' ? '#ffffff' : 'transparent',
-              color: mode === 'canvas' ? '#065f46' : '#64748b',
-              boxShadow: mode === 'canvas' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '3px'
-            }}
+            className={`px-2 py-0.5 text-[10px] font-medium rounded transition-all flex items-center gap-1 ${
+              mode === 'canvas'
+                ? 'bg-white text-emerald-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
           >
             <Hash size={10} /> Kode
           </button>
           <button
             type="button"
             onClick={() => toggleMode('slider')}
-            style={{
-              padding: '2px 8px',
-              fontSize: '10px',
-              fontWeight: 600,
-              borderRadius: '4px',
-              backgroundColor: mode === 'slider' ? '#ffffff' : 'transparent',
-              color: mode === 'slider' ? '#065f46' : '#64748b',
-              boxShadow: mode === 'slider' ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '3px'
-            }}
+            className={`px-2 py-0.5 text-[10px] font-medium rounded transition-all flex items-center gap-1 ${
+              mode === 'slider'
+                ? 'bg-white text-emerald-700 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
           >
             <Sliders size={10} /> Geser
           </button>
         </div>
       </div>
 
-      {/* Mode 1: Canvas Alphanumeric in One Row with Flexbox */}
+      {/* Mode 1: Canvas Alphanumeric in Single Clean Row */}
       {mode === 'canvas' && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
-          {/* Canvas Box */}
-          <div 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              backgroundColor: '#ffffff', 
-              borderRadius: '8px', 
-              border: '1px solid #cbd5e1',
-              height: '40px',
-              padding: '0 4px',
-              flexShrink: 0
-            }}
-          >
+        <div className="flex items-center gap-2 w-full">
+          {/* Canvas Box + Action Buttons */}
+          <div className="flex items-center bg-white rounded-lg border border-gray-300 h-10 px-1 shrink-0 overflow-hidden">
             <canvas
               ref={canvasRef}
               width={112}
               height={32}
               onClick={handleRefresh}
-              title="Klik gambar untuk menyegarkan kode"
-              style={{ display: 'block', borderRadius: '4px', cursor: 'pointer' }}
+              title="Klik gambar untuk mengganti kode"
+              className="block rounded cursor-pointer"
             />
 
-            {/* Refresh & Audio buttons */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '2px', borderLeft: '1px solid #e2e8f0', paddingLeft: '4px', marginLeft: '4px' }}>
+            {/* Vertical action icons */}
+            <div className="flex flex-col gap-0.5 border-l border-gray-200 pl-1 ml-1">
               <button
                 type="button"
                 onClick={handleRefresh}
-                title="Segarkan Kode Captcha"
-                style={{ padding: '4px', color: '#64748b', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Segarkan Kode"
+                className="p-1 text-gray-400 hover:text-emerald-600 hover:bg-slate-100 rounded transition-colors"
               >
-                <RefreshCw size={13} className={isRotating ? 'animate-spin' : ''} color={isRotating ? '#059669' : '#64748b'} />
+                <RefreshCw size={11} className={isRotating ? 'animate-spin text-emerald-600' : ''} />
               </button>
               <button
                 type="button"
                 onClick={handleAudioSpeak}
-                title="Dengarkan Audio Kode"
-                style={{ padding: '4px', color: '#64748b', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Dengarkan Audio"
+                className="p-1 text-gray-400 hover:text-emerald-600 hover:bg-slate-100 rounded transition-colors"
               >
-                <Volume2 size={13} />
+                <Volume2 size={11} />
               </button>
             </div>
           </div>
 
-          {/* Input field */}
-          <div style={{ flex: 1, position: 'relative', minWidth: 0 }}>
+          {/* Left-Aligned Input Field */}
+          <div className="flex-1 relative min-w-0">
             <input
               type="text"
               value={userInput}
               onChange={handleInputChange}
-              placeholder="5 Kode"
+              placeholder="5 Kode verifikasi"
               maxLength={5}
               autoComplete="off"
               spellCheck="false"
-              style={{
-                width: '100%',
-                padding: '0 10px',
-                textAlign: 'center',
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                fontSize: '13px',
-                letterSpacing: '2px',
-                textTransform: 'uppercase',
-                borderRadius: '8px',
-                border: `1px solid ${isVerified ? '#10b981' : userInput.length === 5 ? '#ef4444' : '#cbd5e1'}`,
-                backgroundColor: isVerified ? '#f0fdf4' : '#ffffff',
-                color: isVerified ? '#065f46' : '#0f172a',
-                outline: 'none',
-                height: '40px',
-                boxSizing: 'border-box'
-              }}
+              className={`w-full h-10 px-3 text-left font-mono font-semibold text-xs uppercase rounded-lg border outline-none transition-all ${
+                isVerified
+                  ? 'border-emerald-500 bg-emerald-50/50 text-emerald-800 focus:ring-2 focus:ring-emerald-500/20'
+                  : userInput.length === 5
+                  ? 'border-red-400 bg-red-50/30 text-red-700'
+                  : 'border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 placeholder:normal-case placeholder:font-sans focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20'
+              }`}
             />
             {isVerified && (
-              <div style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', color: '#059669', display: 'flex' }}>
+              <div className="absolute right-2.5 top-1/2 -translate-y-1/2 text-emerald-600 pointer-events-none">
                 <CheckCircle2 size={15} />
               </div>
             )}
@@ -358,45 +312,26 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
       {mode === 'slider' && (
         <div
           ref={sliderTrackRef}
-          style={{
-            position: 'relative',
-            height: '40px',
-            borderRadius: '8px',
-            display: 'flex',
-            alignItems: 'center',
-            userSelect: 'none',
-            overflow: 'hidden',
-            backgroundColor: isSliderSuccess ? '#10b981' : '#f1f5f9',
-            border: `1px solid ${isSliderSuccess ? '#059669' : '#cbd5e1'}`
-          }}
+          className={`relative h-10 rounded-lg flex items-center select-none overflow-hidden border transition-all ${
+            isSliderSuccess
+              ? 'bg-emerald-500 border-emerald-600'
+              : 'bg-slate-100 border-gray-300'
+          }`}
         >
           <div
-            style={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: `${sliderPosition + 40}px`,
-              backgroundColor: isSliderSuccess ? '#10b981' : 'rgba(16, 185, 129, 0.2)'
-            }}
+            style={{ width: `${sliderPosition + 40}px` }}
+            className={`absolute left-0 top-0 bottom-0 ${
+              isSliderSuccess ? 'bg-emerald-500' : 'bg-emerald-100/60'
+            }`}
           />
 
           <div 
-            style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '11px',
-              fontWeight: 600,
-              pointerEvents: 'none',
-              color: isSliderSuccess ? '#ffffff' : '#64748b',
-              opacity: isDragging ? 0.3 : 1
-            }}
+            className={`absolute inset-0 flex items-center justify-center text-xs font-medium pointer-events-none ${
+              isSliderSuccess ? 'text-white' : 'text-gray-500'
+            } ${isDragging ? 'opacity-30' : 'opacity-100'}`}
           >
             {isSliderSuccess ? (
-              <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <span className="flex items-center gap-1.5 font-semibold">
                 <CheckCircle2 size={14} /> Terverifikasi Aman
               </span>
             ) : (
@@ -409,46 +344,26 @@ export const CaptchaSecurity: React.FC<CaptchaSecurityProps> = ({
             onTouchStart={(e) => {
               if (e.touches.length > 0) handleDragStart(e.touches[0].clientX);
             }}
-            style={{
-              position: 'absolute',
-              top: '3px',
-              bottom: '3px',
-              width: '36px',
-              borderRadius: '6px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: isSliderSuccess ? 'default' : 'grab',
-              left: `${sliderPosition + 3}px`,
-              backgroundColor: isSliderSuccess ? '#ffffff' : '#059669',
-              color: isSliderSuccess ? '#059669' : '#ffffff',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.12)',
-              transition: isDragging ? 'none' : 'left 0.2s ease'
-            }}
+            style={{ left: `${sliderPosition + 3}px` }}
+            className={`absolute top-[3px] bottom-[3px] w-9 rounded-md flex items-center justify-center cursor-grab shadow-sm transition-transform ${
+              isSliderSuccess
+                ? 'bg-white text-emerald-600 cursor-default'
+                : 'bg-emerald-600 text-white'
+            }`}
           >
-            {isSliderSuccess ? (
-              <CheckCircle2 size={16} />
-            ) : (
-              <ShieldCheck size={16} />
-            )}
+            {isSliderSuccess ? <CheckCircle2 size={15} /> : <ShieldCheck size={15} />}
           </div>
         </div>
       )}
 
-      {/* Footer Status */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '10px' }}>
-        {error ? (
-          <span style={{ color: '#dc2626', fontWeight: 600 }}>{error}</span>
-        ) : isVerified ? (
-          <span style={{ color: '#059669', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <CheckCircle2 size={12} /> Verifikasi pengguna terkonfirmasi
-          </span>
-        ) : (
-          <span style={{ color: '#64748b' }}>
-            {mode === 'canvas' ? 'Ketik 5 kode di samping untuk verifikasi' : 'Geser tombol hingga ujung kanan'}
-          </span>
-        )}
-      </div>
+      {/* Status or Error Message */}
+      {error ? (
+        <span className="text-[11px] font-medium text-red-600">{error}</span>
+      ) : isVerified ? (
+        <span className="text-[11px] font-medium text-emerald-600 flex items-center gap-1">
+          <CheckCircle2 size={11} /> Verifikasi keamanan berhasil
+        </span>
+      ) : null}
     </div>
   );
 };
