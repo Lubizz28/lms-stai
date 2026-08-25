@@ -26,53 +26,41 @@ import { NavGroup, NavItem } from '../types/navigation';
 import { UserRole } from '../types/roles';
 
 // =========================================================================
-// 1. NAVIGASI KHUSUS MAHASISWA
+// 1. NAVIGASI KHUSUS MAHASISWA (SIMPLIFIED & MODERN LMS UX)
 // =========================================================================
 export const NAVIGATION_MAHASISWA: NavGroup[] = [
   {
-    id: 'beranda-group',
+    id: 'utama-group',
     title: 'UTAMA',
     items: [
-      { id: 'beranda', label: 'Beranda Mahasiswa', path: '/', icon: Home },
+      { id: 'beranda', label: 'Beranda', path: '/', icon: Home },
     ]
   },
   {
-    id: 'pembelajaran-group',
-    title: 'PEMBELAJARAN',
+    id: 'perkuliahan-group',
+    title: 'PERKULIAHAN (LMS)',
     items: [
-      { id: 'mata-kuliah-saya', label: 'Mata Kuliah Saya', path: '/mata-kuliah', icon: BookOpen, badge: '5' },
-      { id: 'presensi-kuliah', label: 'Presensi & Kehadiran', path: '/presensi', icon: QrCode },
-      { id: 'tugas-saya', label: 'Tugas & Asesmen', path: '/tugas', icon: CheckSquare, badge: '2' },
-      { id: 'kuis-ujian', label: 'Kuis & Evaluasi', path: '/kuis', icon: HelpCircle },
-      { id: 'forum-diskusi', label: 'Forum Diskusi', path: '/forum', icon: MessageSquare },
-      { id: 'progres-belajar', label: 'Progres Belajar', path: '/progres', icon: TrendingUp },
+      { id: 'mata-kuliah-saya', label: 'Mata Kuliah', path: '/mata-kuliah', icon: BookOpen, badge: '5' },
+      { id: 'presensi-kuliah', label: 'Presensi Kuliah', path: '/presensi', icon: QrCode },
+      { id: 'tugas-saya', label: 'Tugas Kuliah', path: '/tugas', icon: CheckSquare, badge: '2' },
+      { id: 'kuis-ujian', label: 'Kuis & CBT', path: '/kuis', icon: HelpCircle },
     ]
   },
   {
     id: 'akademik-group',
-    title: 'AKADEMIK',
+    title: 'AKADEMIK (SIAKAD)',
     items: [
       { id: 'jadwal-kuliah', label: 'Jadwal Kuliah', path: '/jadwal', icon: Calendar },
-      { id: 'krs', label: 'Kartu Rencana Studi (KRS)', path: '/krs', icon: FileText },
-      { id: 'khs', label: 'Kartu Hasil Studi (KHS)', path: '/khs', icon: FileSpreadsheet },
-      { id: 'buku-nilai', label: 'Buku Nilai Perkuliahan', path: '/buku-nilai', icon: Award },
+      { id: 'krs', label: 'Rencana Studi (KRS)', path: '/krs', icon: FileText },
+      { id: 'khs', label: 'Hasil Studi & Nilai (KHS)', path: '/khs', icon: FileSpreadsheet },
     ]
   },
   {
-    id: 'informasi-group',
-    title: 'INFORMASI & KOMUNIKASI',
+    id: 'info-akun-group',
+    title: 'INFORMASI & PROFIL',
     items: [
-      { id: 'notifikasi-pusat', label: 'Pusat Notifikasi', path: '/notifikasi', icon: Bell },
-      { id: 'kalender-akademik', label: 'Kalender Akademik', path: '/kalender', icon: Calendar },
-      { id: 'pengumuman', label: 'Pengumuman', path: '/pengumuman', icon: Bell, badge: 'Baru' },
-    ]
-  },
-  {
-    id: 'akun-group',
-    title: 'AKUN',
-    items: [
-      { id: 'profil-saya', label: 'Profil Saya', path: '/profil', icon: User },
-      { id: 'keamanan-akun', label: 'Keamanan Akun', path: '/keamanan', icon: ShieldCheck },
+      { id: 'pengumuman', label: 'Pengumuman Kampus', path: '/pengumuman', icon: Bell, badge: 'Baru' },
+      { id: 'profil-saya', label: 'Profil & KTM Digital', path: '/profil', icon: User },
     ]
   }
 ];
