@@ -502,7 +502,57 @@ class LearningService {
   }
 
   public getMeetingsByClass(classId: string, isStudent = false): CourseMeeting[] {
-    const all = this.getMeetingsData().filter((m) => m.classId === classId);
+    let all = this.getMeetingsData().filter((m) => m.classId === classId);
+    
+    // Jika kelas belum memiliki 16 pertemuan lengkap, generate pertemuan standar 1-16
+    if (all.length < 16) {
+      const fullList = this.getMeetingsData();
+      const standardTopics = [
+        'Kontrak Belajar & Pengantar Silabus RPS',
+        'Kaidah Pokok & Struktur Konsep Dasar',
+        'Sumber Rujukan Primer & Dalil Nash',
+        'Metodologi Analisis Kebahasaan & Istinbath',
+        'Perbandingan Pendekatan Mazhab Fiqih',
+        'Studi Kasus Konseptual & Problematika Kontemporer',
+        'Pendalaman Dalil Sekunder & Kaidah Ijtihad',
+        'Review Materi Paruh Semester & Persiapan UTS',
+        'Evaluasi Tengah Semester (UTS)',
+        'Analisis Formulasi Kaidah Terapan',
+        'Diskusi Kelompok & Presentasi Makalah',
+        'Kajian Naskah Turats & Transformasi Digital',
+        'Studi Lapangan & Implementasi Keilmuan',
+        'Integrasi Keilmuan Islam dan Realitas Sosial',
+        'Review Komprehensif & Refleksi Semester',
+        'Evaluasi Akhir Semester (UAS)'
+      ];
+
+      for (let i = 1; i <= 16; i++) {
+        const existing = all.find(m => m.meetingNumber === i);
+        if (!existing) {
+          const numStr = i < 10 ? `0${i}` : `${i}`;
+          const cleanClassId = classId.replace('cls-', '');
+          const mtgId = classId === 'cls-pai301-a' ? `mtg-pai301a-${numStr}` : `mtg-${cleanClassId}-${numStr}`;
+          
+          const newMtg: CourseMeeting = {
+            id: mtgId,
+            classId,
+            meetingNumber: i,
+            title: `Pertemuan #${i} — ${standardTopics[i - 1]}`,
+            topic: standardTopics[i - 1],
+            description: `Kajian perkuliahan tatap muka dan daring sesi #${i} mengenai ${standardTopics[i - 1]}`,
+            scheduledDate: new Date(Date.now() + (i - 1) * 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            startTime: '08:00',
+            endTime: '10:30',
+            orderIndex: i,
+            status: 'DITERBITKAN',
+            materials: []
+          };
+          fullList.push(newMtg);
+          all.push(newMtg);
+        }
+      }
+      this.saveMeetingsData(fullList);
+    }
     
     // Mahasiswa hanya dapat melihat pertemuan berstatus DITERBITKAN
     if (isStudent) {
