@@ -10,6 +10,7 @@ const BANK_QUESTIONS_KEY = 'salam_bank_questions';
 const ATTEMPTS_STORAGE_KEY = 'salam_quiz_attempts';
 
 export const INITIAL_BANK_QUESTIONS: BankQuestion[] = [
+  // PAI-301: Ushul Fiqih & Qawaid Fiqhiyyah
   {
     id: 'bq-01',
     courseCode: 'PAI-301',
@@ -112,6 +113,204 @@ export const INITIAL_BANK_QUESTIONS: BankQuestion[] = [
     defaultPoints: 40,
     explanation: 'Qiyas menyamakan cabang dengan pokok karena kesamaan \'illat, sedangkan Istihsan berpindah dari qiyas jali ke qiyas khafi karena ada kemaslahatan yang lebih kuat.',
     tags: ['Qiyas', 'Istihsan', 'Ijtihad', 'Esai'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // PAI-204: Ulumul Qur'an & Tafsir Tematik
+  {
+    id: 'bq-uq-01',
+    courseCode: 'PAI-204',
+    topic: 'Asbabun Nuzul',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'MUDAH',
+    questionText: 'Peristiwa atau pertanyaan yang melatarbelakangi turunnya satu atau beberapa ayat Al-Qur\'an secara terminologi disebut:',
+    options: [
+      { id: 'uq-opt-1', text: 'Asbabun Nuzul', isCorrect: true },
+      { id: 'uq-opt-2', text: 'Asbabul Wurud', isCorrect: false },
+      { id: 'uq-opt-3', text: 'Nasikh Mansukh', isCorrect: false },
+      { id: 'uq-opt-4', text: 'Muhkam wa Mutasyabih', isCorrect: false },
+      { id: 'uq-opt-5', text: 'Makkiyyah wa Madaniyyah', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Asbabun nuzul adalah ilmu yang mengkaji latar belakang historis turunnya ayat-ayat Al-Qur\'an.',
+    tags: ['Ulumul Quran', 'Asbabun Nuzul', 'Tafsir'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-uq-02',
+    courseCode: 'PAI-204',
+    topic: 'Karakteristik Surah Makkiyyah & Madaniyyah',
+    type: 'BENAR_SALAH',
+    difficulty: 'SEDANG',
+    questionText: 'Kaidah penetapan surah Makkiyah dan Madaniyah yang muktamad menurut mayoritas ulama tafsir didasarkan pada tempat turunnya ayat, bukan waktu hijrah.',
+    options: [
+      { id: 'uq-opt-2a', text: 'Benar', isCorrect: false },
+      { id: 'uq-opt-2b', text: 'Salah', isCorrect: true },
+    ],
+    defaultPoints: 20,
+    explanation: 'Salah. Pendapat jumhur ulama mendasarkan pembagian Makkiyyah-Madaniyyah pada periode waktu sebelum dan sesudah peristiwa Hijrah Nabi SAW.',
+    tags: ['Makkiyah', 'Madaniyah', 'Kaidah'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // PAI-205: Ulumul Hadits & Kritik Sanad
+  {
+    id: 'bq-uh-01',
+    courseCode: 'PAI-205',
+    topic: 'Kaidah Keshahihan Hadits',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'SEDANG',
+    questionText: 'Berikut adalah lima syarat hadits shahih menurut Imam Ibnu ash-Shalah, KECUALI:',
+    options: [
+      { id: 'uh-opt-1', text: 'Sanad yang bersambung (Ittishal as-Sanad)', isCorrect: false },
+      { id: 'uh-opt-2', text: 'Perawi yang adil (\'Adalah ar-Ruwah)', isCorrect: false },
+      { id: 'uh-opt-3', text: 'Perawi yang dhabith (Dhabth ar-Ruwah)', isCorrect: false },
+      { id: 'uh-opt-4', text: 'Diriwayatkan secara mutawatir oleh lebih dari 10 perawi di tiap thabaqat', isCorrect: true },
+      { id: 'uh-opt-5', text: 'Terhindar dari kejanggalan (Syadz) dan cacat tersembunyi (\'Illat)', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Hadits shahih tidak disyaratkan mutawatir; hadits ahad pun dapat berstatus shahih jika memenuhi 5 kriteria pokok.',
+    tags: ['Ulumul Hadits', 'Syarat Shahih', 'Musthalah'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+  {
+    id: 'bq-uh-02',
+    courseCode: 'PAI-205',
+    topic: 'Takhrij & Kritik Sanad',
+    type: 'ESAI',
+    difficulty: 'SULIT',
+    questionText: 'Uraikan langkah-langkah metodologis dalam melakukan kegiatan Takhrij al-Hadits dari kitab-kitab induk (Kutubut Tis\'ah) hingga penarikan kesimpulan derajat hadits!',
+    essayRubric: 'Kriteria: 1. Identifikasi kata kunci/rawi (25%), 2. Pelacakan matan & sanad (35%), 3. Kritik jarh wa ta\'dil (40%).',
+    defaultPoints: 30,
+    explanation: 'Takhrij mencakup penelusuran sanad, komparasi jalur periwayatan, dan penilaian rawi dengan kaidah Jarh wa Ta\'dil.',
+    tags: ['Takhrij', 'Kritik Sanad', 'Metodologi'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // PAI-302: Pengembangan Kurikulum PAI
+  {
+    id: 'bq-kur-01',
+    courseCode: 'PAI-302',
+    topic: 'Komponen Silabus & RPS',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'MUDAH',
+    questionText: 'Dalam perancangan kurikulum Merdeka dan OBE (Outcome-Based Education), rumusan kemampuan akhir yang diharapkan dicapai mahasiswa pada mata kuliah disebut:',
+    options: [
+      { id: 'kur-opt-1', text: 'Capaian Pembelajaran Mata Kuliah (CPMK)', isCorrect: true },
+      { id: 'kur-opt-2', text: 'Standar Kompetensi Lulusan (SKL)', isCorrect: false },
+      { id: 'kur-opt-3', text: 'Indikator Keberhasilan Kelas', isCorrect: false },
+      { id: 'kur-opt-4', text: 'Alokasi Waktu Pembelajaran', isCorrect: false },
+      { id: 'kur-opt-5', text: 'Rencana Pelaksanaan Pembelajaran (RPP)', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'CPMK merupakan derivasi dari Capaian Pembelajaran Lulusan (CPL) yang dibebankan pada mata kuliah terkait.',
+    tags: ['Kurikulum', 'CPMK', 'OBE'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // PAI-102: Ilmu Pendidikan Islam
+  {
+    id: 'bq-ipi-01',
+    courseCode: 'PAI-102',
+    topic: 'Falsafah Pendidikan Islam',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'SEDANG',
+    questionText: 'Istilah dalam khazanah pendidikan Islam yang berfokus pada penanaman adab, nilai-nilai etika, dan penyucian jiwa secara menyeluruh adalah:',
+    options: [
+      { id: 'ipi-opt-1', text: 'Ta\'dib', isCorrect: true },
+      { id: 'ipi-opt-2', text: 'Ta\'lim', isCorrect: false },
+      { id: 'ipi-opt-3', text: 'Tarbiyah', isCorrect: false },
+      { id: 'ipi-opt-4', text: 'Tadrib', isCorrect: false },
+      { id: 'ipi-opt-5', text: 'Tadris', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Menurut Prof. Dr. Syed Muhammad Naquib Al-Attas, istilah Ta\'dib adalah terminologi yang paling komprehensif menggambarkan hakikat pendidikan Islam yang berporos pada adab.',
+    tags: ['Filsafat PAI', 'Tadib', 'Adab'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // MPI-101: Manajemen Pendidikan Islam
+  {
+    id: 'bq-mpi-01',
+    courseCode: 'MPI-101',
+    topic: 'Fungsi Manajemen POAC',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'MUDAH',
+    questionText: 'Dalam teori manajemen George R. Terry yang diintegrasikan ke dalam lembaga pendidikan Islam, tahapan penentuan tujuan dan perumusan strategi disebut:',
+    options: [
+      { id: 'mpi-opt-1', text: 'Planning (Perencanaan)', isCorrect: true },
+      { id: 'mpi-opt-2', text: 'Organizing (Pengorganisasian)', isCorrect: false },
+      { id: 'mpi-opt-3', text: 'Actuating (Penggerakan)', isCorrect: false },
+      { id: 'mpi-opt-4', text: 'Controlling (Pengawasan)', isCorrect: false },
+      { id: 'mpi-opt-5', text: 'Evaluating (Evaluasi)', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Planning adalah langkah awal fundamental dalam menetapkan visi, misi, sasaran, dan alokasi sumber daya madrasah/pesantren.',
+    tags: ['Manajemen', 'POAC', 'Planning'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // EKS-201: Fiqih Muamalah & Ekonomi Syariah
+  {
+    id: 'bq-eks-01',
+    courseCode: 'EKS-201',
+    topic: 'Akad Tabarru\' & Tijarah',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'SEDANG',
+    questionText: 'Akad kerjasama usaha antara pemilik modal (shahibul mal) dan pengelola dana (mudharib) dengan nisbah bagi hasil yang disepakati sejak awal disebut:',
+    options: [
+      { id: 'eks-opt-1', text: 'Akad Mudharabah', isCorrect: true },
+      { id: 'eks-opt-2', text: 'Akad Musyarakah Mutanaqisah', isCorrect: false },
+      { id: 'eks-opt-3', text: 'Akad Murabahah', isCorrect: false },
+      { id: 'eks-opt-4', text: 'Akad Ijarah Muntahiyah Bittamlik', isCorrect: false },
+      { id: 'eks-opt-5', text: 'Akad Salam', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Mudharabah adalah akad kemitraan di mana modal 100% dari shahibul mal dan keahlian/kerja dari mudharib.',
+    tags: ['Ekonomi Syariah', 'Mudharabah', 'Akad'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // TBI-201: Bahasa Arab Komunikatif & Qira'ah
+  {
+    id: 'bq-tbi-01',
+    courseCode: 'TBI-201',
+    topic: 'Kaidah Nahwu Dasar',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'MUDAH',
+    questionText: 'Isim marfu\' yang terletak di awal kalimat dalam susunan jumlah ismiyyah dinamakan:',
+    arabicText: 'الاسْمُ المَرْفُوعُ العَارِي عَنِ العَوَامِلِ اللَّفْظِيَّةِ',
+    options: [
+      { id: 'tbi-opt-1', text: 'Mubtada\'', isCorrect: true },
+      { id: 'tbi-opt-2', text: 'Khabar', isCorrect: false },
+      { id: 'tbi-opt-3', text: 'Fa\'il', isCorrect: false },
+      { id: 'tbi-opt-4', text: 'Maf\'ul Bih', isCorrect: false },
+      { id: 'tbi-opt-5', text: 'Na\'at', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Mubtada\' adalah isim marfu\' yang terbebas dari amil lafdzi dan menjadi pokok pembicaraan dalam kalimat.',
+    tags: ['Bahasa Arab', 'Nahwu', 'Mubtada'],
+    createdAt: '2026-09-01T08:00:00Z'
+  },
+
+  // TAR-204: Sejarah Peradaban Islam
+  {
+    id: 'bq-tar-01',
+    courseCode: 'TAR-204',
+    topic: 'Khulafaur Rasyidin',
+    type: 'PILIHAN_GANDA',
+    difficulty: 'MUDAH',
+    questionText: 'Khalifah yang menginisiasi standarisasi penulisan mushaf Al-Qur\'an menjadi rasm resmi (Mushaf Utsmani) adalah:',
+    options: [
+      { id: 'tar-opt-1', text: 'Utsman bin Affan r.a.', isCorrect: true },
+      { id: 'tar-opt-2', text: 'Abu Bakar Ash-Shiddiq r.a.', isCorrect: false },
+      { id: 'tar-opt-3', text: 'Umar bin Khattab r.a.', isCorrect: false },
+      { id: 'tar-opt-4', text: 'Ali bin Abi Thalib r.a.', isCorrect: false },
+      { id: 'tar-opt-5', text: 'Muawiyah bin Abi Sufyan', isCorrect: false },
+    ],
+    defaultPoints: 20,
+    explanation: 'Kodifikasi resmi mushaf Al-Qur\'an dengan dialek Quraisy dilakukan pada era Khalifah Utsman bin Affan r.a. untuk menyatukan qiraat umat.',
+    tags: ['Sejarah Islam', 'Khulafaur Rasyidin', 'Kodifikasi'],
     createdAt: '2026-09-01T08:00:00Z'
   }
 ];
